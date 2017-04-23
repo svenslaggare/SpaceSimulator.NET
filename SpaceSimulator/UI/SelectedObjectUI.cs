@@ -83,9 +83,32 @@ namespace SpaceSimulator.UI
                 selectedObjectOrbitPosition = new OrbitPosition(new Orbit(), 0.0);
             }
 
+            var selectedObjectText = OrbitTextInformation.FullInformation(
+                this.SelectedObject.PrimaryBody,
+                this.SelectedObject.State,
+                selectedObjectOrbitPosition,
+                this.SelectedObject);
+
+            var target = this.SelectedObject.Target;
+            if (target != null)
+            {
+                var targetState = target.State;
+                var targetOrbitPosition = OrbitPosition.CalculateOrbitPosition(target);
+
+                selectedObjectText += Environment.NewLine + OrbitTextInformation.TargetInformation(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    this.SelectedObject.State,
+                    selectedObjectOrbitPosition,
+                    target,
+                    target.State,
+                    targetOrbitPosition,
+                    calculateClosestApproach: false);
+            }
+
             this.TextColorBrush.DrawText(
                 deviceContext,
-                OrbitTextInformation.FullInformation(this.SelectedObject.PrimaryBody, this.SelectedObject.State, selectedObjectOrbitPosition, this.SelectedObject),
+                selectedObjectText,
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 90)));
         }

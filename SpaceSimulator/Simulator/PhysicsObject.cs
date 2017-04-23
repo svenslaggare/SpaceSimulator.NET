@@ -90,6 +90,11 @@ namespace SpaceSimulator.Simulator
         public double UsedDeltaV { get; protected set; }
 
         /// <summary>
+        /// The target object
+        /// </summary>
+        public PhysicsObject Target { get; set; }
+
+        /// <summary>
         /// Creates a new physics object
         /// </summary>
         /// <param name="name">The name of the object</param>
@@ -278,6 +283,25 @@ namespace SpaceSimulator.Simulator
         public Matrix3x3d InverseRotationalTransform
         {
             get { return Matrix3x3d.RotationAxis(this.AxisOfRotation, -this.Rotation); }
+        }
+
+        /// <summary>
+        /// Returns the sphere-of-influence of the current object
+        /// </summary>
+        public double? SphereOfInfluence
+        {
+            get
+            {
+                if (this.PrimaryBody == null)
+                {
+                    return null;
+                }
+
+                return OrbitFormulas.SphereOfInfluence(
+                    this.ReferenceOrbit.SemiMajorAxis,
+                    this.Mass,
+                    this.PrimaryBody.Mass);
+            }
         }
 
         /// <summary>

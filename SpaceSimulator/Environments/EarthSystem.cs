@@ -39,13 +39,13 @@ namespace SpaceSimulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>();
 
-            //var moon = simulatorEngine.AddObjectInOrbit(
-            //    "Moon",
-            //    Simulator.SolarSystem.Moon.CreateConfig(),
-            //    new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0),
-            //    isRealSize: true,
-            //    type: PhysicsObjectType.NaturalSatellite);
-            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Moon.jpg", moon));
+            var moon = simulatorEngine.AddObjectInOrbit(
+                "Moon",
+                Simulator.SolarSystem.Moon.CreateConfig(),
+                new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0),
+                isRealSize: true,
+                type: PhysicsObjectType.NaturalSatellite);
+            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Magenta, baseDir + "Moon.jpg", moon));
 
             //var falcon9TargetAltitude = 250E3;
             var falcon9TargetAltitude = 300E3;

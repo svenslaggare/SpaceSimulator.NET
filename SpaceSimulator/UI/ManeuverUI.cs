@@ -31,6 +31,7 @@ namespace SpaceSimulator.UI
         private readonly TextInputUIObject thurstAmountTextInput;
         private readonly TextInputUIObject hohmannTransferRadiusTextInput;
 
+        private readonly ListBoxUIObject interceptTargetList;
         private readonly ListBoxUIObject rendevouzTargetList;
         private readonly ListBoxUIObject planetaryRendevouzTargetList;
 
@@ -48,7 +49,7 @@ namespace SpaceSimulator.UI
             this.uiManager = uiManager;
             this.uiStyle = uiStyle;
 
-            var startPosY = 400.0f;
+            var startPosY = 500.0f;
             var posY = startPosY;
             var deltaY = -40.0f;
             var offsetRight = 0;
@@ -172,6 +173,9 @@ namespace SpaceSimulator.UI
                 "3",
                 this.HohmannTransfer);
 
+            this.interceptTargetList = AddButtonAndListBox("InterceptButton", "Intercept", "InterceptTargetList", this.Intercept);
+            this.UpdateInterceptTargetList(this.SelectedObject);
+
             this.rendevouzTargetList = AddButtonAndListBox("RendevouzButton", "Rendevouz", "RendevouzTargetList", this.Rendevouz);
             this.UpdateRendevouzTargetList(this.SelectedObject);
 
@@ -182,6 +186,7 @@ namespace SpaceSimulator.UI
             {
                 this.UpdateRendevouzTargetList(e);
                 this.UpdatePlanetaryRendevouzTargetList(e);
+                this.UpdateInterceptTargetList(e);
             };
         }
 
@@ -272,6 +277,89 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Calculates an orbital intercept
+        /// </summary>
+        /// <param name="selectedObject">The selected object</param>
+        /// <param name="targetOrbitPosition">The target orbit position</param>
+        private void OrbitalIntercept(PhysicsObject selectedObject, ref OrbitPosition targetOrbitPosition)
+        {
+            var hohmannCoastTime = MiscHelpers.RoundToDays(HohmannTransferOrbit.CalculateBurn(
+                selectedObject.PrimaryBody.StandardGravitationalParameter,
+                selectedObject.ReferenceOrbit.SemiMajorAxis,
+                targetOrbitPosition.Orbit.SemiMajorAxis).CoastTime);
+
+            var synodicPeriod = OrbitFormulas.SynodicPeriod(
+                selectedObject.ReferenceOrbit.Period,
+                targetOrbitPosition.Orbit.Period);
+
+            var deltaTime = MathHelpers.Clamp(1000, 2.0 * 24 * 60 * 60, synodicPeriod / 1000.0);
+
+            this.SimulatorEngine.ScheduleManeuver(
+                selectedObject,
+                InterceptManeuver.Intercept(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    selectedObject.Target.Configuration,
+                    targetOrbitPosition,
+                    hohmannCoastTime * 0.5,
+                    hohmannCoastTime * 2.0,
+                    0,
+                    synodicPeriod * 1.25,
+                    deltaTime));
+        }
+
+        /// <summary>
+        /// Calculates a ground intercept
+        /// </summary>
+        /// <param name="selectedObject">The selected object</param>
+        /// <param name="targetOrbitPosition">The target orbit position</param>
+        private void GroundIntercept(PhysicsObject selectedObject, ref OrbitPosition targetOrbitPosition)
+        {
+            var deltaTime = 600.0;
+            if (targetOrbitPosition.Orbit.Period > 24.0 * 60 * 60.0)
+            {
+                deltaTime = MathHelpers.Clamp(600.0, 24.0 * 60.0 * 60.0, targetOrbitPosition.Orbit.Period / (24.0 * 6.0));
+            }
+
+            this.SimulatorEngine.ScheduleManeuver(
+                this.SelectedObject,
+                InterceptManeuver.Intercept(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    selectedObject.Target.Configuration,
+                    targetOrbitPosition,
+                    targetOrbitPosition.Orbit.Period * 0.1,
+                    targetOrbitPosition.Orbit.Period,
+                    0,
+                    targetOrbitPosition.Orbit.Period * 3,
+                    deltaTime));
+        }
+
+        /// <summary>
+        /// Intercepts with an object
+        /// </summary>
+        private void Intercept()
+        {
+            this.SelectedObject.Target = (PhysicsObject)this.interceptTargetList.SelectedItem?.Tag;
+
+            var startTime = DateTime.UtcNow;
+            if (this.SelectedObject.Target != null)
+            {
+                var targetOrbitPosition = OrbitPosition.CalculateOrbitPosition(this.SelectedObject.Target);
+
+                if (this.SelectedObject.Impacted)
+                {
+                    this.GroundIntercept(this.SelectedObject, ref targetOrbitPosition);
+                }
+                else
+                {
+                    this.OrbitalIntercept(this.SelectedObject, ref targetOrbitPosition);
+                }
+            }
+            Console.WriteLine("Computed intercept in: " + (DateTime.UtcNow - startTime));
+        }
+
+        /// <summary>
         /// The rendevouz maneuver
         /// </summary>
         private void Rendevouz()
@@ -286,6 +374,7 @@ namespace SpaceSimulator.UI
                     this.SelectedObject,
                     ref targetOrbitPosition);
                 this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, manevuer);
+                this.SelectedObject.Target = targetObject;
             }
         }
 
@@ -303,7 +392,24 @@ namespace SpaceSimulator.UI
                     this.SelectedObject,
                     targetObject);
                 this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, maneuver);
+                this.SelectedObject.Target = targetObject;
             }
+        }
+
+        /// <summary>
+        /// Updates the intercept target list
+        /// </summary>
+        /// <param name="selectedObject">The current selected object</param>
+        private void UpdateInterceptTargetList(PhysicsObject selectedObject)
+        {
+            var validTargets = this.SimulatorEngine.Objects
+                   .Where(x =>
+                            x.Type != Simulator.PhysicsObjectType.ObjectOfReference
+                            && x != selectedObject
+                            && x.PrimaryBody == selectedObject.PrimaryBody)
+                   .ToList();
+
+            this.interceptTargetList.SetItems(validTargets.Select(x => new ListBoxUIObject.Item(x.Name, x)).ToList());
         }
 
         /// <summary>

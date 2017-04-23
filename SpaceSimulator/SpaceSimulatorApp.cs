@@ -59,7 +59,7 @@ namespace SpaceSimulator
 
             (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationSpeed = 100;
-            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.01f;
             this.OrbitCamera.MaxRadius = 7000.0f;

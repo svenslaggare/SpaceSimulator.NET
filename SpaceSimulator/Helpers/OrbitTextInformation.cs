@@ -225,5 +225,97 @@ namespace SpaceSimulator.Helpers
 
             return infoBuilder.ToString();
         }
+
+        /// <summary>
+        /// Returns the target information for the given orbit
+        /// </summary>
+        /// <param name="simulatorEngine">The simulator engine</param>
+        /// <param name="physicsObject">The object</param>
+        /// <param name="state">The state</param>
+        /// <param name="orbitPosition">The orbit</param>
+        /// <param name="target">The target</param>
+        /// <param name="targetState">The target state</param>
+        /// <param name="targetOrbitPosition">The target orbit</param>
+        /// <param name="calculateClosestApproach">Indicates if the closest approach should be caclulated</param>
+        /// <param name="closestApproach">The closest approach data</param>
+        public static string TargetInformation(
+            ISimulatorEngine simulatorEngine,
+            PhysicsObject physicsObject,
+            ObjectState state,
+            OrbitPosition orbitPosition,
+            PhysicsObject target,
+            ObjectState targetState,
+            OrbitPosition targetOrbitPosition,
+            bool calculateClosestApproach = true,
+            OrbitCalculators.ApproachData? closestApproach = null)
+        {
+            var orbit = orbitPosition.Orbit;
+            var targetOrbit = targetOrbitPosition.Orbit;
+
+            var primaryBody = physicsObject.PrimaryBody;
+
+            var infoBuilder = new StringBuilder();
+            infoBuilder.AppendLine("Target: " + target.Name);
+
+            infoBuilder.AppendLine(
+                "Distance: " + DataFormatter.Format(Vector3d.Distance(state.Position, targetState.Position), DataUnit.Distance));
+            infoBuilder.AppendLine(
+                "Relative velocity: " + DataFormatter.Format(Vector3d.Distance(state.Velocity, targetState.Velocity), DataUnit.Velocity));
+
+            if (primaryBody == target.PrimaryBody)
+            {
+                if (calculateClosestApproach)
+                {
+                    if (closestApproach == null)
+                    {
+                        closestApproach = OrbitCalculators.ClosestApproach(
+                            simulatorEngine.KeplerProblemSolver,
+                            physicsObject.Configuration,
+                            orbitPosition,
+                            target.Configuration,
+                            targetOrbitPosition);
+                    }
+
+                    var timeToClosestApproach = closestApproach.Value.Time - simulatorEngine.TotalTime;
+                    infoBuilder.AppendLine("Closest approach: " + DataFormatter.Format(closestApproach.Value.Distance, DataUnit.Distance));
+                    infoBuilder.AppendLine("Time to closest approach: " + DataFormatter.Format(Math.Round(timeToClosestApproach), DataUnit.Time));
+                }
+
+                if (orbit.IsBound && targetOrbit.IsBound)
+                {
+                    infoBuilder.AppendLine(
+                        "Synodic period: " + DataFormatter.Format(Math.Round(OrbitFormulas.SynodicPeriod(orbit.Period, targetOrbit.Period)), DataUnit.Time));
+                }
+            }
+
+            if (target.Type != PhysicsObjectType.ArtificialSatellite)
+            {
+                infoBuilder.AppendLine(
+                    "Sphere of influence: " + DataFormatter.Format(target.SphereOfInfluence ?? 0, DataUnit.Distance));
+
+                var enterOrbitPosition = OrbitPosition.CalculateOrbitPosition(target, state);
+                var timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(enterOrbitPosition);
+                if (timeToLeaveSOI != null)
+                {
+                    infoBuilder.AppendLine("Time to enter sphere-of-influence: " + DataFormatter.Format(timeToLeaveSOI ?? 0, DataUnit.Time, 0));
+                }
+            }
+
+            var phaseAngle = 0.0;
+            if (primaryBody == target.PrimaryBody)
+            {
+                phaseAngle = MathHelpers.CalculateMinAngleDifference(targetOrbitPosition.TrueAnomaly, orbitPosition.TrueAnomaly);
+            }
+            else if (primaryBody.PrimaryBody == target.PrimaryBody)
+            {
+                var primaryBodyOrbitPosition = OrbitPosition.CalculateOrbitPosition(primaryBody);
+                phaseAngle = MathHelpers.CalculateMinAngleDifference(targetOrbitPosition.TrueAnomaly, primaryBodyOrbitPosition.TrueAnomaly);
+            }
+
+            infoBuilder.AppendLine("Phase angle: " + DataFormatter.Format(phaseAngle, DataUnit.Angle));
+
+            return infoBuilder.ToString();
+        }
+
     }
 }
