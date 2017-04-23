@@ -81,6 +81,11 @@ namespace SpaceSimulator.Rendering
         public double PassedTrueAnomaly { get; set; }
 
         /// <summary>
+        /// Indicates if the orbit is bound
+        /// </summary>
+        public bool IsBound { get; set; } = true;
+
+        /// <summary>
         /// Represents a point in the orbit
         /// </summary>
         public struct Point
@@ -256,7 +261,6 @@ namespace SpaceSimulator.Rendering
         public static float OrbitLineWidth(BaseCamera camera, Vector3 position)
         {
             var width = Vector3.Distance(position, camera.Position) / 200.0f;
-            //return MathUtil.Clamp(width, 0.01f, 10.0f);
             return MathUtil.Clamp(width, 0.0001f, 10.0f);
         }
 
@@ -321,7 +325,7 @@ namespace SpaceSimulator.Rendering
 
             //Draw
             pass.Apply(deviceContext);
-            deviceContext.Draw(this.vertices.Length, 0);
+            deviceContext.Draw(this.IsBound ? this.vertices.Length : (this.vertices.Length - 1), 0);
             deviceContext.OutputMerger.SetBlendState(null, Color.Black, 0xffffffff);
         }
 

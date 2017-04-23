@@ -48,20 +48,20 @@ namespace SpaceSimulator
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-			: base("SpaceSimulatorV2")
-		{
+            : base("SpaceSimulator")
+        {
             Console.WriteLine("");
 
-            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.SolarSystem.Create(this.GraphicsDevice);
+            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.SolarSystem.Create(this.GraphicsDevice);
             //////this.simulatorEngine.SimulationSpeed = 100000;
-            //this.simulatorEngine.SimulationSpeed = 100;
-            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
-
-            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationSpeed = 100;
             this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            this.OrbitCamera.MinRadius = 0.01f;
+            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.EarthSystem.Create(this.GraphicsDevice);
+            //this.simulatorEngine.SimulationSpeed = 100;
+            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+
+            this.OrbitCamera.MinRadius = 0.001f;
             this.OrbitCamera.MaxRadius = 7000.0f;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
@@ -159,7 +159,7 @@ namespace SpaceSimulator
 
             //Draw 3D
             this.referenceRenderingObject.Draw(this.DeviceContext, this.sunEffect, this.orbitEffect, this.Camera);
-            RenderingObject.Draw(this.DeviceContext, this.planetEffect, this.orbitEffect, this.Camera, this.renderingObjects);      
+            RenderingObject.Draw(this.DeviceContext, this.planetEffect, this.orbitEffect, this.Camera, this.renderingObjects);
 
             //Draw 2D
             this.DeviceContext2D.BeginDraw();

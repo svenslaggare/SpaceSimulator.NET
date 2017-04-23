@@ -14,8 +14,8 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// The distance scale factor
         /// </summary>
-        public const double DistanceScale = 0.5E-5;
-        //public const double DistanceScale = 0.5E-9;
+        //public const double DistanceScale = 0.5E-5;
+        public const double DistanceScale = 0.5E-9;
 
         /// <summary>
         /// The universal gravity constant (G) in SI units

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Rendering;
@@ -69,12 +70,28 @@ namespace SpaceSimulator.Environments
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0),
                 isRealSize: false);
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
-            //simulatorEngine.ScheduleManeuver(
-            //    satellite1,
-            //    HohmannTransferOrbit.Create(simulatorEngine, satellite1, Simulator.SolarSystem.Earth.Radius * 2.0, OrbitalManeuverTime.Now()));
-            //simulatorEngine.ScheduleManeuver(
-            //    satellite1,
-            //    InterplanetaryManeuver.PlanetaryTransfer(simulatorEngine, satellite1, mars));
+
+            //var satellite2 = simulatorEngine.AddObjectInOrbit(
+            //    "Satellite 2",
+            //    new ObjectConfig(10, 1000),
+            //    new OrbitPosition(Physics.Orbit.New(earth, parameter: Simulator.SolarSystem.Earth.Radius * 2.0, eccentricity: 1.05), MathUtild.Deg2Rad * -50.0),
+            //    isRealSize: false);
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite2));
+
+            //var satellite3 = simulatorEngine.AddObjectInOrbit(
+            //    "Satellite 3",
+            //    new ObjectConfig(10, 1000),
+            //    new OrbitPosition(
+            //        Physics.Orbit.New(
+            //            mars,
+            //            parameter: 1.1984E3,
+            //            eccentricity: 1.0004,
+            //            inclination: 22.2203,
+            //            longitudeOfAscendingNode: 10.278,
+            //            argumentOfPeriapsis: 210.5102),
+            //        MathUtild.Deg2Rad * 181.7195),
+            //    isRealSize: false);
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite3));
 
             return (simulatorEngine, sunRenderingObject, renderingObjects);
         }

@@ -49,7 +49,8 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
-        private static IList<Orbit.Point> CreateForUnbound(Physics.Orbit orbit, bool relative)
+        /// <param name="trueAnomaly">The true anomaly</param>
+        private static IList<Orbit.Point> CreateForUnbound(Physics.Orbit orbit, bool relative, double? trueAnomaly)
         {
             var orbitPositions = new List<Orbit.Point>();
 
@@ -59,17 +60,29 @@ namespace SpaceSimulator.Rendering
             }
 
             var theta = Math.Acos(-1 / orbit.Eccentricity);
+            //var theta = -MathUtild.Pi;
 
-            var deltaAngle = 0.01;
-            for (double trueAnomaly = -theta; trueAnomaly <= theta; trueAnomaly += deltaAngle)
+            var deltaAngle = 0.001 / 2;
+            //for (double currentTrueAnomaly = -theta; currentTrueAnomaly <= theta; currentTrueAnomaly += deltaAngle)
+
+            var startTrueAnomaly = -theta;
+            var stopTrueAnomaly = theta;
+            //if (trueAnomaly.HasValue)
+            //{
+            //    var range = theta / 2.0;
+            //    startTrueAnomaly = trueAnomaly.Value - range;
+            //    stopTrueAnomaly = trueAnomaly.Value + range;
+            //}
+
+            for (double currentTrueAnomaly = startTrueAnomaly; currentTrueAnomaly <= stopTrueAnomaly; currentTrueAnomaly += deltaAngle)
             {
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;
-                var newState = orbit.CalculateState(trueAnomaly, ref primaryBodyState);
+                var newState = orbit.CalculateState(currentTrueAnomaly, ref primaryBodyState);
 
                 var position = MathConversionsHelpers.ToDraw(newState.Position);
                 if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || float.IsInfinity(position.LengthSquared())))
                 {
-                    orbitPositions.Add(new Orbit.Point(position, trueAnomaly));
+                    orbitPositions.Add(new Orbit.Point(position, currentTrueAnomaly));
                 }
             }
 
@@ -81,7 +94,8 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
-        public static IList<Orbit.Point> Create(Physics.Orbit orbit, bool relative = false)
+        /// <param name="trueAnomaly">The current true anomaly. Useful for hyperbolic orbits.</param>
+        public static IList<Orbit.Point> Create(Physics.Orbit orbit, bool relative = false, double? trueAnomaly = null)
         {
             if (orbit.IsBound)
             {
@@ -89,7 +103,7 @@ namespace SpaceSimulator.Rendering
             }
             else
             {
-                return CreateForUnbound(orbit, relative);
+                return CreateForUnbound(orbit, relative, trueAnomaly);
             }
         }
     }

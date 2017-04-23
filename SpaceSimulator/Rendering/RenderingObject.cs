@@ -51,7 +51,7 @@ namespace SpaceSimulator.Rendering
 
             if (physicsObject.Type != PhysicsObjectType.ObjectOfReference)
             {
-                this.positions = OrbitPositions.Create(this.physicsObject.ReferenceOrbit, true);
+                this.CalculateOrbitPositions();
                 this.renderingOrbit = new Orbit(graphicsDevice, this.positions, orbitColor, 6 * 0.25f);
             }
 
@@ -62,14 +62,25 @@ namespace SpaceSimulator.Rendering
             this.scalingMatrix = Matrix.Scaling(physicsObject.IsRealSize ? MathConversionsHelpers.ToDraw(this.physicsObject.Radius) : nonRealSize);
             //this.scalingMatrix = Matrix.Scaling(0.01f);
         }
-
+        
+        /// <summary>
+        /// Calculates the orbit positions
+        /// </summary>
+        private void CalculateOrbitPositions()
+        {
+            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
+            //this.positions = OrbitPositions.Create(this.physicsObject.ReferenceOrbit, true);
+            this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+        }
+        
         /// <summary>
         /// Updates which positions that has been passed
         /// </summary>
         private void UpdatePassedPositions()
         {
-            var trueAnomaly = OrbitPosition.CalculateOrbitPosition(this.physicsObject).TrueAnomaly;
-            this.renderingOrbit.PassedTrueAnomaly = trueAnomaly;
+            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
+            this.renderingOrbit.PassedTrueAnomaly = orbitPosition.TrueAnomaly;
+            this.renderingOrbit.IsBound = orbitPosition.Orbit.IsBound;
         }
 
         /// <summary>
@@ -125,7 +136,7 @@ namespace SpaceSimulator.Rendering
         {
             if (this.physicsObject.HasChangedOrbit())
             {
-                this.positions = OrbitPositions.Create(this.physicsObject.ReferenceOrbit, true);
+                this.CalculateOrbitPositions();
                 this.renderingOrbit.Update(this.positions);
             }
 
