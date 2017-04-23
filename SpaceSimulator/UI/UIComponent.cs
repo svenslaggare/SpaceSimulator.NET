@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SharpDX.DirectWrite;
+using SpaceSimulator.Common;
+using SpaceSimulator.Common.Input;
+using SpaceSimulator.Simulator;
+
+namespace SpaceSimulator.UI
+{
+    /// <summary>
+    /// Represents an UI component
+    /// </summary>
+    public abstract class UIComponent
+    {
+        protected RenderingManager2D RenderingManager2D { get; }
+        protected KeyboardManager KeyboardManager { get; }
+        protected SimulatorContainer SimulatorContainer { get; }
+
+        /// <summary>
+        /// Creates a new base UI component
+        /// </summary>
+        /// <param name="renderingManager2D">The rendering manager 2D</param>
+        /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="simulatorContainer">The simulator container</param>
+        public UIComponent(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, SimulatorContainer simulatorContainer)
+        {
+            this.RenderingManager2D = renderingManager2D;
+            this.KeyboardManager = keyboardManager;
+            this.SimulatorContainer = simulatorContainer;
+        }
+
+        /// <summary>
+        /// Returns the simulator engine
+        /// </summary>
+        protected SimulatorEngine SimulatorEngine => this.SimulatorContainer.SimulatorEngine;
+
+        /// <summary>
+        /// Returns the text color brush
+        /// </summary>
+        protected RenderingSolidColorBrush TextColorBrush => this.RenderingManager2D.DefaultSolidColorBrush;
+
+        /// <summary>
+        /// Returns the text format
+        /// </summary>
+        protected TextFormat TextFormat => this.RenderingManager2D.DefaultTextFormat;
+
+        /// <summary>
+        /// Returns the selected object
+        /// </summary>
+        protected PhysicsObject SelectedObject => this.SimulatorContainer.SelectedObject;
+
+        /// <summary>
+        /// Updates the component
+        /// </summary>
+        /// <param name="elapsed">The elapsed time since the last frame</param>
+        public abstract void Update(TimeSpan elapsed);
+
+        /// <summary>
+        /// Called after when the simulator has been updated
+        /// </summary>
+        public virtual void AfterSimulationUpdate()
+        {
+
+        }
+
+        /// <summary>
+        /// Draws the component
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        public abstract void Draw(SharpDX.Direct2D1.DeviceContext deviceContext);
+    }
+}

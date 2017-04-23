@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SharpDX;
+using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Maneuvers;
+using SpaceSimulator.Rendering;
+using SpaceSimulator.Simulator;
+
+namespace SpaceSimulator.Environments
+{
+    /// <summary>
+    /// Contains an environment for the solar system
+    /// </summary>
+    public static class SolarSystem
+    {
+        /// <summary>
+        /// Creates a new system
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
+        /// <returns>Simulator engine, sun rendering object, other rendering objects</returns>
+        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
+        {
+            var sun = new PhysicsObject(
+                "Sun",
+                PhysicsObjectType.ObjectOfReference,
+                Simulator.SolarSystem.Sun.CreateConfig(),
+                null,
+                new ObjectState(),
+                new Physics.Orbit());
+
+            var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
+            var renderingObjects = new List<RenderingObject>();
+
+            PhysicsObject AddObject(PhysicsObject primaryBody, string name, SolarSystemBody body, Color color, string textureName)
+            {
+                var orbit = new OrbitPosition(body.Orbit(primaryBody), 0.0);
+                var newObject = simulatorEngine.AddObjectInOrbit(
+                    name,
+                    body.CreateConfig(),
+                    orbit,
+                    type: PhysicsObjectType.NaturalSatellite,
+                    isRealSize: true);
+                renderingObjects.Add(new RenderingObject(graphicsDevice, color, textureName, newObject));
+                return newObject;
+            }
+
+            var baseDir = "Content/Textures/Planets/";
+
+            var sunRenderingObject = new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Sun.jpg", sun);
+
+            AddObject(sun, "Mercury", Simulator.SolarSystem.Mercury, Color.Gray, baseDir + "Mercury.png");
+            AddObject(sun, "Venus", Simulator.SolarSystem.Venus, new Color(255, 89, 0, 255), baseDir + "Venus2.jpg");
+            var earth = AddObject(sun, "Earth", Simulator.SolarSystem.Earth, Color.Green, baseDir + "Earth.jpg");
+            AddObject(earth, "Moon", Simulator.SolarSystem.Moon, Color.Magenta, baseDir + "Moon.jpg");
+            var mars = AddObject(sun, "Mars", Simulator.SolarSystem.Mars, Color.Red, baseDir + "Mars4.png");
+            AddObject(sun, "Jupiter", Simulator.SolarSystem.Jupiter, new Color(255, 106, 0, 255), baseDir + "Jupiter.jpg");
+            AddObject(sun, "Saturn", Simulator.SolarSystem.Saturn, new Color(255, 167, 0, 255), baseDir + "Saturn.jpg");
+            AddObject(sun, "Uranus", Simulator.SolarSystem.Uranus, Color.Blue, baseDir + "Uranus.jpg");
+            AddObject(sun, "Neptune", Simulator.SolarSystem.Neptune, new Color(0, 148, 255, 255), baseDir + "Neptune.jpg");
+            AddObject(sun, "Pluto", Simulator.SolarSystem.Pluto, new Color(143, 115, 87, 255), baseDir + "Pluto.png");
+
+            var satellite1 = simulatorEngine.AddObjectInOrbit(
+                "Satellite 1",
+                new ObjectConfig(10, 1000),
+                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0),
+                isRealSize: false);
+            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
+            //simulatorEngine.ScheduleManeuver(
+            //    satellite1,
+            //    HohmannTransferOrbit.Create(simulatorEngine, satellite1, Simulator.SolarSystem.Earth.Radius * 2.0, OrbitalManeuverTime.Now()));
+            //simulatorEngine.ScheduleManeuver(
+            //    satellite1,
+            //    InterplanetaryManeuver.PlanetaryTransfer(simulatorEngine, satellite1, mars));
+
+            return (simulatorEngine, sunRenderingObject, renderingObjects);
+        }
+    }
+}
