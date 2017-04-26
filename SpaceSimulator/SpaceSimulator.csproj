@@ -149,11 +149,12 @@
     <Compile Include="Physics\OrbitHelpers.cs" />
     <Compile Include="Helpers\OrbitTextInformation.cs" />
     <Compile Include="Physics\OrbitPosition.cs" />
+    <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />
     <Compile Include="Physics\Rocket\RocketEngine.cs" />
     <Compile Include="Physics\Rocket\RocketStages.cs" />
-    <Compile Include="Physics\SimpleIPhysicsObject.cs" />
+    <Compile Include="Physics\SimplePhysicsObject.cs" />
     <Compile Include="Rendering\RenderingObject.cs" />
     <Compile Include="Environments\SolarSystem.cs" />
     <Compile Include="Simulator\OrbitSimulators\CowellSimulator.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Rendering\Sphere.cs" />
     <Compile Include="Simulator\PhysicsObject.cs" />
     <Compile Include="Simulator\RocketObject.cs" />
+    <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
     <Compile Include="Simulator\SolarSystem.cs" />
     <Compile Include="Simulator\SolarSystemBody.cs" />

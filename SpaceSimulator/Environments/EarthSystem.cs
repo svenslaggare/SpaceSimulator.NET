@@ -27,7 +27,7 @@ namespace SpaceSimulator.Environments
         {
             var baseDir = "Content/Textures/Planets/";
 
-            var earth = new PhysicsObject(
+            var earth = new PlanetObject(
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
                 Simulator.SolarSystem.Earth.CreateConfig(),
@@ -39,12 +39,11 @@ namespace SpaceSimulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>();
 
-            var moon = simulatorEngine.AddObjectInOrbit(
+            var moon = simulatorEngine.AddPlanetInOrbit(
                 "Moon",
+                PhysicsObjectType.NaturalSatellite,
                 Simulator.SolarSystem.Moon.CreateConfig(),
-                new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0),
-                isRealSize: true,
-                type: PhysicsObjectType.NaturalSatellite);
+                new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Magenta, baseDir + "Moon.jpg", moon));
 
             //var falcon9TargetAltitude = 250E3;
@@ -74,11 +73,10 @@ namespace SpaceSimulator.Environments
             //falcon9Object.CheckImpacted(0);
             //falcon9Object.StartEngine();
 
-            var satellite1 = simulatorEngine.AddObjectInOrbit(
+            var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",
                 new ObjectConfig(10, 1000),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0),
-                isRealSize: false);
+                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
             //simulatorEngine.ScheduleManeuver(
             //    satellite1,
@@ -88,7 +86,7 @@ namespace SpaceSimulator.Environments
                 Physics.Orbit.New(earth, parameter: 3.0 * Simulator.SolarSystem.Earth.Radius),
                 87.2 * MathUtild.Deg2Rad);
 
-            var object2 = simulatorEngine.AddObjectInOrbit(
+            var object2 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 2",
                 new ObjectConfig(10, 1000),
                 orbitPosition2);

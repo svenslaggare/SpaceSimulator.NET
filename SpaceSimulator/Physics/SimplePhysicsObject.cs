@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SpaceSimulator.Physics
 {
     /// <summary>
-    /// Provides a simple implementation of the <see cref="IPhysicsObject"/> interface
+    /// Provides a simple implementation of the <see cref="IPhysicsObject"/> interface.
     /// </summary>
     public class SimplePhysicsObject : IPhysicsObject
     {

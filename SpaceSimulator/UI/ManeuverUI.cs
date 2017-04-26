@@ -469,9 +469,9 @@ namespace SpaceSimulator.UI
                 var dv = maneuver.Maneuver.DeltaVelocity.Length();
 
                 var decimals = 2;
-                var P = DataFormatter.Format(maneuver.ProgradeComponent, DataUnit.Velocity, decimals);
-                var N = DataFormatter.Format(maneuver.NormalComponent, DataUnit.Velocity, decimals);
-                var R = DataFormatter.Format(maneuver.RadialComponent, DataUnit.Velocity, decimals);
+                var P = DataFormatter.Format(maneuver.Prograde, DataUnit.Velocity, decimals);
+                var N = DataFormatter.Format(maneuver.Normal, DataUnit.Velocity, decimals);
+                var R = DataFormatter.Format(maneuver.Radial, DataUnit.Velocity, decimals);
 
                 var mainString = maneuver.Object.Name + " - time left: " + DataFormatter.Format(timeLeft, DataUnit.Time, 0);
 

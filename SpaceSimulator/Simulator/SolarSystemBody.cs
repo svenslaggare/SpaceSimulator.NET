@@ -87,10 +87,10 @@ namespace SpaceSimulator.Simulator
         /// <param name="primaryBody">The primary body</param>
         /// <param name="name">The name of the body</param>
         /// <param name="initialTrueAnomaly">The initial true anomaly</param>
-        public PhysicsObject Create(PhysicsObject primaryBody, string name, double initialTrueAnomaly)
+        public PlanetObject Create(PhysicsObject primaryBody, string name, double initialTrueAnomaly)
         {
             var initialOrbit = this.Orbit(primaryBody);
-            return new PhysicsObject(
+            return new PlanetObject(
                 name,
                 PhysicsObjectType.NaturalSatellite,
                 this.CreateConfig(),

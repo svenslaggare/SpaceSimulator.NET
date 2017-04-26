@@ -32,7 +32,7 @@ namespace SpaceSimulator.Simulator
     /// <summary>
     /// Represents an object affected by physics
     /// </summary>
-    public class PhysicsObject : IPhysicsObject
+    public abstract class PhysicsObject : IPhysicsObject
     {
         protected ObjectState state;
         protected ObjectState nextState;

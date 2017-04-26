@@ -73,7 +73,18 @@ namespace SpaceSimulator.Simulator
 
         public override string ToString()
         {
-            return this.Object.Name + ": " + this.Type + " at " + DataFormatter.Format(this.Time, DataUnit.Time);
+            string eventType = "";
+            switch (this.Type)
+            {
+                case SimulationEventType.SphereOfInfluenceChange:
+                    eventType = "Change of sphere-of-influence";
+                    break;
+                case SimulationEventType.Crash:
+                    eventType = "Crash";
+                    break;
+            }
+
+            return this.Object.Name + ": " + eventType + " at " + DataFormatter.Format(this.Time, DataUnit.Time);
         }
     }
 
@@ -93,19 +104,19 @@ namespace SpaceSimulator.Simulator
         public OrbitalManeuver Maneuver { get; }
 
         /// <summary>
-        /// The prograde component
+        /// The prograde component of the delta V
         /// </summary>
-        public double ProgradeComponent { get; private set; }
+        public double Prograde { get; private set; }
 
         /// <summary>
-        /// The normal component
+        /// The normal component of the delta V
         /// </summary>
-        public double NormalComponent { get; private set; }
+        public double Normal { get; private set; }
 
         /// <summary>
-        /// The radial component
+        /// The radial component of the delta V
         /// </summary>
-        public double RadialComponent { get; private set; }
+        public double Radial { get; private set; }
 
         /// <summary>
         /// Creates a new maneuver
@@ -124,7 +135,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="stateAtBurn">The state of the object at the burn</param>
         public void ComputeComponents(ref ObjectState stateAtBurn)
         {
-            (this.ProgradeComponent, this.NormalComponent, this.RadialComponent)
+            (this.Prograde, this.Normal, this.Radial)
                 = OrbitHelpers.ComputeVelocityComponents(ref stateAtBurn, this.Maneuver.DeltaVelocity);
         }
 
@@ -209,7 +220,6 @@ namespace SpaceSimulator.Simulator
             foreach (var current in objects)
             {
                 this.AddObject(current);
-                this.CalculateSphereOfInfluence(current);
             }
 
             this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator));
@@ -307,72 +317,65 @@ namespace SpaceSimulator.Simulator
             {
                 this.naturalObjects.Add(physicsObject);
             }
+
+            this.CalculateSphereOfInfluence(physicsObject);
         }
 
         /// <summary>
-        /// Adds the given object
-        /// </summary>
-        /// <param name="type">The type of the object</param>
-        /// <param name="primaryBody">The object to orbit around</param>
-        /// <param name="name">The name of the object</param>
-        /// <param name="config">The configuration</param>
-        /// <param name="position">The initial position</param>
-        /// <param name="velocity">The initial velocity</param>
-        /// <param name="isRealSize">Indicates if the size of the object is real</param>
-        /// <returns>The created object</returns>
-        public PhysicsObject AddObject(
-            PhysicsObjectType type,
-            PhysicsObject primaryBody,
-            string name,
-            ObjectConfig config,
-            Vector3d position,
-            Vector3d velocity,
-            bool isRealSize = false)
-        {
-            var initialState = new ObjectState(this.totalTime, position, velocity, Vector3d.Zero);
-
-            var newObject = new PhysicsObject(
-                name,
-                type,
-                config,
-                primaryBody,
-                initialState,
-                Orbit.CalculateOrbit(primaryBody, ref initialState),
-                isRealSize: isRealSize);
-            this.AddObject(newObject);
-            this.CalculateSphereOfInfluence(newObject);
-            return newObject;
-        }
-
-        /// <summary>
-        /// Adds an object in given orbit around the given object
+        /// Adds a planet object in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration</param>
         /// <param name="orbitPosition">The position in the orbit</param>
-        /// <param name="isRealSize">Indicates if the size of the object is real</param>
         /// <param name="type">The type of the object</param>
         /// <returns>The created object</returns>
-        public PhysicsObject AddObjectInOrbit(
+        public PhysicsObject AddPlanetInOrbit(
             string name,
+            PhysicsObjectType type,
             ObjectConfig config,
-            OrbitPosition orbitPosition,
-            bool isRealSize = false,
-            PhysicsObjectType type = PhysicsObjectType.ArtificialSatellite)
+            OrbitPosition orbitPosition)
         {
+            if (type == PhysicsObjectType.ArtificialSatellite)
+            {
+                throw new ArgumentException("Invalid type.");
+            }
+
             var orbit = orbitPosition.Orbit;
             var primaryBodyState = orbit.PrimaryBody.State;
-            var newObject = new PhysicsObject(
+            var newObject = new PlanetObject(
                 name,
                 type,
                 config,
                 (PhysicsObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
-                orbitPosition.Orbit,
-                isRealSize: isRealSize);
+                orbitPosition.Orbit);
 
             this.AddObject(newObject);
-            this.CalculateSphereOfInfluence(newObject);
+            return newObject;
+        }
+
+        /// <summary>
+        /// Adds a satellite in given orbit around the given object
+        /// </summary>
+        /// <param name="name">The name of the object</param>
+        /// <param name="config">The configuration</param>
+        /// <param name="orbitPosition">The position in the orbit</param>
+        /// <returns>The created object</returns>
+        public PhysicsObject AddSatelliteInOrbit(
+            string name,
+            ObjectConfig config,
+            OrbitPosition orbitPosition)
+        {
+            var orbit = orbitPosition.Orbit;
+            var primaryBodyState = orbit.PrimaryBody.State;
+            var newObject = new SatelliteObject(
+                name,
+                config,
+                (PhysicsObject)orbit.PrimaryBody,
+                orbitPosition.CalculateState(ref primaryBodyState),
+                orbitPosition.Orbit);
+
+            this.AddObject(newObject);
             return newObject;
         }
 
@@ -403,8 +406,8 @@ namespace SpaceSimulator.Simulator
                 initialState,
                 Orbit.CalculateOrbit(primaryBody, ref initialState),
                 rocketStages);
+
             this.AddObject(newObject);
-            this.CalculateSphereOfInfluence(newObject);
             return newObject;
         }
 
@@ -433,7 +436,6 @@ namespace SpaceSimulator.Simulator
                 rocketStages);
 
             this.AddObject(newObject);
-            this.CalculateSphereOfInfluence(newObject);
             return newObject;
         }
 
@@ -652,14 +654,6 @@ namespace SpaceSimulator.Simulator
                     if (this.totalTime >= maneuver.Maneuver.ManeuverTime - this.maneuverTimeEpsilon)
                     {
                         this.executedManeuvers.Add(maneuver);
-
-                        //var state = maneuver.Object.State;
-                        //state.Velocity -= maneuver.Object.PrimaryBody.Velocity;
-                        //var result = this.ComputeManeuverComponents(ref state, maneuver.Maneuver.DeltaVelocity);
-
-                        //Debug.Log("P: " + result[0] + ", N: " + result[1] + ", R: " + result[2]);
-                        //Debug.Log(maneuver + ": " + (this.totalTime - maneuver.Maneuver.ManeuverTime));
-
                         maneuver.Object.ApplyDeltaVelocity(this.totalTime, maneuver.Maneuver.DeltaVelocity);
 
                         //If the current maneuver leads to a SOI change/crash, mark it
@@ -860,10 +854,10 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Updates for a solver
+        /// Updates for a Kepler solver
         /// </summary>
         /// <param name="time">The amount of time to simulate for</param>
-        private void UpdateSolver(double time)
+        private void UpdateKeplerSolver(double time)
         {
             //Determine the of sub-intervals
             this.DetermineSubIntervals(time);
@@ -892,7 +886,7 @@ namespace SpaceSimulator.Simulator
             if (restart)
             {
                 var t = time - amountSimulated;
-                this.UpdateSolver(t);
+                this.UpdateKeplerSolver(t);
             }
         }
 
@@ -908,7 +902,7 @@ namespace SpaceSimulator.Simulator
                     this.UpdateIntegrator((int)Math.Ceiling(duration.TotalSeconds / this.timeStep));
                     break;
                 case PhysicsSimulationMode.KeplerProblemUniversalVariable:
-                    this.UpdateSolver(duration.TotalSeconds);
+                    this.UpdateKeplerSolver(duration.TotalSeconds);
                     break;
             }
         }
@@ -924,7 +918,7 @@ namespace SpaceSimulator.Simulator
                     this.UpdateIntegrator(this.SimulationSpeed);
                     break;
                 case PhysicsSimulationMode.KeplerProblemUniversalVariable:
-                    this.UpdateSolver(this.timeStep * this.SimulationSpeed);
+                    this.UpdateKeplerSolver(this.timeStep * this.SimulationSpeed);
                     break;
             }
         }
