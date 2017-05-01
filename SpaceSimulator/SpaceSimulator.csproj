@@ -132,6 +132,11 @@
     <Compile Include="Mathematics\Quaterniond.cs" />
     <Compile Include="Mathematics\Vector3d.cs" />
     <Compile Include="Mathematics\Vector4d.cs" />
+    <Compile Include="Physics\Atmosphere\AtmosphericFormulas.cs" />
+    <Compile Include="Physics\Atmosphere\AtmosphericProperties.cs" />
+    <Compile Include="Physics\Atmosphere\EarthAtmosphericModel.cs" />
+    <Compile Include="Physics\Atmosphere\IAtmosphericModel.cs" />
+    <Compile Include="Physics\Atmosphere\NoAtmosphereModel.cs" />
     <Compile Include="Physics\Constants.cs" />
     <Compile Include="Physics\IPhysicsObject.cs" />
     <Compile Include="Physics\ISimulatorEngine.cs" />

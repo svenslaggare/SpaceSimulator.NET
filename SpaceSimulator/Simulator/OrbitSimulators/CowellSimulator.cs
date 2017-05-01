@@ -55,18 +55,32 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 return Vector3d.Zero;
             }
 
-            var thrustAcceleration = Vector3d.Zero;
+            var nonGravityAcceleration = Vector3d.Zero;
             var rocketObject = physicsObject as RocketObject;
-            if (primary && rocketObject != null && rocketObject.IsEngineRunning)
+            var primaryBodyState = physicsObject.PrimaryBody.State;
+
+
+            if (primary && rocketObject != null)
             {
-                thrustAcceleration = rocketObject.EngineAcceleration();
+                if (rocketObject.IsEngineRunning)
+                {
+                    nonGravityAcceleration += rocketObject.EngineAcceleration();
+                }
+
+                if (physicsObject.PrimaryBody is PlanetObject primaryPlanet)
+                {
+                    nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
+                        primaryPlanet.Configuration,
+                        ref primaryBodyState,
+                        rocketObject.AtmosphericProperties,
+                        ref state);
+                }
             }
 
-            var primaryBodyState = physicsObject.PrimaryBody.State;
             return OrbitFormulas.GravityAcceleration(
                 physicsObject.PrimaryBody.StandardGravitationalParameter,
                 state.Position - physicsObject.PrimaryBody.State.Position)
-                + thrustAcceleration
+                + nonGravityAcceleration
                 + CalculateAcceleration(physicsObject.PrimaryBody, ref primaryBodyState, objects, timeStep, false);
         }
 
@@ -88,8 +102,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 timeStep,
                 (double t, ref ObjectState state) => this.CalculateAcceleration(currentObject, ref state, otherObjects, timeStep, true));
 
-            var rocketObject = currentObject as RocketObject;
-            if (rocketObject != null && rocketObject.IsEngineRunning)
+            if (currentObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
                 rocketObject.AfterImpulse(timeStep);
             }

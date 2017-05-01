@@ -205,6 +205,7 @@ namespace SpaceSimulator.Simulator.Rocket
             var currentObject = new RocketObject(
                 rocketObject.Name,
                 rocketObject.Configuration,
+                rocketObject.AtmosphericProperties,
                 rocketObject.PrimaryBody,
                 rocketObject.State,
                 rocketObject.ReferenceOrbit,

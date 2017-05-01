@@ -52,12 +52,12 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.SolarSystem.Create(this.GraphicsDevice);
+            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.SolarSystem.Create(this.GraphicsDevice);
             //////this.simulatorEngine.SimulationSpeed = 100000;
             //this.simulatorEngine.SimulationSpeed = 100;
-            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.EarthSystem.Create(this.GraphicsDevice);
+            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationSpeed = 100;
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 

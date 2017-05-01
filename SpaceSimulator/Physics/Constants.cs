@@ -36,5 +36,15 @@ namespace SpaceSimulator.Physics
         /// The standard gravity in m/s^2
         /// </summary>
         public const double StandardGravity = 9.80665;
+
+        /// <summary>
+        /// The specific gas constant for the earth
+        /// </summary>
+        public const double EarthSpecificGasConstant = 8.31432E3;
+
+        /// <summary>
+        /// The absolute zero temperature (in C)
+        /// </summary>
+        public const double AbsoluteZero = -273.15;
     }
 }

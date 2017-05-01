@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
@@ -29,6 +30,7 @@ namespace SpaceSimulator.Environments
                 "Sun",
                 PhysicsObjectType.ObjectOfReference,
                 Simulator.SolarSystem.Sun.CreateConfig(),
+                new NoAtmosphereModel(),
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
@@ -43,6 +45,7 @@ namespace SpaceSimulator.Environments
                     name,
                     PhysicsObjectType.NaturalSatellite,
                     body.CreateConfig(),
+                    new NoAtmosphereModel(),
                     orbit);
                 renderingObjects.Add(new RenderingObject(graphicsDevice, color, textureName, newObject));
                 return newObject;

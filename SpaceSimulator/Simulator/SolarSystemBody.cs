@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Simulator
 {
@@ -94,6 +95,7 @@ namespace SpaceSimulator.Simulator
                 name,
                 PhysicsObjectType.NaturalSatellite,
                 this.CreateConfig(),
+                new NoAtmosphereModel(),
                 primaryBody,
                 initialOrbit.CalculateState(initialTrueAnomaly, primaryBody.State),
                 initialOrbit);

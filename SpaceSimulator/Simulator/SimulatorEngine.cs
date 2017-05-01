@@ -8,6 +8,7 @@ using SharpDX;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Physics.Rocket;
 using SpaceSimulator.Physics.Solvers;
@@ -326,6 +327,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration</param>
+        /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <param name="type">The type of the object</param>
         /// <returns>The created object</returns>
@@ -333,6 +335,7 @@ namespace SpaceSimulator.Simulator
             string name,
             PhysicsObjectType type,
             ObjectConfig config,
+            IAtmosphericModel atmosphericModel,
             OrbitPosition orbitPosition)
         {
             if (type == PhysicsObjectType.ArtificialSatellite)
@@ -346,6 +349,7 @@ namespace SpaceSimulator.Simulator
                 name,
                 type,
                 config,
+                atmosphericModel,
                 (PhysicsObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit);
@@ -385,7 +389,8 @@ namespace SpaceSimulator.Simulator
         /// <param name="primaryBody">The object to orbit around</param>
         /// <param name="name">The name of the object</param>
         /// <param name="radius">The radius of the object</param>
-        /// <param name="rocketEngine">The rocket engine</param>
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
+        /// <param name="rocketStages">The rocket stages</param>
         /// <param name="position">The initial position</param>
         /// <param name="velocity">The initial velocity</param>
         /// <returns>The created object</returns>
@@ -393,6 +398,7 @@ namespace SpaceSimulator.Simulator
             PhysicsObject primaryBody,
             string name,
             double radius,
+            AtmosphericProperties atmosphericProperties,
             RocketStages rocketStages,
             Vector3d position,
             Vector3d velocity)
@@ -402,6 +408,7 @@ namespace SpaceSimulator.Simulator
             var newObject = new RocketObject(
                 name,
                 new ObjectConfig(radius, rocketStages.InitialTotalMass),
+                atmosphericProperties,
                 primaryBody,
                 initialState,
                 Orbit.CalculateOrbit(primaryBody, ref initialState),
@@ -416,12 +423,14 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="radius">The radius of the object</param>
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
         /// <param name="rocketStages">The rocket stages</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <returns>The created object</returns>
         public RocketObject AddRocketObjectInOrbit(
             string name,
             double radius,
+            AtmosphericProperties atmosphericProperties,
             RocketStages rocketStages,
             OrbitPosition orbitPosition)
         {
@@ -430,6 +439,7 @@ namespace SpaceSimulator.Simulator
             var newObject = new RocketObject(
                 name,
                 new ObjectConfig(radius, rocketStages.InitialTotalMass),
+                atmosphericProperties,
                 (PhysicsObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit,

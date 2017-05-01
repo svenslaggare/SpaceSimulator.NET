@@ -63,7 +63,6 @@ namespace SpaceSimulator.Mathematics
         /// <param name="worldPosition">The position in the world</param>
         public static Vector3 ToDrawPosition(Vector3d worldPosition)
         {
-            //return ToUnity(worldPosition - Camera.main.GetComponent<FreeMoveCamera>().Position);
             return ToDraw(worldPosition);
         }
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Physics.Rocket;
 using SpaceSimulator.Simulator.Rocket;
 
@@ -23,7 +24,9 @@ namespace SpaceSimulator.Simulator
     /// </summary>
     public class RocketObject : PhysicsObject
     {
+        private readonly AtmosphericProperties atmosphericProperties;
         private readonly RocketStages rocketStages;
+
         private bool engineRunning;
         private IRocketControlProgram controlProgram;
 
@@ -32,6 +35,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration</param>
+        /// <param name="atmosphericProperties">The atmospheric properties of the object</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
@@ -39,13 +43,23 @@ namespace SpaceSimulator.Simulator
         public RocketObject(
             string name,
             ObjectConfig config,
+            AtmosphericProperties atmosphericProperties,
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
             RocketStages rocketStages)
             : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit, false)
         {
+            this.atmosphericProperties = atmosphericProperties;
             this.rocketStages = rocketStages;
+        }
+
+        /// <summary>
+        /// Returns the atmospheric properties
+        /// </summary>
+        public AtmosphericProperties AtmosphericProperties
+        {
+            get { return this.atmosphericProperties; }
         }
 
         /// <summary>

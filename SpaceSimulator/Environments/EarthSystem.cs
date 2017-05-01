@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using SharpDX;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Physics.Rocket;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Simulator.Rocket;
 
 namespace SpaceSimulator.Environments
 {
@@ -31,6 +33,7 @@ namespace SpaceSimulator.Environments
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
                 Simulator.SolarSystem.Earth.CreateConfig(),
+                new EarthAtmosphericModel(),
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
@@ -39,48 +42,46 @@ namespace SpaceSimulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>();
 
-            var moon = simulatorEngine.AddPlanetInOrbit(
-                "Moon",
-                PhysicsObjectType.NaturalSatellite,
-                Simulator.SolarSystem.Moon.CreateConfig(),
-                new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Magenta, baseDir + "Moon.jpg", moon));
+            //var moon = simulatorEngine.AddPlanetInOrbit(
+            //    "Moon",
+            //    PhysicsObjectType.NaturalSatellite,
+            //    Simulator.SolarSystem.Moon.CreateConfig(),
+            //    new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0));
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Magenta, baseDir + "Moon.jpg", moon));
 
             //var falcon9TargetAltitude = 250E3;
             var falcon9TargetAltitude = 300E3;
             //var falcon9TargetAltitude = 1000E3;
 
-            //var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
-            //var falcon9Object = simulatorEngine.AddRocketObject(
-            //    earth,
-            //    "Falcon 9",
-            //    10,
-            //    RocketStages.New(
-            //        RocketEngine.CreateFromBurnTime(9, 845E3, 282, 10000, 162),
-            //        RocketEngine.CreateFromBurnTime(1, 934E3, 348, 5000, 397)
-            //    ),
-            //    OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
-            //    //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
-            //    Vector3d.Zero);
-            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", falcon9Object));
+            var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
+            var falcon9Object = simulatorEngine.AddRocketObject(
+                earth,
+                "Falcon 9",
+                10,
+                new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 4.0), 0.05),
+                RocketStages.New(
+                    RocketEngine.CreateFromBurnTime(9, 845E3, 282, 10000, 162),
+                    RocketEngine.CreateFromBurnTime(1, 934E3, 348, 5000, 397)
+                ),
+                OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
+                //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
+                Vector3d.Zero);
+            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", falcon9Object));
 
-            //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
-            //    simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
-            //    falcon9Object,
-            //    2E3,
-            //    falcon9TargetOrbit);
-            //falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd));
-            //falcon9Object.CheckImpacted(0);
-            //falcon9Object.StartEngine();
+            var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
+                simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
+                falcon9Object,
+                2E3,
+                falcon9TargetOrbit);
+            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd));
+            falcon9Object.CheckImpacted(0);
+            falcon9Object.StartEngine();
 
-            var satellite1 = simulatorEngine.AddSatelliteInOrbit(
-                "Satellite 1",
-                new ObjectConfig(10, 1000),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
-            //simulatorEngine.ScheduleManeuver(
-            //    satellite1,
-            //    HohmannTransferOrbit.Create(simulatorEngine, satellite1, Simulator.SolarSystem.Earth.Radius * 2.0, OrbitalManeuverTime.TimeFromNow(10 * 60.0)));
+            //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
+            //    "Satellite 1",
+            //    new ObjectConfig(10, 1000),
+            //    new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
 
             var orbitPosition2 = new OrbitPosition(
                 Physics.Orbit.New(earth, parameter: 3.0 * Simulator.SolarSystem.Earth.Radius),
