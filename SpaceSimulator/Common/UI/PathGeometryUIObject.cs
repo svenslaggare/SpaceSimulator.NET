@@ -54,7 +54,7 @@ namespace SpaceSimulator.Common.UI
 
             this.brush.ApplyResource(brush =>
             {
-                this.pathGeometry.Draw(deviceContext, this.ScreenPosition, brush);
+                this.pathGeometry.DrawFilled(deviceContext, this.ScreenPosition, brush);
             });
         }
     }

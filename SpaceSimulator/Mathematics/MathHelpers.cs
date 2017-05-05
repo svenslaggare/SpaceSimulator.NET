@@ -299,5 +299,18 @@ namespace SpaceSimulator.Mathematics
 
             return delta;
         }
+
+        /// <summary>
+        /// Moves the rectangle by the given amount
+        /// </summary>
+        /// <param name="rectangle">The rectangle</param>
+        /// <param name="amount">The amount</param>
+        /// <returns>The moved rectangle</returns>
+        public static RectangleF Move(this RectangleF rectangle, Vector2 amount)
+        {
+            var currentCopy = rectangle;
+            currentCopy.Offset(amount);
+            return currentCopy;
+        }
     }
 }

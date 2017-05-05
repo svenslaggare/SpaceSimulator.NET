@@ -44,5 +44,14 @@ namespace SpaceSimulator.Physics.Atmosphere
         {
             return Math.PI * baseRadius * Math.Sqrt(baseRadius * baseRadius + height * height);
         }
+
+        /// <summary>
+        /// Returns the area of a circle
+        /// </summary>
+        /// <param name="radius">The radius</param>
+        public static double CircleArea(double radius)
+        {
+            return Math.PI * radius * radius;
+        }
     }
 }

@@ -26,6 +26,33 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         }
 
         /// <summary>
+        /// Calculates the non-gravity based acceleration of the given object
+        /// </summary>
+        /// <param name="rocketObject">The rocket object</param>
+        /// <param name="state">The state</param>
+        private Vector3d CalculateNonGravityAcceleration(RocketObject rocketObject, ref ObjectState state)
+        {
+            var nonGravityAcceleration = Vector3d.Zero;
+            var primaryBodyState = rocketObject.PrimaryBody.State;
+
+            if (rocketObject.IsEngineRunning)
+            {
+                nonGravityAcceleration += rocketObject.EngineAcceleration();
+            }
+
+            if (rocketObject.PrimaryBody is PlanetObject primaryPlanet)
+            {
+                nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
+                    primaryPlanet.Configuration,
+                    ref primaryBodyState,
+                    rocketObject.AtmosphericProperties,
+                    ref state) / rocketObject.Mass;
+            }
+
+            return nonGravityAcceleration;
+        }
+
+        /// <summary>
         /// Calculates the sum of the acceleration applied to the given object
         /// </summary>
         /// <param name="physicsObject">The object</param>
@@ -56,25 +83,11 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             }
 
             var nonGravityAcceleration = Vector3d.Zero;
-            var rocketObject = physicsObject as RocketObject;
             var primaryBodyState = physicsObject.PrimaryBody.State;
 
-
-            if (primary && rocketObject != null)
+            if (primary && physicsObject is RocketObject rocketObject)
             {
-                if (rocketObject.IsEngineRunning)
-                {
-                    nonGravityAcceleration += rocketObject.EngineAcceleration();
-                }
-
-                if (physicsObject.PrimaryBody is PlanetObject primaryPlanet)
-                {
-                    nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
-                        primaryPlanet.Configuration,
-                        ref primaryBodyState,
-                        rocketObject.AtmosphericProperties,
-                        ref state);
-                }
+                nonGravityAcceleration = this.CalculateNonGravityAcceleration(rocketObject, ref state);
             }
 
             return OrbitFormulas.GravityAcceleration(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
 
@@ -39,6 +40,21 @@ namespace SpaceSimulator.Simulator
             : base(name, type, config, primaryBody, initialState, initialOrbit, true)
         {
             this.AtmosphericModel = atmosphericModel;
+        }
+
+        /// <summary>
+        /// Calculates the drag force on the given object
+        /// </summary>
+        /// <param name="rocketObject">The object</param>
+        /// <param name="state">The state of the object</param>
+        public Vector3d DragOnObject(RocketObject rocketObject, ref ObjectState state)
+        {
+            var primaryState = this.State;
+            return this.AtmosphericModel.CalculateDrag(
+                this.Configuration,
+                ref primaryState,
+                rocketObject.AtmosphericProperties,
+                ref state);
         }
     }
 }

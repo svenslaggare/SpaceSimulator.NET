@@ -39,6 +39,7 @@ namespace SpaceSimulator.Physics.Atmosphere
                 pressure = 2.488 * Math.Pow((temperature + 273.1) / 216.6, -11.388);
             }
 
+            pressure *= 1000;
             temperature = temperature + Math.Abs(Constants.AbsoluteZero);
             return AtmosphericFormulas.DensityOfAir(pressure, temperature);
         }

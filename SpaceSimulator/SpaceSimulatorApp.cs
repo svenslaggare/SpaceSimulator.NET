@@ -19,6 +19,7 @@ using SpaceSimulator.Common.UI;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.UI;
@@ -43,6 +44,8 @@ namespace SpaceSimulator
         private readonly UIManager uiManager;
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
+
+        //private Plot2D plot2D;
 
         /// <summary>
         /// Creates a new space simulator application
@@ -107,6 +110,14 @@ namespace SpaceSimulator
         {
             base.Initialize();
             this.CreateEffect();
+
+            //var values = new List<Vector2>();
+            //var earthAtmosphericModel = new EarthAtmosphericModel();
+            //for (double altitude = 0; altitude <= 100E3; altitude += 100)
+            //{
+            //    values.Add(new Vector2((float)altitude, (float)earthAtmosphericModel.DensityOfAir(altitude)));
+            //}
+            //this.plot2D = new Plot2D(this.RenderingManager2D, values, Color.Red, 500, 375, labelAxisX: "Altitude", labelAxisY: "Density of air");
         }
 
         protected override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)
@@ -170,6 +181,7 @@ namespace SpaceSimulator
             }
 
             this.uiManager.Draw(this.DeviceContext2D);
+            //this.plot2D.Draw(this.DeviceContext2D, new Vector2(400, 200));
             this.DeviceContext2D.EndDraw();
 
             //Present

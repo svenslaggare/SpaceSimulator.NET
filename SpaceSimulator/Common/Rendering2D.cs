@@ -427,16 +427,30 @@ namespace SpaceSimulator.Common
         }
 
         /// <summary>
-        /// Draws the geometry
+        /// Draws the geometry filled
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="position">The position</param>
         /// <param name="brush">The brush</param>
-        public void Draw(DeviceContext deviceContext, Vector2 position, Brush brush)
+        public void DrawFilled(DeviceContext deviceContext, Vector2 position, Brush brush)
         {
             var originalTransform = deviceContext.Transform;
             deviceContext.Transform = Matrix3x2.Translation(position);
             deviceContext.FillGeometry(this.pathGeometry, brush);
+            deviceContext.Transform = originalTransform;
+        }
+
+        /// <summary>
+        /// Draws the geometry outlines
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="position">The position</param>
+        /// <param name="brush">The brush</param>
+        public void DrawOutline(DeviceContext deviceContext, Vector2 position, Brush brush)
+        {
+            var originalTransform = deviceContext.Transform;
+            deviceContext.Transform = Matrix3x2.Translation(position);
+            deviceContext.DrawGeometry(this.pathGeometry, brush);
             deviceContext.Transform = originalTransform;
         }
 

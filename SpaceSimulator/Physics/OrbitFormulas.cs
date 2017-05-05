@@ -44,7 +44,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the acceleration due to gravity
         /// </summary>
-        /// <param name="standardGravitationalParameter">The standard gravitational parameter</param>
+        /// <param name="standardGravitationalParameter">The standard gravitational parameter of the other object</param>
         /// <param name="r">The distance between the centers</param>
         public static Vector3d GravityAcceleration(double standardGravitationalParameter, Vector3d r)
         {

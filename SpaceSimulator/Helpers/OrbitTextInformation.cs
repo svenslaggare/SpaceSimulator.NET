@@ -29,6 +29,11 @@ namespace SpaceSimulator.Helpers
         {
             var orbit = orbitPosition.Orbit;
             var infoBuilder = new StringBuilder();
+            
+            void AddBulletItem(string item)
+            {
+                infoBuilder.AppendLine("    • " + item);
+            }
 
             if (physicsObject != null)
             {
@@ -65,12 +70,28 @@ namespace SpaceSimulator.Helpers
 
                     (var horizontalSpeed, var verticalSpeed) = OrbitHelpers.ComputeHorizontalAndVerticalVelocity(gravityAccelerationDirection, relativeVelocity);
 
-                    infoBuilder.AppendLine("Horizontal speed: " + DataFormatter.Format(horizontalSpeed, DataUnit.Velocity));
-                    infoBuilder.AppendLine("Vertical speed: " + DataFormatter.Format(verticalSpeed, DataUnit.Velocity));
+                    AddBulletItem("Horizontal speed: " + DataFormatter.Format(horizontalSpeed, DataUnit.Velocity));
+                    AddBulletItem("Vertical speed: " + DataFormatter.Format(verticalSpeed, DataUnit.Velocity));
                 }
             }
 
             infoBuilder.AppendLine("Acceleration: " + DataFormatter.Format(state.Acceleration.Length(), DataUnit.Acceleration));
+
+            if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
+            {
+                var gravityAcceleration = OrbitFormulas.GravityAcceleration(physicsObject.PrimaryBody.StandardGravitationalParameter, state.Position - refPosition);
+                AddBulletItem("Gravity: " + DataFormatter.Format(gravityAcceleration.Length(), DataUnit.Acceleration));
+
+                if (physicsObject is RocketObject rocketObject)
+                {
+                    var primaryPlanet = primaryBody as PlanetObject;
+                    var dragAcceleration = primaryPlanet.DragOnObject(rocketObject, ref state) / rocketObject.Mass;
+                    var thrustAcceleration = rocketObject.EngineAcceleration();
+
+                    AddBulletItem("Thrust: " + DataFormatter.Format(thrustAcceleration.Length(), DataUnit.Acceleration));
+                    AddBulletItem("Drag: " + DataFormatter.Format(dragAcceleration.Length(), DataUnit.Acceleration));
+                }
+            }
 
             double latitude = 0;
             double longitide = 0;

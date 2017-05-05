@@ -40,7 +40,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// The specific gas constant for the earth
         /// </summary>
-        public const double EarthSpecificGasConstant = 8.31432E3;
+        public const double EarthSpecificGasConstant = 287.058;
 
         /// <summary>
         /// The absolute zero temperature (in C)
