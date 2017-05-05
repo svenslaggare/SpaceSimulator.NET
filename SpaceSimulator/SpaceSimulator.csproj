@@ -154,6 +154,7 @@
     <Compile Include="Physics\OrbitHelpers.cs" />
     <Compile Include="Helpers\OrbitTextInformation.cs" />
     <Compile Include="Physics\OrbitPosition.cs" />
+    <Compile Include="Rendering\Plot2D.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />
