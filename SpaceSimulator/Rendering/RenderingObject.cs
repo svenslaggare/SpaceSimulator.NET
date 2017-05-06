@@ -30,6 +30,10 @@ namespace SpaceSimulator.Rendering
 
         private readonly Matrix scalingMatrix;
 
+        private readonly TimeSpan orbitUpdateTime = TimeSpan.FromMilliseconds(50.0);
+        private DateTime lastOrbitUpdate = new DateTime();
+        private bool updateOrbit = false;
+
         /// <summary>
         /// Creates a new rendering object
         /// </summary>
@@ -69,7 +73,6 @@ namespace SpaceSimulator.Rendering
         private void CalculateOrbitPositions()
         {
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
-            //this.positions = OrbitPositions.Create(this.physicsObject.ReferenceOrbit, true);
             this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
         }
         
@@ -136,8 +139,18 @@ namespace SpaceSimulator.Rendering
         {
             if (this.physicsObject.HasChangedOrbit())
             {
-                this.CalculateOrbitPositions();
-                this.renderingOrbit.Update(this.positions);
+                this.updateOrbit = true;
+            }
+
+            if (this.updateOrbit)
+            {
+                if (DateTime.UtcNow - this.lastOrbitUpdate >= this.orbitUpdateTime)
+                {
+                    this.CalculateOrbitPositions();
+                    this.renderingOrbit.Update(this.positions);
+                    this.updateOrbit = false;
+                    this.lastOrbitUpdate = DateTime.UtcNow;
+                }
             }
 
             this.renderingOrbit.Draw(

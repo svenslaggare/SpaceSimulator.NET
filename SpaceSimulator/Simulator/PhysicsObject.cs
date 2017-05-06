@@ -346,10 +346,14 @@ namespace SpaceSimulator.Simulator
         /// Indicates if the orbit of the object has changed.
         /// If that this is the case, reset the indication.
         /// </summary>
-        public bool HasChangedOrbit()
+        /// <param name="clear">Indicates if to clear the indication</param>
+        public bool HasChangedOrbit(bool clear = true)
         {
             var hasChanged = this.orbitChanged;
-            this.orbitChanged = false;
+            if (clear)
+            {
+                this.orbitChanged = false;
+            }
             return hasChanged;
         }
 
