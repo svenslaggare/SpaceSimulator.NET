@@ -69,6 +69,7 @@ namespace SpaceSimulator.Environments
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",
                 new ObjectConfig(10, 1000),
+                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
 

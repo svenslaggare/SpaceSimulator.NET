@@ -14,9 +14,8 @@ namespace SpaceSimulator.Simulator
     /// <summary>
     /// Represents a physics object with a rocket engine
     /// </summary>
-    public class RocketObject : PhysicsObject
+    public class RocketObject : ArtificialPhysicsObject
     {
-        private readonly AtmosphericProperties atmosphericProperties;
         private readonly RocketStages rocketStages;
 
         private bool engineRunning;
@@ -42,18 +41,9 @@ namespace SpaceSimulator.Simulator
             ObjectState initialState,
             Orbit initialOrbit,
             RocketStages rocketStages)
-            : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit, false)
+            : base(name, config, atmosphericProperties, primaryBody, initialState, initialOrbit)
         {
-            this.atmosphericProperties = atmosphericProperties;
             this.rocketStages = rocketStages;
-        }
-
-        /// <summary>
-        /// Returns the atmospheric properties
-        /// </summary>
-        public AtmosphericProperties AtmosphericProperties
-        {
-            get { return this.atmosphericProperties; }
         }
 
         /// <summary>
@@ -157,6 +147,7 @@ namespace SpaceSimulator.Simulator
                 var spentStageObject = new SatelliteObject(
                     $"{this.Name} - {oldStage.Name}",
                     this.Configuration.WithMass(oldStage.Mass),
+                    this.AtmosphericProperties,
                     this.PrimaryBody,
                     this.ReferenceState,
                     this.ReferenceOrbit);

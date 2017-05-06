@@ -21,6 +21,14 @@ namespace SpaceSimulator.Physics.Atmosphere
         (double, double) PressureAndTemperature(double altitude);
 
         /// <summary>
+        /// Indicates if the given object is inside the atmosphere
+        /// </summary>
+        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBodyState">The state of the primary body</param>
+        /// <param name="state">The state of the object</param>
+        bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state);
+
+        /// <summary>
         /// Calculates the drag force of the given object
         /// </summary>
         /// <param name="primaryBodyConfig">The configuration of the primary body</param>

@@ -28,15 +28,15 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <summary>
         /// Calculates the non-gravity based acceleration of the given object
         /// </summary>
-        /// <param name="rocketObject">The rocket object</param>
+        /// <param name="artificialObject">The artificial physics object</param>
         /// <param name="state">The state</param>
         /// <param name="timeStep">The time step</param>
-        private Vector3d CalculateNonGravityAcceleration(RocketObject rocketObject, ref ObjectState state, double timeStep)
+        private Vector3d CalculateNonGravityAcceleration(ArtificialPhysicsObject artificialObject, ref ObjectState state, double timeStep)
         {
             var nonGravityAcceleration = Vector3d.Zero;
-            var primaryBodyState = rocketObject.PrimaryBody.State;
+            var primaryBodyState = artificialObject.PrimaryBody.State;
 
-            if (rocketObject.IsEngineRunning)
+            if (artificialObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
                 nonGravityAcceleration += rocketObject.EngineAcceleration();
                 //if (rocketObject.IsEngineRunning)
@@ -48,13 +48,17 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 //}
             }
 
-            if (rocketObject.PrimaryBody is PlanetObject primaryPlanet)
+            if (artificialObject.PrimaryBody is PlanetObject primaryPlanet
+                && primaryPlanet.AtmosphericModel.Inside(
+                    primaryPlanet.Configuration,
+                    ref primaryBodyState,
+                    ref state))
             {
                 nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
                     primaryPlanet.Configuration,
                     ref primaryBodyState,
-                    rocketObject.AtmosphericProperties,
-                    ref state) / rocketObject.Mass;
+                    artificialObject.AtmosphericProperties,
+                    ref state) / artificialObject.Mass;
             }
 
             return nonGravityAcceleration;
@@ -93,9 +97,9 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             var nonGravityAcceleration = Vector3d.Zero;
             var primaryBodyState = physicsObject.PrimaryBody.State;
 
-            if (primary && physicsObject is RocketObject rocketObject)
+            if (primary && physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
             {
-                nonGravityAcceleration = this.CalculateNonGravityAcceleration(rocketObject, ref state, timeStep);
+                nonGravityAcceleration = this.CalculateNonGravityAcceleration(artificialPhysicsObject, ref state, timeStep);
             }
 
             return OrbitFormulas.GravityAcceleration(

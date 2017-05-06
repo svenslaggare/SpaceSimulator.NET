@@ -98,6 +98,7 @@ namespace SpaceSimulator.Environments
             var object2 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 2",
                 new ObjectConfig(10, 1000),
+                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 orbitPosition2);
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", object2));
 

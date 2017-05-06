@@ -9,29 +9,33 @@ using SpaceSimulator.Physics.Atmosphere;
 namespace SpaceSimulator.Simulator
 {
     /// <summary>
-    /// Represents a satellite physics object
+    /// Represetns a generic artificial physics object
     /// </summary>
-    public class SatelliteObject : ArtificialPhysicsObject
+    public abstract class ArtificialPhysicsObject : PhysicsObject
     {
         /// <summary>
-        /// Creates a new satellite object
+        /// Returns the atmospheric properties
+        /// </summary>
+        public AtmosphericProperties AtmosphericProperties { get; }
+
+        /// <summary>
+        /// Creates a new artificial object object
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration for the object</param>
-        /// <param name="atmosphericProperties">The atmospheric properties</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
-        public SatelliteObject(
+        public ArtificialPhysicsObject(
             string name,
             ObjectConfig config,
             AtmosphericProperties atmosphericProperties,
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, config, atmosphericProperties, primaryBody, initialState, initialOrbit)
+            : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit, false)
         {
-
+            this.AtmosphericProperties = atmosphericProperties;
         }
     }
 }

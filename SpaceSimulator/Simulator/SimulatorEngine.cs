@@ -378,11 +378,13 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration</param>
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <returns>The created object</returns>
         public PhysicsObject AddSatelliteInOrbit(
             string name,
             ObjectConfig config,
+            AtmosphericProperties atmosphericProperties,
             OrbitPosition orbitPosition)
         {
             var orbit = orbitPosition.Orbit;
@@ -390,6 +392,7 @@ namespace SpaceSimulator.Simulator
             var newObject = new SatelliteObject(
                 name,
                 config,
+                atmosphericProperties,
                 (PhysicsObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit);

@@ -103,13 +103,17 @@ namespace SpaceSimulator.Helpers
                 var gravityAcceleration = OrbitFormulas.GravityAcceleration(physicsObject.PrimaryBody.StandardGravitationalParameter, state.Position - refPosition);
                 AddBulletItem("Gravity: " + DataFormatter.Format(gravityAcceleration.Length(), DataUnit.Acceleration));
 
-                if (physicsObject is RocketObject rocketObject)
+                if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
                 {
                     var primaryPlanet = primaryBody as PlanetObject;
-                    var dragAcceleration = primaryPlanet.DragOnObject(rocketObject, ref state) / rocketObject.Mass;
-                    var thrustAcceleration = rocketObject.EngineAcceleration();
+                    var dragAcceleration = primaryPlanet.DragOnObject(artificialPhysicsObject, ref state) / artificialPhysicsObject.Mass;
 
-                    AddBulletItem("Thrust: " + DataFormatter.Format(thrustAcceleration.Length(), DataUnit.Acceleration));
+                    if (physicsObject is RocketObject rocketObject)
+                    {
+                        var thrustAcceleration = rocketObject.EngineAcceleration();
+                        AddBulletItem("Thrust: " + DataFormatter.Format(thrustAcceleration.Length(), DataUnit.Acceleration));
+                    }
+
                     AddBulletItem("Drag: " + DataFormatter.Format(dragAcceleration.Length(), DataUnit.Acceleration));
                 }
             }

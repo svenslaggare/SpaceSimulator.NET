@@ -23,6 +23,17 @@ namespace SpaceSimulator.Physics.Atmosphere
         }
 
         /// <summary>
+        /// Indicates if the given object is inside the atmosphere
+        /// </summary>
+        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBodyState">The state of the primary body</param>
+        /// <param name="state">The state of the object</param>
+        public bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Calculates the drag of the given object
         /// </summary>
         /// <param name="primaryBodyConfig">The configuration of the primary body</param>

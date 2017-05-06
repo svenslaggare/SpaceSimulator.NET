@@ -15,6 +15,11 @@ namespace SpaceSimulator.Physics.Atmosphere
     public sealed class EarthAtmosphericModel : IAtmosphericModel
     {
         /// <summary>
+        /// The altitude when the atmosphere ends
+        /// </summary>
+        public static readonly double EndOfAtmosphereAltitude = 300E3;
+
+        /// <summary>
         /// Calculates the pressure and temperature at the given altitude
         /// </summary>
         /// <param name="altitude">The altitude</param>
@@ -54,6 +59,18 @@ namespace SpaceSimulator.Physics.Atmosphere
         {
             (var pressure, var temperature) = PressureAndTemperature(altitude);
             return AtmosphericFormulas.DensityOfAir(pressure, temperature);
+        }
+
+        /// <summary>
+        /// Indicates if the given object is inside the atmosphere
+        /// </summary>
+        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBodyState">The state of the primary body</param>
+        /// <param name="state">The state of the object</param>
+        public bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state)
+        {
+            var altitude = (state.Position - primaryBodyState.Position).Length() - primaryBodyConfig.Radius;
+            return altitude < EndOfAtmosphereAltitude;
         }
 
         /// <summary>
