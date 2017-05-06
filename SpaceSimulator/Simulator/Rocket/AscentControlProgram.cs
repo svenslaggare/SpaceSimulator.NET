@@ -423,7 +423,6 @@ namespace SpaceSimulator.Simulator.Rocket
 
             var deltaAltitude = 200.0;
             var timeStep = 0.02;
-            //timeStep *= 10.0;
             timeStep *= 5.0;
 
             //var maxPitchStart = Math.Max(6E3, minAltitude);

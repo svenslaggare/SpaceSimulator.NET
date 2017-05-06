@@ -158,9 +158,10 @@ namespace SpaceSimulator.Simulator
     {
         private readonly IList<PhysicsObject> objects = new List<PhysicsObject>();
         private readonly IList<PhysicsObject> naturalObjects = new List<PhysicsObject>();
+        private readonly IList<PhysicsObject> newObjects = new List<PhysicsObject>();
+
         private double totalTime;
         private double timeStep = 0.02;
-
         private readonly IList<double> subTimeIntervals = new List<double>();
 
         private readonly INumericIntegrator numericIntegrator = new RungeKutta4Integrator();
@@ -211,6 +212,11 @@ namespace SpaceSimulator.Simulator
         {
             get { return this.gaussProblemSolver; }
         }
+
+        /// <summary>
+        /// Fires when a new object is added
+        /// </summary>
+        public event EventHandler<PhysicsObject> ObjectAdded;
 
         /// <summary>
         /// Creates a new simulator engine
@@ -320,6 +326,15 @@ namespace SpaceSimulator.Simulator
             }
 
             this.CalculateSphereOfInfluence(physicsObject);
+        }
+
+        /// <summary>
+        /// Adds the given object to the list of objects to add
+        /// </summary>
+        /// <param name="physicsObject">The object</param>
+        private void AddNewObject(PhysicsObject physicsObject)
+        {
+            this.newObjects.Add(physicsObject);
         }
 
         /// <summary>
@@ -728,7 +743,7 @@ namespace SpaceSimulator.Simulator
             {
                 if (currentObject.Type != PhysicsObjectType.ObjectOfReference)
                 {
-                    this.currentOrbitSimulator.Update(this.totalTime, deltaTime, currentObject, this.naturalObjects);
+                    this.currentOrbitSimulator.Update(this.totalTime, deltaTime, currentObject, this.naturalObjects, this.AddNewObject);
 
                     if (this.SimulationMode == PhysicsSimulationMode.KeplerProblemUniversalVariable)
                     {
@@ -748,6 +763,18 @@ namespace SpaceSimulator.Simulator
                         currentObject.NextState.Rotation,
                         deltaTime)));
                 }
+            }
+
+            //Add new objects
+            if (this.newObjects.Count > 0)
+            {
+                foreach (var newObject in this.newObjects)
+                {
+                    this.AddObject(newObject);
+                    this.ObjectAdded?.Invoke(this, newObject);
+                }
+
+                this.newObjects.Clear();
             }
 
             //Set the absolute state for all objects

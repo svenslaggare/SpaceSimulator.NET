@@ -69,17 +69,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="burnTime">The burn time</param>
         public static RocketEngine CreateFromBurnTime(int numberOfEngines, double thrust, double specificImpulse, double dryMass, double burnTime)
         {
-            return new RocketEngine(numberOfEngines, thrust, specificImpulse, dryMass, numberOfEngines * burnTime * CalculateMassFlowRate(thrust, specificImpulse));
-        }
-
-        /// <summary>
-        /// Calculates the mass flow rate (kg/s)
-        /// </summary>
-        /// <param name="thrust">The thrust (in newtons)</param>
-        /// <param name="specificImpulse">The specific impulse (in seconds)</param>
-        public static double CalculateMassFlowRate(double thrust, double specificImpulse)
-        {
-            return thrust / (Constants.StandardGravity * specificImpulse);
+            return new RocketEngine(numberOfEngines, thrust, specificImpulse, dryMass, numberOfEngines * burnTime * RocketFormulas.CalculateMassFlowRate(thrust, specificImpulse));
         }
 
         /// <summary>
@@ -87,7 +77,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double MassFlowRate
         {
-            get { return CalculateMassFlowRate(this.Thrust, this.SpecificImpulse); }
+            get { return RocketFormulas.CalculateMassFlowRate(this.Thrust, this.SpecificImpulse); }
         }
 
         /// <summary>
@@ -104,6 +94,14 @@ namespace SpaceSimulator.Physics.Rocket
         public double TotalMassFlowRate
         {
             get { return this.MassFlowRate * this.NumberOfEngines; }
+        }
+
+        /// <summary>
+        /// Returns the effective exhaust velocity
+        /// </summary>
+        public double EffectiveExhaustVelocity
+        {
+            get { return this.SpecificImpulse * Constants.StandardGravity; }
         }
     }
 }

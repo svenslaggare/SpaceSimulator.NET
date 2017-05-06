@@ -11,14 +11,6 @@ using SpaceSimulator.Simulator.Rocket;
 
 namespace SpaceSimulator.Simulator
 {
-    public enum RocketObjectState
-    {
-        InitialAscent,
-        Coast,
-        Circularizing,
-        InOrbit
-    }
-
     /// <summary>
     /// Represents a physics object with a rocket engine
     /// </summary>
@@ -96,7 +88,6 @@ namespace SpaceSimulator.Simulator
             {
                 this.engineRunning = true;
                 this.state.Impacted = false;
-
                 this.controlProgram.Start(this.state.Time);
             }
         }
@@ -129,7 +120,8 @@ namespace SpaceSimulator.Simulator
         /// Handles what happens after the current rocket impulse
         /// </summary>
         /// <param name="time">The time of the impulse</param>
-        public void AfterImpulse(double time)
+        /// <param name="addObject">A function to add a new object</param>
+        public void AfterImpulse(double time, Action<PhysicsObject> addObject = null)
         {
             var primaryBodyState = this.PrimaryBody.NextState;
             var state = this.NextState;
@@ -146,8 +138,21 @@ namespace SpaceSimulator.Simulator
             }
             else
             {
-                if (this.rocketStages.Stage())
+                if (this.rocketStages.Stage(out var oldStage, out var oldStageFuelLeft))
                 {
+                    if (addObject != null)
+                    {
+                        var spentStageObject = new SatelliteObject(
+                            this.Name + " Stage",
+                            this.Configuration.WithMass(oldStage.DryMass + oldStageFuelLeft),
+                            this.PrimaryBody,
+                            this.ReferenceState,
+                            this.ReferenceOrbit);
+                        spentStageObject.SetNextState(this.ReferenceState);
+
+                        addObject(spentStageObject);
+                    }
+
                     this.Configuration = this.Configuration.WithMass(this.rocketStages.TotalMass);
                 }
                 else

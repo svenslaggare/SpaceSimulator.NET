@@ -316,8 +316,8 @@ namespace SpaceSimulator.Simulator
                     return 0.0;
                 }
 
-                var r = MathConversionsHelpers.SwapYZ(state.Position - this.PrimaryBody.Position);
-                var v = MathConversionsHelpers.SwapYZ(state.Velocity - this.PrimaryBody.Velocity);
+                var r = MathHelpers.SwapYZ(state.Position - this.PrimaryBody.Position);
+                var v = MathHelpers.SwapYZ(state.Velocity - this.PrimaryBody.Velocity);
                 var h = Vector3d.Cross(r, v);
 
                 return Math.Acos(h.Length() / (r.Length() * v.Length()));

@@ -35,7 +35,7 @@ namespace SpaceSimulator.UI
         {
             this.orbitCamera = orbitCamera;
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];
-            this.orbitCamera.Radius = MathConversionsHelpers.ToDraw(this.focusObject.Radius * 3.5);
+            this.orbitCamera.Radius = MathHelpers.ToDraw(this.focusObject.Radius * 3.5);
         }
 
         public override void Update(TimeSpan elapsed)
@@ -52,13 +52,13 @@ namespace SpaceSimulator.UI
 
             if (changed)
             {
-                this.orbitCamera.Radius = MathConversionsHelpers.ToDraw(this.focusObject.Radius * 5.0);
+                this.orbitCamera.Radius = MathHelpers.ToDraw(this.focusObject.Radius * 5.0);
             }
         }
 
         public override void AfterSimulationUpdate()
         {
-            this.orbitCamera.Focus = MathConversionsHelpers.ToDrawPosition(this.focusObject.Position);
+            this.orbitCamera.Focus = MathHelpers.ToDrawPosition(this.focusObject.Position);
         }
 
         public override void Draw(DeviceContext deviceContext)

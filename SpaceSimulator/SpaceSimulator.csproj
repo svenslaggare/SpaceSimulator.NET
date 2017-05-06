@@ -123,7 +123,6 @@
     <Compile Include="Helpers\CollisionHelpers.cs" />
     <Compile Include="Helpers\DataFormater.cs" />
     <Compile Include="Helpers\MiscHelpers.cs" />
-    <Compile Include="Mathematics\MathConversionsHelpers.cs" />
     <Compile Include="Mathematics\MathHelpers.cs" />
     <Compile Include="Mathematics\MathUtild.cs" />
     <Compile Include="Mathematics\Matrix3x3d.cs" />
@@ -154,6 +153,9 @@
     <Compile Include="Physics\OrbitHelpers.cs" />
     <Compile Include="Helpers\OrbitTextInformation.cs" />
     <Compile Include="Physics\OrbitPosition.cs" />
+    <Compile Include="Physics\Rocket\RocketEngine2.cs" />
+    <Compile Include="Physics\Rocket\RocketFormulas.cs" />
+    <Compile Include="Physics\Rocket\RocketStage.cs" />
     <Compile Include="Rendering\Plot2D.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />

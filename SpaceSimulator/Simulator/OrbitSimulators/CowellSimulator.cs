@@ -30,7 +30,8 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// </summary>
         /// <param name="rocketObject">The rocket object</param>
         /// <param name="state">The state</param>
-        private Vector3d CalculateNonGravityAcceleration(RocketObject rocketObject, ref ObjectState state)
+        /// <param name="timeStep">The time step</param>
+        private Vector3d CalculateNonGravityAcceleration(RocketObject rocketObject, ref ObjectState state, double timeStep)
         {
             var nonGravityAcceleration = Vector3d.Zero;
             var primaryBodyState = rocketObject.PrimaryBody.State;
@@ -38,6 +39,13 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             if (rocketObject.IsEngineRunning)
             {
                 nonGravityAcceleration += rocketObject.EngineAcceleration();
+                //if (rocketObject.IsEngineRunning)
+                //{
+                //    var currentStage = rocketObject.Stages.CurrentStage;
+                //    var deltaV = currentStage.EffectiveExhaustVelocity * Math.Log(rocketObject.Mass / (rocketObject.Mass - timeStep * currentStage.MassFlowRate));
+                //    var engineAcceleration = currentStage.NumberOfEngines * (deltaV / timeStep);
+                //    nonGravityAcceleration += MathHelpers.Normalized(rocketObject.EngineAcceleration()) * engineAcceleration;
+                //}
             }
 
             if (rocketObject.PrimaryBody is PlanetObject primaryPlanet)
@@ -87,7 +95,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
 
             if (primary && physicsObject is RocketObject rocketObject)
             {
-                nonGravityAcceleration = this.CalculateNonGravityAcceleration(rocketObject, ref state);
+                nonGravityAcceleration = this.CalculateNonGravityAcceleration(rocketObject, ref state, timeStep);
             }
 
             return OrbitFormulas.GravityAcceleration(
@@ -104,7 +112,8 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <param name="timeStep">The time step</param>
         /// <param name="currentObject">The current object</param>
         /// <param name="otherObjects">The other objects</param>
-        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, IList<PhysicsObject> otherObjects)
+        /// <param name="addObject">A function to add a new object</param>
+        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, IList<PhysicsObject> otherObjects, Action<PhysicsObject> addObject)
         {
             var currentState = currentObject.State;
             var nextState = this.numericIntegrator.Solve(
@@ -117,7 +126,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
 
             if (currentObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
-                rocketObject.AfterImpulse(timeStep);
+                rocketObject.AfterImpulse(timeStep, addObject);
             }
 
             currentObject.SetNextState(nextState);

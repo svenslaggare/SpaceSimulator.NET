@@ -12,6 +12,14 @@ namespace SpaceSimulator.Physics.Atmosphere
     /// </summary>
     public sealed class NoAtmosphereModel : IAtmosphericModel
     {
+        /// <summary>
+        /// Calculates the drag of the given object
+        /// </summary>
+        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBodyState">The state of the primary body</param>
+        /// <param name="properties">The atmospheric properties of the object</param>
+        /// <param name="state">The state of the object</param>
+        /// <returns>The drag force</returns>
         public Vector3d CalculateDrag(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state)
         {
             return Vector3d.Zero;

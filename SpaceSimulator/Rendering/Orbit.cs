@@ -254,13 +254,14 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Calculates the width of an orbit line
+        /// Calculates the width of an orbit line segment
         /// </summary>
         /// <param name="camera">The camera</param>
         /// <param name="position">The position of the object (in game space)</param>
         public static float OrbitLineWidth(BaseCamera camera, Vector3 position)
         {
             var width = Vector3.Distance(position, camera.Position) / 200.0f;
+            //var width = (float)Vector3d.Distance(MathConversionsHelpers.FromDrawPosition(position), MathConversionsHelpers.FromDrawPosition(camera.Position)) / 0.4E8f;
             return MathUtil.Clamp(width, 0.0001f, 10.0f);
         }
 

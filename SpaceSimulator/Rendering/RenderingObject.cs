@@ -57,9 +57,9 @@ namespace SpaceSimulator.Rendering
 
             this.renderingSphere = new Sphere(graphicsDevice, 1.0f, textureName, defaultMaterial);
 
-            var nonRealSize = MathConversionsHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
+            var nonRealSize = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
 
-            this.scalingMatrix = Matrix.Scaling(physicsObject.IsRealSize ? MathConversionsHelpers.ToDraw(this.physicsObject.Radius) : nonRealSize);
+            this.scalingMatrix = Matrix.Scaling(physicsObject.IsRealSize ? MathHelpers.ToDraw(this.physicsObject.Radius) : nonRealSize);
             //this.scalingMatrix = Matrix.Scaling(0.01f);
         }
         
@@ -93,7 +93,7 @@ namespace SpaceSimulator.Rendering
                 return Matrix.Identity;
             }
 
-            return Matrix.Translation(MathConversionsHelpers.ToDrawPosition(this.physicsObject.PrimaryBody.Position));
+            return Matrix.Translation(MathHelpers.ToDrawPosition(this.physicsObject.PrimaryBody.Position));
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private Vector3 DrawPosition
         {
-            get { return MathConversionsHelpers.ToDrawPosition(this.physicsObject.Position); }
+            get { return MathHelpers.ToDrawPosition(this.physicsObject.Position); }
         }
 
         /// <summary>

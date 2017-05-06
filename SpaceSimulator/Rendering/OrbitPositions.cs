@@ -34,7 +34,7 @@ namespace SpaceSimulator.Rendering
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;
                 var newState = orbit.CalculateState(trueAnomaly, ref primaryBodyState);
 
-                var position = MathConversionsHelpers.ToDraw(newState.Position);
+                var position = MathHelpers.ToDrawPosition(newState.Position);
                 if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || float.IsInfinity(position.LengthSquared())))
                 {
                     orbitPositions.Add(new Orbit.Point(position, trueAnomaly));
@@ -79,7 +79,7 @@ namespace SpaceSimulator.Rendering
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;
                 var newState = orbit.CalculateState(currentTrueAnomaly, ref primaryBodyState);
 
-                var position = MathConversionsHelpers.ToDraw(newState.Position);
+                var position = MathHelpers.ToDrawPosition(newState.Position);
                 if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || float.IsInfinity(position.LengthSquared())))
                 {
                     orbitPositions.Add(new Orbit.Point(position, currentTrueAnomaly));

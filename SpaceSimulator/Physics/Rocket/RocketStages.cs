@@ -83,17 +83,23 @@ namespace SpaceSimulator.Physics.Rocket
         /// <summary>
         /// Stages the rocket if possible
         /// </summary>
-        /// <returns>True if staged else false</returns>
-        public bool Stage()
+        /// <param name="oldStage">The old stage if staged</param>
+        /// <param name="oldStageFuelMassRemaining">The amount of fuel remaining in the old stage</param>
+        /// <returns>True if staged, else false. If staged, sets the out variables.</returns>
+        public bool Stage(out RocketEngine oldStage, out double oldStageFuelMassRemaining)
         {
             if (this.stages.Count > 0)
             {
+                oldStage = this.CurrentStage;
+                oldStageFuelMassRemaining = this.FuelMassRemaining;
                 this.CurrentStage = this.stages.Dequeue();
                 this.FuelMassRemaining = this.CurrentStage.FuelMass;
                 return true;
             }
             else
             {
+                oldStage = null;
+                oldStageFuelMassRemaining = 0.0;
                 return false;
             }
         }

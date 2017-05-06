@@ -383,8 +383,8 @@ namespace SpaceSimulator.Physics
             var v = Math.Sqrt(this.StandardGravitationalParameter / this.Parameter)
                         * (-sinTrueAnomaly * P + (this.Eccentricity + cosTrueAnomaly) * Q);
 
-            var radius = primaryBodyState.Position + MathConversionsHelpers.SwapYZ(R * r);
-            var velocity = primaryBodyState.Velocity + MathConversionsHelpers.SwapYZ(R * v);
+            var radius = primaryBodyState.Position + MathHelpers.SwapYZ(R * r);
+            var velocity = primaryBodyState.Velocity + MathHelpers.SwapYZ(R * v);
 
             return new ObjectState(
                 primaryBodyState.Time,

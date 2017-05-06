@@ -267,13 +267,13 @@ namespace SpaceSimulator.Physics
         /// <param name="state">The state of the object</param>
         public static OrbitPosition CalculateOrbitPosition(IPhysicsObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
         {
-            var r = MathConversionsHelpers.SwapYZ(state.Position - primaryBodyState.Position);
-            var v = MathConversionsHelpers.SwapYZ(state.Velocity - primaryBodyState.Velocity);
+            var r = MathHelpers.SwapYZ(state.Position - primaryBodyState.Position);
+            var v = MathHelpers.SwapYZ(state.Velocity - primaryBodyState.Velocity);
             var mu = primaryBody.StandardGravitationalParameter;
 
             var h = Vector3d.Cross(r, v);
             var e = (1 / mu) * ((v.LengthSquared() - (mu / r.Length())) * r - (Vector3d.Dot(r, v) * v));
-            var n = Vector3d.Cross(MathConversionsHelpers.SwapYZ(Vector3d.Up), h);
+            var n = Vector3d.Cross(MathHelpers.SwapYZ(Vector3d.Up), h);
 
             var parameter = h.LengthSquared() / mu;
             var eccentricity = e.Length();
