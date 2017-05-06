@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,14 +10,14 @@ namespace SpaceSimulator.Physics.Rocket
     /// <summary>
     /// Represents a collection of rocket stages
     /// </summary>
-    public class RocketStages
+    public sealed class RocketStages : IEnumerable<RocketStage>
     {
-        private readonly Queue<RocketEngine> stages;
+        private readonly Queue<RocketStage> stages;
 
         /// <summary>
         /// Returns the current stage
         /// </summary>
-        public RocketEngine CurrentStage { get; private set; }
+        public RocketStage CurrentStage { get; private set; }
 
         /// <summary>
         /// The initial total mass
@@ -32,9 +33,9 @@ namespace SpaceSimulator.Physics.Rocket
         /// Creates a new collection of stages
         /// </summary>
         /// <param name="stages">The stage</param>
-        public RocketStages(IList<RocketEngine> stages)
+        public RocketStages(IList<RocketStage> stages)
         {
-            this.stages = new Queue<RocketEngine>(stages);
+            this.stages = new Queue<RocketStage>(stages);
             this.CurrentStage = this.stages.Dequeue();
             this.InitialTotalMass = stages.Sum(x => x.InitialTotalMass);
             this.FuelMassRemaining = this.CurrentStage.FuelMass;
@@ -47,9 +48,9 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="currentStage">The current stage</param>
         /// <param name="initialTotalMass">The initial total mass</param>
         /// <param name="fuelMassRemaining">The amount of fuel mass remaining in the current stage</param>
-        private RocketStages(Queue<RocketEngine> stages, RocketEngine currentStage, double initialTotalMass, double fuelMassRemaining)
+        private RocketStages(Queue<RocketStage> stages, RocketStage currentStage, double initialTotalMass, double fuelMassRemaining)
         {
-            this.stages = new Queue<RocketEngine>(stages);
+            this.stages = new Queue<RocketStage>(stages);
             this.CurrentStage = currentStage;
             this.InitialTotalMass = initialTotalMass;
             this.FuelMassRemaining = fuelMassRemaining;
@@ -59,9 +60,9 @@ namespace SpaceSimulator.Physics.Rocket
         /// Creates a new collection of stages
         /// </summary>
         /// <param name="stages">The stages</param>
-        public static RocketStages New(params RocketEngine[] stages)
+        public static RocketStages New(params RocketStage[] stages)
         {
-            return new RocketStages(new List<RocketEngine>(stages));
+            return new RocketStages(new List<RocketStage>(stages));
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="oldStage">The old stage if staged</param>
         /// <param name="oldStageFuelMassRemaining">The amount of fuel remaining in the old stage</param>
         /// <returns>True if staged, else false. If staged, sets the out variables.</returns>
-        public bool Stage(out RocketEngine oldStage, out double oldStageFuelMassRemaining)
+        public bool Stage(out RocketStage oldStage, out double oldStageFuelMassRemaining)
         {
             if (this.stages.Count > 0)
             {
@@ -121,6 +122,21 @@ namespace SpaceSimulator.Physics.Rocket
             {
                 return null;
             }
+        }
+
+        public IEnumerator<RocketStage> GetEnumerator()
+        {
+            yield return this.CurrentStage;
+
+            foreach (var stage in this.stages)
+            {
+                yield return stage;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

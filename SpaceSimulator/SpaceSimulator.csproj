@@ -153,14 +153,13 @@
     <Compile Include="Physics\OrbitHelpers.cs" />
     <Compile Include="Helpers\OrbitTextInformation.cs" />
     <Compile Include="Physics\OrbitPosition.cs" />
-    <Compile Include="Physics\Rocket\RocketEngine2.cs" />
+    <Compile Include="Physics\Rocket\RocketEngine.cs" />
     <Compile Include="Physics\Rocket\RocketFormulas.cs" />
     <Compile Include="Physics\Rocket\RocketStage.cs" />
     <Compile Include="Rendering\Plot2D.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />
-    <Compile Include="Physics\Rocket\RocketEngine.cs" />
     <Compile Include="Physics\Rocket\RocketStages.cs" />
     <Compile Include="Physics\SimplePhysicsObject.cs" />
     <Compile Include="Rendering\RenderingObject.cs" />

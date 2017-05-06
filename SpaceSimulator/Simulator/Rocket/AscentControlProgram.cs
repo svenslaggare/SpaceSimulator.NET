@@ -179,6 +179,7 @@ namespace SpaceSimulator.Simulator.Rocket
                         this.LogStatus(DataFormatter.Format(totalTime, DataUnit.Time));
                         this.LogStatus(DataFormatter.Format(this.rocketObject.Mass, DataUnit.Mass, useBase10: true));
                         this.state = State.InOrbit;
+                        //this.rocketObject.Stage();
                     }
                     break;
             }
@@ -477,6 +478,5 @@ namespace SpaceSimulator.Simulator.Rocket
 
             return (bestPitchStart, bestPitchEnd);
         }
-
     }
 }

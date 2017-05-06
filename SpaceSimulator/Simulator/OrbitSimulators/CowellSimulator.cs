@@ -124,9 +124,14 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 timeStep,
                 (double t, ref ObjectState state) => this.CalculateAcceleration(currentObject, ref state, otherObjects, timeStep, true));
 
-            if (currentObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
+            if (currentObject is RocketObject rocketObject)
             {
-                rocketObject.AfterImpulse(timeStep, addObject);
+                if (rocketObject.IsEngineRunning)
+                {
+                    rocketObject.AfterImpulse(timeStep);
+                }
+
+                rocketObject.ClearStagedObjects(addObject);
             }
 
             currentObject.SetNextState(nextState);

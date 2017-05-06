@@ -46,7 +46,20 @@ namespace SpaceSimulator.Helpers
 
             if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
             {
-                infoBuilder.AppendLine("Mass: " + DataFormatter.Format(physicsObject.Mass, DataUnit.Mass, useBase10: true));
+                string FormatMass(double mass)
+                {
+                    return DataFormatter.Format(mass, DataUnit.Mass, useBase10: true);
+                }
+
+                infoBuilder.AppendLine("Mass: " + FormatMass(physicsObject.Mass));
+
+                if (physicsObject is RocketObject rocketObject)
+                {
+                    foreach (var stage in rocketObject.Stages)
+                    {
+                        AddBulletItem($"{stage.Name}: {FormatMass(stage.InitialTotalMass)}");
+                    }
+                }
             }
 
             var refPosition = Vector3d.Zero;

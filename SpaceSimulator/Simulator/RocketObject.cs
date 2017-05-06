@@ -22,6 +22,8 @@ namespace SpaceSimulator.Simulator
         private bool engineRunning;
         private IRocketControlProgram controlProgram;
 
+        private IList<PhysicsObject> toStage = new List<PhysicsObject>();
+
         /// <summary>
         /// Creates a new rocket object
         /// </summary>
@@ -120,8 +122,7 @@ namespace SpaceSimulator.Simulator
         /// Handles what happens after the current rocket impulse
         /// </summary>
         /// <param name="time">The time of the impulse</param>
-        /// <param name="addObject">A function to add a new object</param>
-        public void AfterImpulse(double time, Action<PhysicsObject> addObject = null)
+        public void AfterImpulse(double time)
         {
             var primaryBodyState = this.PrimaryBody.NextState;
             var state = this.NextState;
@@ -138,28 +139,52 @@ namespace SpaceSimulator.Simulator
             }
             else
             {
-                if (this.rocketStages.Stage(out var oldStage, out var oldStageFuelLeft))
-                {
-                    if (addObject != null)
-                    {
-                        var spentStageObject = new SatelliteObject(
-                            this.Name + " Stage",
-                            this.Configuration.WithMass(oldStage.DryMass + oldStageFuelLeft),
-                            this.PrimaryBody,
-                            this.ReferenceState,
-                            this.ReferenceOrbit);
-                        spentStageObject.SetNextState(this.ReferenceState);
-
-                        addObject(spentStageObject);
-                    }
-
-                    this.Configuration = this.Configuration.WithMass(this.rocketStages.TotalMass);
-                }
-                else
+                if (!this.Stage())
                 {
                     this.engineRunning = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Stages the current stage
+        /// </summary>
+        /// <returns>True if staged else false</returns>
+        public bool Stage()
+        {
+            if (this.rocketStages.Stage(out var oldStage, out var oldStageFuelLeft))
+            {
+                var spentStageObject = new SatelliteObject(
+                    $"{this.Name} - {oldStage.Name}",
+                    this.Configuration.WithMass(oldStage.DryMass + oldStageFuelLeft),
+                    this.PrimaryBody,
+                    this.ReferenceState,
+                    this.ReferenceOrbit);
+                spentStageObject.SetNextState(this.ReferenceState);
+                this.toStage.Add(spentStageObject);
+
+                this.Configuration = this.Configuration.WithMass(this.rocketStages.TotalMass);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Clears the staged objects
+        /// </summary>
+        /// <param name="addObject">Called for each cleared staged object</param>
+        public void ClearStagedObjects(Action<PhysicsObject> addObject = null)
+        {
+            if (addObject != null)
+            {
+                foreach (var staged in this.toStage)
+                {
+                    addObject(staged);
+                }
+            }
+
+            this.toStage.Clear();
         }
 
         public override void Update(double totalTime, double timeStep)
