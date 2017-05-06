@@ -33,6 +33,11 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double DryMass { get; }
 
+        /// <summary>
+        /// Returns the amount of fuel mass remaining (in kg) in the stage
+        /// </summary>
+        public double FuelMassRemaining { get; private set; }
+
         private double totalThrust;
         private double totalMassFlowRate;
 
@@ -43,15 +48,43 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="engines">The engines</param>
         /// <param name="nonEngineDryMass">The non-engine dry mass</param>
         /// <param name="fuelMass">The fuel mass (in kg)</param>
-        public RocketStage(string name, List<RocketEngine> engines, double nonEngineDryMass, double fuelMass)
+        public RocketStage(string name, IList<RocketEngine> engines, double nonEngineDryMass, double fuelMass)
         {
             this.Name = name;
             this.engines = new List<RocketEngine>(engines);
+
             this.DryMass = nonEngineDryMass + this.engines.Sum(x => x.Mass);
             this.FuelMass = fuelMass;
             this.InitialTotalMass = this.DryMass + this.FuelMass;
+            this.FuelMassRemaining = fuelMass;
+
             this.totalThrust = this.engines.Sum(engine => engine.Thrust);
             this.totalMassFlowRate = this.engines.Sum(engine => engine.MassFlowRate);
+        }
+
+        /// <summary>
+        /// Copies the given stage
+        /// </summary>
+        private RocketStage(string name, IList<RocketEngine> engines, double dryMass, double fuelMass, double initialTotalMass, double fuelMassRemaining)
+        {
+            this.Name = name;
+            this.engines = new List<RocketEngine>(engines);
+
+            this.DryMass = dryMass;
+            this.FuelMass = fuelMass;
+            this.InitialTotalMass = initialTotalMass;
+            this.FuelMassRemaining = fuelMassRemaining;
+
+            this.totalThrust = this.engines.Sum(engine => engine.Thrust);
+            this.totalMassFlowRate = this.engines.Sum(engine => engine.MassFlowRate);
+        }
+
+        /// <summary>
+        /// Creates a clone of the current stage
+        /// </summary>
+        public RocketStage Clone()
+        {
+            return new RocketStage(this.Name, this.engines, this.DryMass, this.FuelMass, this.InitialTotalMass, this.FuelMassRemaining);
         }
 
         /// <summary>
@@ -87,6 +120,14 @@ namespace SpaceSimulator.Physics.Rocket
         }
 
         /// <summary>
+        /// Returns the mass of the stage
+        /// </summary>
+        public double Mass
+        {
+            get { return this.DryMass + this.FuelMassRemaining; }
+        }
+
+        /// <summary>
         /// Returns the rocket engines
         /// </summary>
         public IReadOnlyList<RocketEngine> Engines
@@ -108,6 +149,25 @@ namespace SpaceSimulator.Physics.Rocket
         public double TotalMassFlowRate
         {
             get { return this.totalMassFlowRate; }
+        }
+
+        /// <summary>
+        /// Uses fuel in the stage for the given amount of time
+        /// </summary>
+        /// <param name="time">The time</param>
+        /// <returns>The change in mass, or null if there is not enough fuel</returns>
+        public double? UseFuel(double time)
+        {
+            var deltaMass = this.TotalMassFlowRate * time;
+            if (this.FuelMassRemaining - deltaMass > 0)
+            {
+                this.FuelMassRemaining -= deltaMass;
+                return deltaMass;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

@@ -25,11 +25,6 @@ namespace SpaceSimulator.Physics.Rocket
         public double InitialTotalMass { get; }
 
         /// <summary>
-        /// Returns the amount of fuel mass remaining (in kg) in the current stage
-        /// </summary>
-        public double FuelMassRemaining { get; private set; }
-
-        /// <summary>
         /// Creates a new collection of stages
         /// </summary>
         /// <param name="stages">The stage</param>
@@ -38,7 +33,6 @@ namespace SpaceSimulator.Physics.Rocket
             this.stages = new Queue<RocketStage>(stages);
             this.CurrentStage = this.stages.Dequeue();
             this.InitialTotalMass = stages.Sum(x => x.InitialTotalMass);
-            this.FuelMassRemaining = this.CurrentStage.FuelMass;
         }
 
         /// <summary>
@@ -47,13 +41,11 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="stages">The stages</param>
         /// <param name="currentStage">The current stage</param>
         /// <param name="initialTotalMass">The initial total mass</param>
-        /// <param name="fuelMassRemaining">The amount of fuel mass remaining in the current stage</param>
-        private RocketStages(Queue<RocketStage> stages, RocketStage currentStage, double initialTotalMass, double fuelMassRemaining)
+        private RocketStages(IEnumerable<RocketStage> stages, RocketStage currentStage, double initialTotalMass)
         {
             this.stages = new Queue<RocketStage>(stages);
             this.CurrentStage = currentStage;
             this.InitialTotalMass = initialTotalMass;
-            this.FuelMassRemaining = fuelMassRemaining;
         }
 
         /// <summary>
@@ -74,35 +66,19 @@ namespace SpaceSimulator.Physics.Rocket
         }
 
         /// <summary>
+        /// Returns the amount of fuel mass remaining (in kg) in the current stage
+        /// </summary>
+        public double FuelMassRemaining
+        {
+            get { return this.CurrentStage.FuelMassRemaining; }
+        }
+
+        /// <summary>
         /// Clones the current stages
         /// </summary>
         public RocketStages Clone()
         {
-            return new RocketStages(this.stages, this.CurrentStage, this.InitialTotalMass, this.FuelMassRemaining);
-        }
-
-        /// <summary>
-        /// Stages the rocket if possible
-        /// </summary>
-        /// <param name="oldStage">The old stage if staged</param>
-        /// <param name="oldStageFuelMassRemaining">The amount of fuel remaining in the old stage</param>
-        /// <returns>True if staged, else false. If staged, sets the out variables.</returns>
-        public bool Stage(out RocketStage oldStage, out double oldStageFuelMassRemaining)
-        {
-            if (this.stages.Count > 0)
-            {
-                oldStage = this.CurrentStage;
-                oldStageFuelMassRemaining = this.FuelMassRemaining;
-                this.CurrentStage = this.stages.Dequeue();
-                this.FuelMassRemaining = this.CurrentStage.FuelMass;
-                return true;
-            }
-            else
-            {
-                oldStage = null;
-                oldStageFuelMassRemaining = 0.0;
-                return false;
-            }
+            return new RocketStages(this.stages.Select(x => x.Clone()), this.CurrentStage.Clone(), this.InitialTotalMass);
         }
 
         /// <summary>
@@ -112,15 +88,26 @@ namespace SpaceSimulator.Physics.Rocket
         /// <returns>The change in mass, or null if there is not enough fuel</returns>
         public double? UseFuel(double time)
         {
-            var deltaMass = this.CurrentStage.TotalMassFlowRate * time;
-            if (this.FuelMassRemaining - deltaMass > 0)
+            return this.CurrentStage.UseFuel(time);
+        }
+
+        /// <summary>
+        /// Stages the rocket if possible
+        /// </summary>
+        /// <param name="oldStage">The old stage if staged</param>
+        /// <returns>True if staged, else false. If staged, sets the out variables.</returns>
+        public bool Stage(out RocketStage oldStage)
+        {
+            if (this.stages.Count > 0)
             {
-                this.FuelMassRemaining -= deltaMass;
-                return deltaMass;
+                oldStage = this.CurrentStage;
+                this.CurrentStage = this.stages.Dequeue();
+                return true;
             }
             else
             {
-                return null;
+                oldStage = null;
+                return false;
             }
         }
 

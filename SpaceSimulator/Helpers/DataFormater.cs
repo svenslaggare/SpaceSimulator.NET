@@ -73,7 +73,19 @@ namespace SpaceSimulator.Helpers
         /// <summary>
         /// The mass in kg
         /// </summary>
-        Mass
+        Mass,
+        /// <summary>
+        /// The density in kg/m^3
+        /// </summary>
+        Density,
+        /// <summary>
+        /// The pressure in Pascal
+        /// </summary>
+        Pressure,
+        /// <summary>
+        /// The temperature in celsius
+        /// </summary>
+        TemperatureCelsius
     }
 
     /// <summary>
@@ -108,6 +120,9 @@ namespace SpaceSimulator.Helpers
             { DataUnit.Acceleration, "m/s²" },
             { DataUnit.Force, "N" },
             { DataUnit.Mass, "kg" },
+            { DataUnit.Density, "kg/m³" },
+            { DataUnit.Pressure, "Pa" },
+            //{ DataUnit.Temperature, "C" }
         };
 
         private static readonly IDictionary<DataUnit, Func<double, int, string>> nonPrefix = new Dictionary<DataUnit, Func<double, int, string>>()
@@ -127,6 +142,7 @@ namespace SpaceSimulator.Helpers
             { DataUnit.EarthMass, (value, decimals) => Math.Round(value / SolarSystem.Earth.Mass, decimals) + " EM" },
             { DataUnit.SolarMass, (value, decimals) => Math.Round(value / SolarSystem.Sun.Mass, decimals) + " SM" },
             { DataUnit.AstronomicalUnits, (value, decimals) => Math.Round(value / Constants.AstronomicalUnit, decimals) + " AU" },
+            { DataUnit.TemperatureCelsius, (value, decimals) => Math.Round(value - Math.Abs(Constants.AbsoluteZero), decimals) + " °C" }
         };
 
         private const int defaultNumDecimals = 4;
@@ -232,12 +248,18 @@ namespace SpaceSimulator.Helpers
             else
             {
                 var power = Math.Round(Math.Log10(absValue));
-                prefix = new KeyValuePair<string, double>($"E{power} ", Math.Pow(10, power));
-                prefixSpace = false;
+                if (power != 0)
+                {
+                    prefix = new KeyValuePair<string, double>($"E{power} ", Math.Pow(10, power));
+                    prefixSpace = false;
+                }
+                else
+                {
+                    prefixSpace = true;
+                }
             }
 
-            var unitString = "";
-            unitNames.TryGetValue(unit, out unitString);
+            unitNames.TryGetValue(unit, out var unitString);
 
             var prefixValue = Math.Round((value / (prefix.Value > 0 ? prefix.Value : 1)), numDecimals);
             if (prefixValue == 0)

@@ -186,7 +186,7 @@ namespace SpaceSimulator.Simulator.Rocket
 
             if (!this.isSimulation && (DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
             {
-                Console.WriteLine(MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(this.rocketObject.State.Prograde)));
+                //Console.WriteLine(MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(this.rocketObject.State.Prograde)));
                 this.lastTime = DateTime.UtcNow;
             }
         }
@@ -424,7 +424,7 @@ namespace SpaceSimulator.Simulator.Rocket
 
             var deltaAltitude = 200.0;
             var timeStep = 0.02;
-            timeStep *= 5.0;
+            timeStep *= 2.0;
 
             //var maxPitchStart = Math.Max(6E3, minAltitude);
             var maxPitchStart = minAltitude;

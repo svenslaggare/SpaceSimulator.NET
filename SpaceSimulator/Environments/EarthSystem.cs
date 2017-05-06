@@ -63,11 +63,11 @@ namespace SpaceSimulator.Environments
                 earth,
                 "Falcon 9",
                 10,
-                new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 1.5), 0.01 * 0.0),
+                new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 1.5), 0.01 * 1.0),
                 RocketStages.New(
                     RocketStage.CreateFromBurnTime("Stage 1", 9, 845E3, 282, 5000, 470, 162),
                     RocketStage.CreateFromBurnTime("Stage 2", 1, 934E3, 348, 500, 470, 397),
-                    RocketStage.Payload("Payload", 4000)
+                    RocketStage.Payload("Payload", 4000 * 1)
                 ),
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
@@ -80,7 +80,7 @@ namespace SpaceSimulator.Environments
             //    2E3,
             //    falcon9TargetOrbit);
             var bestPitchStart = 2E3;
-            var bestPitchEnd = 13.0625E3;
+            var bestPitchEnd = 12.8625E3;
             falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd));
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartEngine();

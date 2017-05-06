@@ -14,6 +14,13 @@ namespace SpaceSimulator.Physics.Atmosphere
     public interface IAtmosphericModel
     {
         /// <summary>
+        /// Calculates the pressure and temperature at the given altitude
+        /// </summary>
+        /// <param name="altitude">The altitude</param>
+        /// <returns>(Pressure, Temperature)</returns>
+        (double, double) PressureAndTemperature(double altitude);
+
+        /// <summary>
         /// Calculates the drag force of the given object
         /// </summary>
         /// <param name="primaryBodyConfig">The configuration of the primary body</param>

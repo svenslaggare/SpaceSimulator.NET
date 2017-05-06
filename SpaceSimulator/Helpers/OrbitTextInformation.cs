@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.Helpers
@@ -57,7 +58,14 @@ namespace SpaceSimulator.Helpers
                 {
                     foreach (var stage in rocketObject.Stages)
                     {
-                        AddBulletItem($"{stage.Name}: {FormatMass(stage.InitialTotalMass)}");
+                        if (stage.FuelMass > 0.0)
+                        {
+                            AddBulletItem($"{stage.Name}: {FormatMass(stage.Mass)} ({Math.Round(100 * (stage.FuelMassRemaining / stage.FuelMass), 1)}%)");
+                        }
+                        else
+                        {
+                            AddBulletItem($"{stage.Name}: {FormatMass(stage.Mass)}");
+                        }
                     }
                 }
             }
@@ -121,6 +129,26 @@ namespace SpaceSimulator.Helpers
             if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
             {
                 infoBuilder.AppendLine("Used Δv: " + DataFormatter.Format(physicsObject.UsedDeltaV, DataUnit.Velocity));
+            }
+
+            {
+                if (physicsObject is RocketObject rocketObject && primaryBody is PlanetObject primaryPlanet)
+                {
+                    var atmosphericModel = primaryPlanet.AtmosphericModel;
+                    infoBuilder.AppendLine("");
+                    infoBuilder.AppendLine("Atmosphere");
+                    var altitude = primaryBody.Altitude(state.Position);
+
+                    (var pressure, var temperature) = atmosphericModel.PressureAndTemperature(altitude);
+                    infoBuilder.AppendLine($"Pressure: {DataFormatter.Format(pressure, DataUnit.Pressure)}");
+                    infoBuilder.AppendLine($"Temperature: {DataFormatter.Format(temperature, DataUnit.TemperatureCelsius)}");
+
+                    if (atmosphericModel is EarthAtmosphericModel earthAtmosphericModel)
+                    {
+                        var densityOfAir = AtmosphericFormulas.DensityOfAir(pressure, temperature);
+                        infoBuilder.AppendLine($"Density of air: {DataFormatter.Format(densityOfAir, DataUnit.Density, useBase10: true)}");
+                    }
+                }
             }
 
             if (physicsObject == null || !physicsObject.Impacted)

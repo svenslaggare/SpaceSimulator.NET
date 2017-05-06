@@ -13,6 +13,16 @@ namespace SpaceSimulator.Physics.Atmosphere
     public sealed class NoAtmosphereModel : IAtmosphericModel
     {
         /// <summary>
+        /// Calculates the pressure and temperature at the given altitude
+        /// </summary>
+        /// <param name="altitude">The altitude</param>
+        /// <returns>(Pressure, Temperature)</returns>
+        public (double, double) PressureAndTemperature(double altitude)
+        {
+            return (0, 0);
+        }
+
+        /// <summary>
         /// Calculates the drag of the given object
         /// </summary>
         /// <param name="primaryBodyConfig">The configuration of the primary body</param>

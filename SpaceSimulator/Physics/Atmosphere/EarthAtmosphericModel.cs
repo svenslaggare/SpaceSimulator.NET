@@ -15,10 +15,11 @@ namespace SpaceSimulator.Physics.Atmosphere
     public sealed class EarthAtmosphericModel : IAtmosphericModel
     {
         /// <summary>
-        /// Calculates the density of the air at the given altitude
+        /// Calculates the pressure and temperature at the given altitude
         /// </summary>
         /// <param name="altitude">The altitude</param>
-        public double DensityOfAir(double altitude)
+        /// <returns>(Pressure, Temperature)</returns>
+        public (double, double) PressureAndTemperature(double altitude)
         {
             double temperature = 0.0;
             double pressure = 0.0;
@@ -41,6 +42,17 @@ namespace SpaceSimulator.Physics.Atmosphere
 
             pressure *= 1000;
             temperature = temperature + Math.Abs(Constants.AbsoluteZero);
+
+            return (pressure, temperature);
+        }
+
+        /// <summary>
+        /// Calculates the density of the air at the given altitude
+        /// </summary>
+        /// <param name="altitude">The altitude</param>
+        public double DensityOfAir(double altitude)
+        {
+            (var pressure, var temperature) = PressureAndTemperature(altitude);
             return AtmosphericFormulas.DensityOfAir(pressure, temperature);
         }
 

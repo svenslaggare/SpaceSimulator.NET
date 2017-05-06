@@ -152,11 +152,11 @@ namespace SpaceSimulator.Simulator
         /// <returns>True if staged else false</returns>
         public bool Stage()
         {
-            if (this.rocketStages.Stage(out var oldStage, out var oldStageFuelLeft))
+            if (this.rocketStages.Stage(out var oldStage))
             {
                 var spentStageObject = new SatelliteObject(
                     $"{this.Name} - {oldStage.Name}",
-                    this.Configuration.WithMass(oldStage.DryMass + oldStageFuelLeft),
+                    this.Configuration.WithMass(oldStage.Mass),
                     this.PrimaryBody,
                     this.ReferenceState,
                     this.ReferenceOrbit);
