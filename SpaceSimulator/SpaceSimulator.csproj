@@ -158,6 +158,7 @@
     <Compile Include="Physics\Rocket\RocketFormulas.cs" />
     <Compile Include="Physics\Rocket\RocketStage.cs" />
     <Compile Include="Rendering\Plot2D.cs" />
+    <Compile Include="Simulator\ITextOutputWriter.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />

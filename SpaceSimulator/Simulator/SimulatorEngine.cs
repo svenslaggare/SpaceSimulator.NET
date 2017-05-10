@@ -90,15 +90,6 @@ namespace SpaceSimulator.Simulator
     }
 
     /// <summary>
-    /// Manages the events for the simulator
-    /// </summary>
-    public sealed class SimulationEventManager
-    {
-        private readonly IList<SimulationEvent> events = new List<SimulationEvent>();
-        private readonly IList<SimulationEvent> executedEvents = new List<SimulationEvent>();
-    }
-
-    /// <summary>
     /// Represents a maneuver for the simulator
     /// </summary>
     public sealed class SimulationManeuever : IComparable<SimulationManeuever>
@@ -192,6 +183,11 @@ namespace SpaceSimulator.Simulator
         private readonly IDictionary<PhysicsObject, double> sphereOfInfluences = new Dictionary<PhysicsObject, double>();
         private readonly double maneuverTimeEpsilon = 1E-6;
         private bool addedEvent = false;
+
+        /// <summary>
+        /// The text output writer
+        /// </summary>
+        public ITextOutputWriter TextOutputWriter { get; } = new ConsoleTextOutputWriter();
 
         /// <summary>
         /// The simulation speed
@@ -439,7 +435,8 @@ namespace SpaceSimulator.Simulator
                 primaryBody,
                 initialState,
                 Orbit.CalculateOrbit(primaryBody, ref initialState),
-                rocketStages);
+                rocketStages,
+                this.TextOutputWriter);
 
             this.AddObject(newObject);
             return newObject;
@@ -470,7 +467,8 @@ namespace SpaceSimulator.Simulator
                 (PhysicsObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit,
-                rocketStages);
+                rocketStages,
+                this.TextOutputWriter);
 
             this.AddObject(newObject);
             return newObject;

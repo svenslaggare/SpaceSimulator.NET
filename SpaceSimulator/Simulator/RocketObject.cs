@@ -21,7 +21,9 @@ namespace SpaceSimulator.Simulator
         private bool engineRunning;
         private IRocketControlProgram controlProgram;
 
-        private IList<PhysicsObject> toStage = new List<PhysicsObject>();
+        private readonly IList<PhysicsObject> toStage = new List<PhysicsObject>();
+
+        private readonly ITextOutputWriter textOutputWriter;
 
         /// <summary>
         /// Creates a new rocket object
@@ -33,6 +35,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         /// <param name="rocketStages">The rocket stages</param>
+        /// <param name="textOutputWriter">The text output writer</param>
         public RocketObject(
             string name,
             ObjectConfig config,
@@ -40,10 +43,12 @@ namespace SpaceSimulator.Simulator
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
-            RocketStages rocketStages)
+            RocketStages rocketStages,
+            ITextOutputWriter textOutputWriter)
             : base(name, config, atmosphericProperties, primaryBody, initialState, initialOrbit)
         {
             this.rocketStages = rocketStages;
+            this.textOutputWriter = textOutputWriter;
         }
 
         /// <summary>
@@ -155,6 +160,7 @@ namespace SpaceSimulator.Simulator
                 this.toStage.Add(spentStageObject);
 
                 this.Configuration = this.Configuration.WithMass(this.rocketStages.TotalMass);
+                this.textOutputWriter.WriteLine($"{this.Name}: staged '{oldStage.Name}'.");
                 return true;
             }
 

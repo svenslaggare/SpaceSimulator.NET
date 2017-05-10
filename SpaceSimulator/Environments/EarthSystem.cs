@@ -81,7 +81,7 @@ namespace SpaceSimulator.Environments
             //    falcon9TargetOrbit);
             var bestPitchStart = 2E3;
             var bestPitchEnd = 12.8625E3;
-            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd));
+            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartEngine();
 

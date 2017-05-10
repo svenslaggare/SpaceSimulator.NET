@@ -18,6 +18,7 @@ namespace SpaceSimulator.Simulator.Rocket
     {
         private readonly RocketObject rocketObject;
         private readonly Orbit targetOrbit;
+        private readonly ITextOutputWriter textOutputWriter;
 
         private State state;
 
@@ -29,7 +30,8 @@ namespace SpaceSimulator.Simulator.Rocket
         private readonly double pitchManeuverStartAltitude;
         private readonly double pitchManeuverStopAltitude;
 
-        private readonly bool isSimulation;
+        private bool pitchStarted = false;
+        private bool pitchCompleted = false;
 
         private DateTime lastTime;
 
@@ -40,14 +42,13 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <param name="targetOrbit">The target orbit</param>
         /// <param name="pitchEndAltitude">The altitude when to start the pitch maneuver</param>
         /// <param name="pitchStartAltitude">The altitude to stop the pitch maneuver</param>
-        /// <param name="isSimulation">Indicates if the control program is simulated</param>
-        public AscentControlProgram(RocketObject rocketObject, Orbit targetOrbit, double pitchStartAltitude, double pitchEndAltitude, bool isSimulation = false)
+        /// <param name="textOutputWriter">The text output writer</param>
+        public AscentControlProgram(RocketObject rocketObject, Orbit targetOrbit, double pitchStartAltitude, double pitchEndAltitude, ITextOutputWriter textOutputWriter)
         {
             this.rocketObject = rocketObject;
             this.targetOrbit = targetOrbit;
             this.state = State.InitialAscent;
-
-            this.isSimulation = isSimulation;
+            this.textOutputWriter = textOutputWriter;
 
             this.pitchManeuverStartAltitude = pitchStartAltitude;
             this.pitchManeuverStopAltitude = pitchEndAltitude;
@@ -87,6 +88,10 @@ namespace SpaceSimulator.Simulator.Rocket
             get { return this.state == State.InOrbit || this.state == State.Failed; }
         }
 
+        /// <summary>
+        /// Starts the program
+        /// </summary>
+        /// <param name="totalTime">The current time</param>
         public void Start(double totalTime)
         {
             this.ThrustDirection = this.VerticalThrustDirection();
@@ -98,10 +103,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <param name="message">The message</param>
         private void LogStatus(string message)
         {
-            if (!this.isSimulation)
-            {
-                Console.WriteLine(message);
-            }
+            textOutputWriter.WriteLine(this.rocketObject.Name, message);
         }
 
         public void Update(double totalTime, double timeStep)
@@ -126,11 +128,20 @@ namespace SpaceSimulator.Simulator.Rocket
                         this.ThrustDirection = Vector3d.Transform(this.HorizontalThrustDirection(), Matrix3x3d.RotationY(MathUtild.Deg2Rad * turnAmount * 90.0));
                         //var rotationAxis = Vector3d.Cross(this.VerticalThrustDirection(), this.HorizontalThrustDirection());
                         //this.ThrustDirection = Vector3d.Transform(this.rocketObject.State.Prograde, Matrix3x3d.RotationAxis(rotationAxis, 0.1 * 90.0 * MathUtild.Deg2Rad));
-                        //this.LogStatus("Pitch maneuver started.");
+
+                        if (!this.pitchStarted)
+                        {
+                            this.LogStatus("Pitch maneuver started.");
+                            this.pitchStarted = true;
+                        }
                     }
                     else
                     {
-                        //this.LogStatus("Pitch maneuver completed.");
+                        if (!this.pitchCompleted)
+                        {
+                            this.LogStatus("Pitch maneuver completed.");
+                            this.pitchCompleted = true;
+                        }
 
                         if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 60.0)
                         {
@@ -184,7 +195,7 @@ namespace SpaceSimulator.Simulator.Rocket
                     break;
             }
 
-            if (!this.isSimulation && (DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
+            if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
             {
                 //Console.WriteLine(MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(this.rocketObject.State.Prograde)));
                 this.lastTime = DateTime.UtcNow;
@@ -203,6 +214,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <returns>(totalTime, mass, orbit)</returns>
         private static (double, double, Orbit) SimulateAscent(IOrbitSimulator orbitSimulator, RocketObject rocketObject, Orbit targetOrbit, double timeStep, double pitchStart, double pitchEnd)
         {
+            var textOutputWriter = new NullTextOutputWriter();
             var currentObject = new RocketObject(
                 rocketObject.Name,
                 rocketObject.Configuration,
@@ -210,9 +222,10 @@ namespace SpaceSimulator.Simulator.Rocket
                 rocketObject.PrimaryBody,
                 rocketObject.State,
                 rocketObject.ReferenceOrbit,
-                rocketObject.Stages.Clone());
+                rocketObject.Stages.Clone(),
+                textOutputWriter);
 
-            var ascentProgram = new AscentControlProgram(currentObject, targetOrbit, pitchStart, pitchEnd, isSimulation: true);
+            var ascentProgram = new AscentControlProgram(currentObject, targetOrbit, pitchStart, pitchEnd, textOutputWriter);
             currentObject.SetControlProgram(ascentProgram);
 
             currentObject.CheckImpacted(rocketObject.State.Time);
