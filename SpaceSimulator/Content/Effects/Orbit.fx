@@ -112,11 +112,6 @@ void GS(point VertexOut gin[1],
 
 float4 PS(GeoOut pin) : SV_Target
 {
-	//pin.NormalW = normalize(pin.NormalW);
-	//float3 toEye = gEyePosW - pin.PosW;
-	//float distToEye = length(toEye);
-	//toEye /= distToEye;
-
 	float4 color = pin.Color;
 	color.a = 0.75;
 	return color;

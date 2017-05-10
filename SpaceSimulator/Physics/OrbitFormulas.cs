@@ -173,7 +173,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="eccentricity">The eccentricity</param>
         /// <param name="trueAnomaly">The true anomaly</param>
-        public static double CalculateEccentricAnomaly(double eccentricity, double trueAnomaly)
+        public static double EccentricAnomaly(double eccentricity, double trueAnomaly)
         {
             var cosTrueAnomaly = Math.Cos(trueAnomaly);
             var E = Math.Acos((eccentricity + cosTrueAnomaly) / (1 + eccentricity * cosTrueAnomaly));
@@ -190,7 +190,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="eccentricity">The eccentricity</param>
         /// <param name="trueAnomaly">The true anomaly</param>
-        public static double CalculateHyperbolicEccentricAnomaly(double eccentricity, double trueAnomaly)
+        public static double HyperbolicEccentricAnomaly(double eccentricity, double trueAnomaly)
         {
             var cosTrueAnomaly = Math.Cos(trueAnomaly);
             var F = MathHelpers.Acosh((eccentricity + cosTrueAnomaly) / (1 + eccentricity * cosTrueAnomaly));
@@ -206,7 +206,7 @@ namespace SpaceSimulator.Physics
         /// Calculates the parabolic eccentric anomaly from the true anomaly
         /// </summary>
         /// <param name="trueAnomaly">The true anomaly</param>
-        public static double CalculateParabolicEccentricAnomaly(double trueAnomaly)
+        public static double ParabolicEccentricAnomaly(double trueAnomaly)
         {
             return Math.Tan(trueAnomaly / 2.0);
         }
@@ -216,7 +216,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="eccentricity">The eccentricity of the orbit</param>
         /// <param name="eccentricAnomaly">The eccentricity anomaly</param>
-        public static double CalculateMeanAnomaly(double eccentricity, double eccentricAnomaly)
+        public static double MeanAnomaly(double eccentricity, double eccentricAnomaly)
         {
             return eccentricAnomaly - eccentricity * Math.Sin(eccentricAnomaly);
         }
@@ -226,11 +226,22 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="eccentricity">The eccentricity of the orbit</param>
         /// <param name="eccentricAnomaly">The eccentricity anomaly</param>
-        public static double CalculateTrueAnomalyFromEccentricAnomaly(double eccentricity, double eccentricAnomaly)
+        public static double TrueAnomalyFromEccentricAnomaly(double eccentricity, double eccentricAnomaly)
         {
             return 2.0 * Math.Atan2(
                 Math.Sqrt(1 + eccentricity) * Math.Sin(eccentricAnomaly / 2.0),
                 Math.Sqrt(1 - eccentricity) * Math.Cos(eccentricAnomaly / 2.0));
+        }
+
+        /// <summary>
+        /// Calculates the altitude over the given primary body
+        /// </summary>
+        /// <param name="primaryBodyPosition">The position of the primary body</param>
+        /// <param name="primaryBodyRadius">The radius of the primary body</param>
+        /// <param name="objectPosition">The position of the object</param>
+        public static double Altitude(Vector3d primaryBodyPosition, double primaryBodyRadius, Vector3d objectPosition)
+        {
+             return (objectPosition - primaryBodyPosition).Length() - primaryBodyRadius;
         }
     }
 }

@@ -61,7 +61,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents an orbit used for rendering
     /// </summary>
-    public class Orbit : IDisposable
+    public sealed class Orbit : IDisposable
     {
         private readonly Device graphicsDevice;
 
@@ -169,7 +169,9 @@ namespace SpaceSimulator.Rendering
                 var next = positions[nextIndex].Position;
                 var prev = positions[prevIndex].Position;
 
-                var up = Vector3.Up;
+                //var up = Vector3.Up;
+                var up = Vector3.Cross(next - current, current);
+                up.Normalize();
                 vertices.Add(new OrbitVertex()
                 {
                     Position = current,
@@ -277,13 +279,14 @@ namespace SpaceSimulator.Rendering
             }
 
             this.positions = positions;
+            var beforeVerticiesCount = this.vertices.Length;
             this.UpdateVertices();
 
             if (this.vertexBuffer == null)
             {
                 this.CreateVertexBuffer();
             }
-            else
+            else if (this.vertices.Length != beforeVerticiesCount)
             {
                 this.vertexBuffer.Dispose();
                 this.CreateVertexBuffer();

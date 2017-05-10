@@ -69,7 +69,7 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <param name="state">The state of the object</param>
         public bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state)
         {
-            var altitude = (state.Position - primaryBodyState.Position).Length() - primaryBodyConfig.Radius;
+            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBodyConfig.Radius, state.Position);
             return altitude < EndOfAtmosphereAltitude;
         }
 
@@ -84,7 +84,12 @@ namespace SpaceSimulator.Physics.Atmosphere
         public Vector3d CalculateDrag(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state)
         {
             var v = state.Velocity - primaryBodyState.Velocity;
-            var altitude = (state.Position - primaryBodyState.Position).Length() - primaryBodyConfig.Radius;
+            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBodyConfig.Radius, state.Position);
+            if (altitude >= EndOfAtmosphereAltitude)
+            {
+                return Vector3d.Zero;
+            }
+
             var densityOfAir = this.DensityOfAir(altitude);
             return AtmosphericFormulas.Drag(v, densityOfAir, properties.ReferenceArea, properties.DragCoefficient);
         }

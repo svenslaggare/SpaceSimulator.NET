@@ -90,6 +90,15 @@ namespace SpaceSimulator.Simulator
     }
 
     /// <summary>
+    /// Manages the events for the simulator
+    /// </summary>
+    public sealed class SimulationEventManager
+    {
+        private readonly IList<SimulationEvent> events = new List<SimulationEvent>();
+        private readonly IList<SimulationEvent> executedEvents = new List<SimulationEvent>();
+    }
+
+    /// <summary>
     /// Represents a maneuver for the simulator
     /// </summary>
     public sealed class SimulationManeuever : IComparable<SimulationManeuever>
@@ -889,7 +898,7 @@ namespace SpaceSimulator.Simulator
 
             this.subTimeIntervals.Add(this.TotalTime + time);
 
-            //Sort, as the maneuvers might not be ordered by time.
+            //Sort, as the maneuvers might not be ordered on time.
             this.subTimeIntervals.Sort();
         }
 

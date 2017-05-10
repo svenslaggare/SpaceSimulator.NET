@@ -44,7 +44,7 @@ namespace SpaceSimulator.Physics
             {
                 if (this.Orbit.IsElliptical)
                 {
-                    return OrbitFormulas.CalculateEccentricAnomaly(this.Orbit.Eccentricity, this.TrueAnomaly);
+                    return OrbitFormulas.EccentricAnomaly(this.Orbit.Eccentricity, this.TrueAnomaly);
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace SpaceSimulator.Physics
             {
                 if (this.Orbit.IsHyperbolic)
                 {
-                    return OrbitFormulas.CalculateHyperbolicEccentricAnomaly(this.Orbit.Eccentricity, this.TrueAnomaly);
+                    return OrbitFormulas.HyperbolicEccentricAnomaly(this.Orbit.Eccentricity, this.TrueAnomaly);
                 }
                 else
                 {
@@ -82,7 +82,7 @@ namespace SpaceSimulator.Physics
             {
                 if (this.Orbit.IsParabolic)
                 {
-                    return OrbitFormulas.CalculateParabolicEccentricAnomaly(this.TrueAnomaly);
+                    return OrbitFormulas.ParabolicEccentricAnomaly(this.TrueAnomaly);
                 }
                 else
                 {
@@ -98,8 +98,8 @@ namespace SpaceSimulator.Physics
         private double TimeToTrueAnomalyElliptical(double trueAnomaly)
         {
             var e = this.Orbit.Eccentricity;
-            var E = OrbitFormulas.CalculateEccentricAnomaly(e, this.TrueAnomaly);
-            var targetE = OrbitFormulas.CalculateEccentricAnomaly(e, trueAnomaly);
+            var E = OrbitFormulas.EccentricAnomaly(e, this.TrueAnomaly);
+            var targetE = OrbitFormulas.EccentricAnomaly(e, trueAnomaly);
             var mu = this.Orbit.PrimaryBody.StandardGravitationalParameter;
             var a = this.Orbit.SemiMajorAxis;
 
@@ -123,8 +123,8 @@ namespace SpaceSimulator.Physics
         private double TimeToTrueAnomalyHyperbolic(double trueAnomaly)
         {
             var e = this.Orbit.Eccentricity;
-            var F = OrbitFormulas.CalculateHyperbolicEccentricAnomaly(e, this.TrueAnomaly);
-            var targetF = OrbitFormulas.CalculateHyperbolicEccentricAnomaly(e, trueAnomaly);
+            var F = OrbitFormulas.HyperbolicEccentricAnomaly(e, this.TrueAnomaly);
+            var targetF = OrbitFormulas.HyperbolicEccentricAnomaly(e, trueAnomaly);
             var mu = this.Orbit.PrimaryBody.StandardGravitationalParameter;
             var a = this.Orbit.SemiMajorAxis;
 
@@ -141,8 +141,8 @@ namespace SpaceSimulator.Physics
         {
             var p = this.Orbit.Parameter;
             var sqrtP = Math.Sqrt(p);
-            var D = sqrtP * OrbitFormulas.CalculateParabolicEccentricAnomaly(this.TrueAnomaly);
-            var targetD = sqrtP * OrbitFormulas.CalculateParabolicEccentricAnomaly(trueAnomaly);
+            var D = sqrtP * OrbitFormulas.ParabolicEccentricAnomaly(this.TrueAnomaly);
+            var targetD = sqrtP * OrbitFormulas.ParabolicEccentricAnomaly(trueAnomaly);
             var mu = this.Orbit.PrimaryBody.StandardGravitationalParameter;
 
             var factor = 1.0 / (2.0 * Math.Sqrt(mu));

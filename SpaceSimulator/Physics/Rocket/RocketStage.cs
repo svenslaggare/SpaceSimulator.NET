@@ -97,7 +97,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="nonEngineDryMass">The non-engine dry mass</param>
         /// <param name="engineMass">The mass of an engine</param>
         /// <param name="burnTime">The burn time</param>
-        public static RocketStage CreateFromBurnTime(string name, int numberOfEngines, double thrust, double specificImpulse, double nonEngineDryMass, double engineMass, double burnTime)
+        public static RocketStage FromBurnTime(string name, int numberOfEngines, double thrust, double specificImpulse, double nonEngineDryMass, double engineMass, double burnTime)
         {
             var engines = new List<RocketEngine>();
             for (int i = 0; i < numberOfEngines; i++)
@@ -105,7 +105,7 @@ namespace SpaceSimulator.Physics.Rocket
                 engines.Add(new RocketEngine(thrust, specificImpulse, engineMass));
             }
 
-            var fuelMass = numberOfEngines * burnTime * RocketFormulas.CalculateMassFlowRate(thrust, specificImpulse);
+            var fuelMass = numberOfEngines * burnTime * RocketFormulas.MassFlowRate(thrust, specificImpulse);
             return new RocketStage(name, engines, nonEngineDryMass, fuelMass);
         }
 

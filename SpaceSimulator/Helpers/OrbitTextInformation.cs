@@ -139,6 +139,8 @@ namespace SpaceSimulator.Helpers
                 if (physicsObject is RocketObject rocketObject && primaryBody is PlanetObject primaryPlanet)
                 {
                     var atmosphericModel = primaryPlanet.AtmosphericModel;
+
+                    if (atmosphericModel.Inside(primaryBody, ref state))
                     infoBuilder.AppendLine("");
                     infoBuilder.AppendLine("Atmosphere");
                     var altitude = primaryBody.Altitude(state.Position);
@@ -150,7 +152,9 @@ namespace SpaceSimulator.Helpers
                     if (atmosphericModel is EarthAtmosphericModel earthAtmosphericModel)
                     {
                         var densityOfAir = AtmosphericFormulas.DensityOfAir(pressure, temperature);
+                        var dynamicPressure = AtmosphericFormulas.DynamicPressure(densityOfAir, (state.Velocity - refVelocity).Length());
                         infoBuilder.AppendLine($"Density of air: {DataFormatter.Format(densityOfAir, DataUnit.Density, useBase10: true)}");
+                        infoBuilder.AppendLine($"Dynamic pressure: {DataFormatter.Format(dynamicPressure, DataUnit.Pressure)}");
                     }
                 }
             }

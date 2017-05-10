@@ -19,7 +19,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents an object used for rendering
     /// </summary>
-    public class RenderingObject : IDisposable
+    public sealed class RenderingObject : IDisposable
     {
         private readonly Color orbitColor;
         private readonly PhysicsObject physicsObject;

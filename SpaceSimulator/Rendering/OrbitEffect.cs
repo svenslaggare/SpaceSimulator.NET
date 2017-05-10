@@ -13,7 +13,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents an orbit effect
     /// </summary>
-    public class OrbitEffect : BasicEffect
+    public sealed class OrbitEffect : BasicEffect
     {
         private readonly EffectScalarVariable lineWidth;
 

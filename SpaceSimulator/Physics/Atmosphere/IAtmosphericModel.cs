@@ -38,4 +38,22 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <returns>The drag force</returns>
         Vector3d CalculateDrag(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state);
     }
+
+    /// <summary>
+    /// Contains extensions methods for the <see cref="IAtmosphericModel"/> interface
+    /// </summary>
+    public static class IAtmosphericModelExtensions
+    {
+        /// <summary>
+        /// Indicates if the given object is inside the atmosphere
+        /// </summary>
+        /// <param name="model">The current model</param>
+        /// <param name="primaryBody">The body that the atmosphere is applied to</param>
+        /// <param name="state">The state of the object</param>
+        public static bool Inside(this IAtmosphericModel model, IPhysicsObject primaryBody, ref ObjectState state)
+        {
+            var primaryBodyState = primaryBody.State;
+            return model.Inside(primaryBody.Configuration, ref primaryBodyState, ref state);
+        }
+    }
 }

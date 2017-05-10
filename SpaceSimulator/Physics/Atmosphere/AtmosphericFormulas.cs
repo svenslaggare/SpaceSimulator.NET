@@ -36,6 +36,16 @@ namespace SpaceSimulator.Physics.Atmosphere
         }
 
         /// <summary>
+        /// Calculates the dynamic pressure
+        /// </summary>
+        /// <param name="densityOfAir">The density of the air (in kg/m^3)</param>
+        /// <param name="velocity">The velocity</param>
+        public static double DynamicPressure(double densityOfAir, double velocity)
+        {
+            return 0.5 * densityOfAir * velocity * velocity;
+        }
+
+        /// <summary>
         /// Returns the area of a rocket cone nose
         /// </summary>
         /// <param name="baseRadius">The radius of the base</param>

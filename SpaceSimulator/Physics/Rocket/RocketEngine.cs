@@ -44,7 +44,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double MassFlowRate
         {
-            get { return RocketFormulas.CalculateMassFlowRate(this.Thrust, this.SpecificImpulse); }
+            get { return RocketFormulas.MassFlowRate(this.Thrust, this.SpecificImpulse); }
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double EffectiveExhaustVelocity
         {
-            get { return this.SpecificImpulse * Constants.StandardGravity; }
+            get { return RocketFormulas.EffectiveExhaustVelocity(this.SpecificImpulse); }
         }
     }
 }

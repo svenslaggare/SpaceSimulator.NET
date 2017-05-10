@@ -22,7 +22,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents a rendering of a sphere (planet, moon, etc.)
     /// </summary>
-    public class Sphere : IDisposable
+    public sealed class Sphere : IDisposable
     {
         private readonly BasicVertex[] vertices;
         private readonly int[] indices;

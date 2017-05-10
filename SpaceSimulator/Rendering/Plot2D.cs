@@ -15,7 +15,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents a rendering of 2D function
     /// </summary>
-    public class Plot2D : IDisposable
+    public sealed class Plot2D : IDisposable
     {
         private readonly RenderingManager2D renderingManager2D;
 

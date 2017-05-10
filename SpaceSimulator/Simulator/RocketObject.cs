@@ -164,14 +164,14 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Clears the staged objects
         /// </summary>
-        /// <param name="addObject">Called for each cleared staged object</param>
-        public void ClearStagedObjects(Action<PhysicsObject> addObject = null)
+        /// <param name="apply">Applied to each staged object</param>
+        public void ClearStagedObjects(Action<PhysicsObject> apply = null)
         {
-            if (addObject != null)
+            if (apply != null)
             {
                 foreach (var staged in this.toStage)
                 {
-                    addObject(staged);
+                    apply(staged);
                 }
             }
 
