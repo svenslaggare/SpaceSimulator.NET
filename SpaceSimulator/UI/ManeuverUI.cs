@@ -12,6 +12,8 @@ using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Maneuvers;
+using SpaceSimulator.Physics.Solvers;
+using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.UI
@@ -43,7 +45,12 @@ namespace SpaceSimulator.UI
         /// <param name="simulatorContainer">The simulation container</param>
         /// <param name="uiManager">The UI manager</param>
         /// <param name="uiStyle">The UI style</param>
-        public ManeuverUI(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, SimulatorContainer simulatorContainer, UIManager uiManager, UIStyle uiStyle)
+        public ManeuverUI(
+            RenderingManager2D renderingManager2D,
+            KeyboardManager keyboardManager,
+            SimulatorContainer simulatorContainer,
+            UIManager uiManager,
+            UIStyle uiStyle)
             : base(renderingManager2D, keyboardManager, simulatorContainer)
         {
             this.uiManager = uiManager;
@@ -347,7 +354,7 @@ namespace SpaceSimulator.UI
             {
                 var targetOrbitPosition = OrbitPosition.CalculateOrbitPosition(this.SelectedObject.Target);
 
-                if (this.SelectedObject.Impacted)
+                if (this.SelectedObject.HasImpacted)
                 {
                     this.GroundIntercept(this.SelectedObject, ref targetOrbitPosition);
                 }

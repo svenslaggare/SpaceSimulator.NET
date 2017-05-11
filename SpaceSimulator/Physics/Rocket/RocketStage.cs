@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Physics.Rocket
 {
@@ -34,6 +35,11 @@ namespace SpaceSimulator.Physics.Rocket
         public double DryMass { get; }
 
         /// <summary>
+        /// The atmospheric properties for the stage
+        /// </summary>
+        public AtmosphericProperties AtmosphericProperties { get; }
+
+        /// <summary>
         /// Returns the amount of fuel mass remaining (in kg) in the stage
         /// </summary>
         public double FuelMassRemaining { get; private set; }
@@ -48,7 +54,8 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="engines">The engines</param>
         /// <param name="nonEngineDryMass">The non-engine dry mass</param>
         /// <param name="fuelMass">The fuel mass (in kg)</param>
-        public RocketStage(string name, IList<RocketEngine> engines, double nonEngineDryMass, double fuelMass)
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
+        public RocketStage(string name, IList<RocketEngine> engines, double nonEngineDryMass, double fuelMass, AtmosphericProperties atmosphericProperties)
         {
             this.Name = name;
             this.engines = new List<RocketEngine>(engines);
@@ -60,12 +67,14 @@ namespace SpaceSimulator.Physics.Rocket
 
             this.totalThrust = this.engines.Sum(engine => engine.Thrust);
             this.totalMassFlowRate = this.engines.Sum(engine => engine.MassFlowRate);
+
+            this.AtmosphericProperties = atmosphericProperties;
         }
 
         /// <summary>
         /// Copies the given stage
         /// </summary>
-        private RocketStage(string name, IList<RocketEngine> engines, double dryMass, double fuelMass, double initialTotalMass, double fuelMassRemaining)
+        private RocketStage(string name, IList<RocketEngine> engines, double dryMass, double fuelMass, double initialTotalMass, double fuelMassRemaining, AtmosphericProperties atmosphericProperties)
         {
             this.Name = name;
             this.engines = new List<RocketEngine>(engines);
@@ -77,6 +86,8 @@ namespace SpaceSimulator.Physics.Rocket
 
             this.totalThrust = this.engines.Sum(engine => engine.Thrust);
             this.totalMassFlowRate = this.engines.Sum(engine => engine.MassFlowRate);
+
+            this.AtmosphericProperties = atmosphericProperties;
         }
 
         /// <summary>
@@ -84,7 +95,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public RocketStage Clone()
         {
-            return new RocketStage(this.Name, this.engines, this.DryMass, this.FuelMass, this.InitialTotalMass, this.FuelMassRemaining);
+            return new RocketStage(this.Name, this.engines, this.DryMass, this.FuelMass, this.InitialTotalMass, this.FuelMassRemaining, this.AtmosphericProperties);
         }
 
         /// <summary>
@@ -97,7 +108,16 @@ namespace SpaceSimulator.Physics.Rocket
         /// <param name="nonEngineDryMass">The non-engine dry mass</param>
         /// <param name="engineMass">The mass of an engine</param>
         /// <param name="burnTime">The burn time</param>
-        public static RocketStage FromBurnTime(string name, int numberOfEngines, double thrust, double specificImpulse, double nonEngineDryMass, double engineMass, double burnTime)
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
+        public static RocketStage FromBurnTime(
+            string name,
+            int numberOfEngines,
+            double thrust,
+            double specificImpulse,
+            double nonEngineDryMass,
+            double engineMass,
+            AtmosphericProperties atmosphericProperties,
+            double burnTime)
         {
             var engines = new List<RocketEngine>();
             for (int i = 0; i < numberOfEngines; i++)
@@ -106,7 +126,7 @@ namespace SpaceSimulator.Physics.Rocket
             }
 
             var fuelMass = numberOfEngines * burnTime * RocketFormulas.MassFlowRate(thrust, specificImpulse);
-            return new RocketStage(name, engines, nonEngineDryMass, fuelMass);
+            return new RocketStage(name, engines, nonEngineDryMass, fuelMass, atmosphericProperties);
         }
 
         /// <summary>
@@ -114,9 +134,10 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         /// <param name="name">The name of the stage</param>
         /// <param name="mass">The mass</param>
-        public static RocketStage Payload(string name, double mass)
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
+        public static RocketStage Payload(string name, double mass, AtmosphericProperties atmosphericProperties)
         {
-            return new RocketStage(name, new List<RocketEngine>(), mass, 0.0);
+            return new RocketStage(name, new List<RocketEngine>(), mass, 0.0, atmosphericProperties);
         }
 
         /// <summary>

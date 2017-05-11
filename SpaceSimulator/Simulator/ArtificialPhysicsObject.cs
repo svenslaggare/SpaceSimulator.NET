@@ -16,7 +16,7 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the atmospheric properties
         /// </summary>
-        public AtmosphericProperties AtmosphericProperties { get; }
+        public abstract AtmosphericProperties AtmosphericProperties { get; }
 
         /// <summary>
         /// Creates a new artificial object object
@@ -29,13 +29,12 @@ namespace SpaceSimulator.Simulator
         public ArtificialPhysicsObject(
             string name,
             ObjectConfig config,
-            AtmosphericProperties atmosphericProperties,
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
             : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit, false)
         {
-            this.AtmosphericProperties = atmosphericProperties;
+
         }
     }
 }

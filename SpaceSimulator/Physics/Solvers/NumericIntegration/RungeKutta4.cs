@@ -78,7 +78,7 @@ namespace SpaceSimulator.Physics.Solvers
             double deltaTime, 
             CalculateAcceleration calculateAcceleration)
         {
-            if (state.Impacted)
+            if (state.HasImpacted)
             {
                 return SolverHelpers.MoveImpactedObject(
                     primaryBody.Configuration,

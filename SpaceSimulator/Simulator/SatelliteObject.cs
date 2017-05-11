@@ -14,6 +14,11 @@ namespace SpaceSimulator.Simulator
     public class SatelliteObject : ArtificialPhysicsObject
     {
         /// <summary>
+        /// Returns the atmospheric properties
+        /// </summary>
+        public override AtmosphericProperties AtmosphericProperties { get; }
+
+        /// <summary>
         /// Creates a new satellite object
         /// </summary>
         /// <param name="name">The name of the object</param>
@@ -29,9 +34,9 @@ namespace SpaceSimulator.Simulator
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, config, atmosphericProperties, primaryBody, initialState, initialOrbit)
+            : base(name, config, primaryBody, initialState, initialOrbit)
         {
-
+            this.AtmosphericProperties = atmosphericProperties;
         }
     }
 }

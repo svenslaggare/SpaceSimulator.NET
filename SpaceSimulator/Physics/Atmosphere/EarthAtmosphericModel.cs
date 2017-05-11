@@ -17,7 +17,7 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <summary>
         /// The altitude when the atmosphere ends
         /// </summary>
-        public static readonly double EndOfAtmosphereAltitude = 300E3;
+        public static readonly double EndOfAtmosphereAltitude = 250E3;
 
         /// <summary>
         /// Calculates the pressure and temperature at the given altitude

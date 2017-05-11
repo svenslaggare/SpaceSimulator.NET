@@ -237,9 +237,9 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Indicates if the object has impacted any object
         /// </summary>
-        public bool Impacted
+        public bool HasImpacted
         {
-            get { return this.state.Impacted; }
+            get { return this.state.HasImpacted; }
         }
 
         /// <summary>
@@ -360,7 +360,7 @@ namespace SpaceSimulator.Simulator
         public void ApplyDeltaVelocity(double totalTime, Vector3d deltaV)
         {
             this.state.Velocity += deltaV;
-            this.state.Impacted = false;
+            this.state.HasImpacted = false;
 
             this.ReferenceState = this.state;
             this.ReferenceOrbit = Orbit.CalculateOrbit(this);
@@ -407,7 +407,7 @@ namespace SpaceSimulator.Simulator
                     this.state.Acceleration = OrbitFormulas.GravityAcceleration(
                         this.PrimaryBody.StandardGravitationalParameter,
                         dir * newDistance);
-                    this.state.Impacted = true;
+                    this.state.HasImpacted = true;
 
                     var referenceState = this.state;
                     referenceState.Time = time;
@@ -426,7 +426,7 @@ namespace SpaceSimulator.Simulator
         {
             this.state = this.nextState;
 
-            if (!this.Impacted)
+            if (!this.HasImpacted)
             {
                 this.CheckImpacted(totalTime);
             }

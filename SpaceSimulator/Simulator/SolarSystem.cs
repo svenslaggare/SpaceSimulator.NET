@@ -63,12 +63,11 @@ namespace SpaceSimulator.Simulator
                 6378.1370 * 1000,
                 6371 * 1000,
                 5.9722E24,
-                Constants.SiderealDay * 0,
+                Constants.SiderealDay * 0.0,
                 Orbit.New(
                    semiMajorAxis: 149598023E3,
                    eccentricity: 0.0167086,
                    inclination: MathUtild.Deg2Rad * 0.00005,
-                   //inclination: MathUtild.Deg2Rad * 45.0d,
                    longitudeOfAscendingNode: MathUtild.Deg2Rad * -11.26064,
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 114.20783
                 ));

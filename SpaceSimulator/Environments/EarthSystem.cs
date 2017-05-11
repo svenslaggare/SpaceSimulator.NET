@@ -37,7 +37,7 @@ namespace SpaceSimulator.Environments
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
-            var earthRenderingObject = new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Earth.jpg", earth);
+            var earthRenderingObject = new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Earth.jpg", earth, MathUtil.DegreesToRadians(180.0f));
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>();
@@ -63,12 +63,7 @@ namespace SpaceSimulator.Environments
                 earth,
                 "Falcon 9",
                 10,
-                new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 1.5), 0.01 * 1.0),
-                RocketStages.New(
-                    RocketStage.FromBurnTime("Stage 1", 9, 845E3, 282, 5000, 470, 162),
-                    RocketStage.FromBurnTime("Stage 2", 1, 934E3, 348, 500, 470, 397),
-                    RocketStage.Payload("Payload", 4000 * 1)
-                ),
+                Rockets.CreateFalcon9(4000.0),
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
                 Vector3d.Zero);

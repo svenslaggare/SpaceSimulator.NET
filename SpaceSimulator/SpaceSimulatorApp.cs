@@ -155,6 +155,11 @@ namespace SpaceSimulator
                 component.AfterSimulationUpdate();
             }
 
+            foreach (var currentObject in this.renderingObjects)
+            {
+                currentObject.Update(this.simulatorEngine);
+            }
+
             base.Update(elapsed);
         }
 

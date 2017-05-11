@@ -222,7 +222,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             var orbit = orbitPosition.Orbit;
             var targetOrbit = targetOrbitPosition.Orbit;
 
-            var stationary = state.Impacted;
+            var stationary = state.HasImpacted;
             var maxImpactCheckTime = 1000.0;
             var impactCheckDeltaTime = 100.0;
 

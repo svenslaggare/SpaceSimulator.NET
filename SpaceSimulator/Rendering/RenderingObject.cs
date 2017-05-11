@@ -10,6 +10,7 @@ using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Solvers;
 using SpaceSimulator.Simulator;
 using Device = SharpDX.Direct3D11.Device;
 using DeviceContext = SharpDX.Direct3D11.DeviceContext;
@@ -28,11 +29,18 @@ namespace SpaceSimulator.Rendering
         private readonly Orbit renderingOrbit;
         private readonly Sphere renderingSphere;
 
+        private readonly Rendering.Orbit nextManeuverRenderingOrbit;
+        private DateTime nextManeuverRenderingOrbitUpdated;
+        private readonly TimeSpan nextManeuverRenderingOrbitUpdateFrequency = TimeSpan.FromSeconds(1.0);
+        private bool drawNextManeuver = false;
+
         private readonly Matrix scalingMatrix;
 
         private readonly TimeSpan orbitUpdateTime = TimeSpan.FromMilliseconds(50.0);
         private DateTime lastOrbitUpdate = new DateTime();
         private bool updateOrbit = false;
+
+        private readonly float baseRotationY;
 
         /// <summary>
         /// Creates a new rendering object
@@ -41,7 +49,8 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitColor">The color of the orbit</param>
         /// <param name="textureName">The name of the texture for the sphere model</param>
         /// <param name="physicsObject">The physics object to render</param>
-        public RenderingObject(Device graphicsDevice, Color orbitColor, string textureName, PhysicsObject physicsObject)
+        /// <param name="baseRotationY">The base rotation in the Y-axis</param>
+        public RenderingObject(Device graphicsDevice, Color orbitColor, string textureName, PhysicsObject physicsObject, float baseRotationY = 0.0f)
         {
             this.orbitColor = orbitColor;
             this.physicsObject = physicsObject;
@@ -61,10 +70,12 @@ namespace SpaceSimulator.Rendering
 
             this.renderingSphere = new Sphere(graphicsDevice, 1.0f, textureName, defaultMaterial);
 
-            var nonRealSize = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
+            this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
 
+            var nonRealSize = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
             this.scalingMatrix = Matrix.Scaling(physicsObject.IsRealSize ? MathHelpers.ToDraw(this.physicsObject.Radius) : nonRealSize);
-            //this.scalingMatrix = Matrix.Scaling(0.01f);
+
+            this.baseRotationY = baseRotationY;
         }
         
         /// <summary>
@@ -91,12 +102,21 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private Matrix PrimaryBodyTransform()
         {
-            if (this.physicsObject.PrimaryBody == null)
+            var primaryBody = this.physicsObject.PrimaryBody;
+            if (primaryBody == null)
             {
                 return Matrix.Identity;
             }
 
-            return Matrix.Translation(MathHelpers.ToDrawPosition(this.physicsObject.PrimaryBody.Position));
+            var transform = Matrix.Identity;
+
+            if (this.physicsObject.HasImpacted)
+            {
+                transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
+            }
+
+            transform *= Matrix.Translation(MathHelpers.ToDrawPosition(primaryBody.Position));
+            return transform;
         }
 
         /// <summary>
@@ -123,20 +143,71 @@ namespace SpaceSimulator.Rendering
                 planetEffect,
                 pass,
                 camera,
-                this.scalingMatrix * Matrix.RotationY(MathUtil.DegreesToRadians(180.0f)) * Matrix.Translation(this.DrawPosition));
+                this.scalingMatrix
+                * Matrix.RotationY(this.baseRotationY - (float)this.physicsObject.Rotation)
+                * Matrix.Translation(this.DrawPosition));
         }
 
         /// <summary>
         /// Draws the orbit
         /// </summary>
         /// <param name="deviceContext">The device context</param>
-        /// <param name="sunEffect">The sun effect</param>
         /// <param name="planetEffect">The planet effect</param>
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="pass">The effect pass</param>
         private void DrawOrbit(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
         {
+            if (!this.physicsObject.HasImpacted)
+            {
+                this.renderingOrbit.Draw(
+                    deviceContext,
+                    orbitEffect,
+                    pass,
+                    camera,
+                    this.PrimaryBodyTransform(),
+                    this.DrawPosition);
+            }
+        }
+
+        /// <summary>
+        /// Draws the next maneuver
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="planetEffect">The planet effect</param>
+        /// <param name="orbitEffect">The orbit effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="pass">The effect pass</param>
+        private void DrawNextManeuver(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
+        {
+            if (this.drawNextManeuver)
+            {
+                this.nextManeuverRenderingOrbit.Draw(
+                    deviceContext,
+                    orbitEffect,
+                    pass,
+                    camera,
+                    this.PrimaryBodyTransform(),
+                    this.DrawPosition);
+            }
+        }
+
+        /// <summary>
+        /// Returns the next maneuver
+        /// </summary>
+        /// <param name="simulatorEngine">The simulator engine</param>
+        private SimulationManeuever NextManeuver(SimulatorEngine simulatorEngine)
+        {
+            return simulatorEngine.Maneuvers.FirstOrDefault(x => x.Object == this.physicsObject);
+        }
+
+        /// <summary>
+        /// Updates the object
+        /// </summary>
+        /// <param name="simulatorEngine">The simulator engine</param>
+        public void Update(SimulatorEngine simulatorEngine)
+        {
+            //Orbit
             if (this.physicsObject.HasChangedOrbit())
             {
                 this.updateOrbit = true;
@@ -153,13 +224,42 @@ namespace SpaceSimulator.Rendering
                 }
             }
 
-            this.renderingOrbit.Draw(
-                deviceContext,
-                orbitEffect,
-                pass,
-                camera,
-                this.PrimaryBodyTransform(),
-                this.DrawPosition);
+            //Next maneuver
+            var nextManeuver = this.NextManeuver(simulatorEngine);
+            if (nextManeuver != null)
+            {
+                var duration = DateTime.UtcNow - this.nextManeuverRenderingOrbitUpdated;
+                if (duration >= this.nextManeuverRenderingOrbitUpdateFrequency)
+                {
+                    var currentOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object);
+
+                    var currentState = new ObjectState();
+                    var currentPrimaryBodyState = new ObjectState();
+
+                    SolverHelpers.AfterTime(
+                        simulatorEngine.KeplerProblemSolver,
+                        nextManeuver.Object.Configuration,
+                        nextManeuver.Object.State,
+                        currentOrbit,
+                        nextManeuver.Maneuver.ManeuverTime - simulatorEngine.TotalTime,
+                        out currentState,
+                        out currentPrimaryBodyState);
+
+                    currentState.Velocity += nextManeuver.Maneuver.DeltaVelocity;
+                    var nextOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object.PrimaryBody, ref currentPrimaryBodyState, ref currentState);
+
+                    var positions = OrbitPositions.Create(nextOrbit, true);
+                    this.nextManeuverRenderingOrbit.Update(positions);
+
+                    this.nextManeuverRenderingOrbitUpdated = DateTime.UtcNow;
+                }
+
+                this.drawNextManeuver = true;
+            }
+            else
+            {
+                this.drawNextManeuver = false;
+            }
         }
 
         /// <summary>
@@ -225,6 +325,7 @@ namespace SpaceSimulator.Rendering
                 {
                     currentObject.UpdatePassedPositions();
                     currentObject.DrawOrbit(deviceContext, planetEffect, orbitEffect, camera, pass);
+                    currentObject.DrawNextManeuver(deviceContext, planetEffect, orbitEffect, camera, pass);
                 }
             }
         }

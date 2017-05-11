@@ -30,7 +30,6 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="config">The configuration</param>
-        /// <param name="atmosphericProperties">The atmospheric properties of the object</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
@@ -39,13 +38,12 @@ namespace SpaceSimulator.Simulator
         public RocketObject(
             string name,
             ObjectConfig config,
-            AtmosphericProperties atmosphericProperties,
             PhysicsObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
             RocketStages rocketStages,
             ITextOutputWriter textOutputWriter)
-            : base(name, config, atmosphericProperties, primaryBody, initialState, initialOrbit)
+            : base(name, config, primaryBody, initialState, initialOrbit)
         {
             this.rocketStages = rocketStages;
             this.textOutputWriter = textOutputWriter;
@@ -66,7 +64,12 @@ namespace SpaceSimulator.Simulator
         {
             get { return this.rocketStages; }
         }
-        
+
+        /// <summary>
+        /// Returns the atmospheric properties
+        /// </summary>
+        public override AtmosphericProperties AtmosphericProperties => this.Stages.AtmosphericProperties;
+
         /// <summary>
         /// Sets the control program
         /// </summary>
@@ -84,7 +87,7 @@ namespace SpaceSimulator.Simulator
             if (this.controlProgram != null)
             {
                 this.engineRunning = true;
-                this.state.Impacted = false;
+                this.state.HasImpacted = false;
                 this.controlProgram.Start(this.state.Time);
             }
         }

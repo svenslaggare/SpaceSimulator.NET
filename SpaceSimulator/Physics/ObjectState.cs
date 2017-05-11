@@ -40,7 +40,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Indicates if the object has impacted the primary body
         /// </summary>
-        public bool Impacted { get; set; }
+        public bool HasImpacted { get; set; }
 
         /// <summary>
         /// Creates a new state
@@ -58,7 +58,7 @@ namespace SpaceSimulator.Physics
             this.Velocity = velocity;
             this.Acceleration = acceleration;
             this.Rotation = rotation;
-            this.Impacted = impacted;
+            this.HasImpacted = impacted;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace SpaceSimulator.Physics
                 this.Velocity + velocity,
                 this.Acceleration + acceleration,
                 this.Rotation,
-                this.Impacted);
+                this.HasImpacted);
         }
 
         /// <summary>

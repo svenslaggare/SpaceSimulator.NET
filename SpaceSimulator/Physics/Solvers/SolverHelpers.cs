@@ -68,7 +68,7 @@ namespace SpaceSimulator.Physics.Solvers
                 nextPrimaryBodyState.Velocity + velocity,
                 state.Acceleration,
                 rotation: state.Rotation,
-                impacted: state.Impacted);
+                impacted: state.HasImpacted);
         }
 
         /// <summary>

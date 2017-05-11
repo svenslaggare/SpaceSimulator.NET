@@ -79,7 +79,7 @@ namespace SpaceSimulator.Helpers
                 refVelocity = primaryBody.Velocity;
             }
 
-            if (physicsObject == null || !physicsObject.Impacted)
+            if (physicsObject == null || !physicsObject.HasImpacted)
             {
                 infoBuilder.AppendLine("Distance: " + DataFormatter.Format((state.Position - refPosition).Length(), DataUnit.Distance));
                 infoBuilder.AppendLine("Speed: " + DataFormatter.Format((state.Velocity - refVelocity).Length(), DataUnit.Velocity));
@@ -136,30 +136,32 @@ namespace SpaceSimulator.Helpers
             }
 
             {
-                if (physicsObject is RocketObject rocketObject && primaryBody is PlanetObject primaryPlanet)
+                if (primaryBody is PlanetObject primaryPlanet)
                 {
                     var atmosphericModel = primaryPlanet.AtmosphericModel;
 
                     if (atmosphericModel.Inside(primaryBody, ref state))
-                    infoBuilder.AppendLine("");
-                    infoBuilder.AppendLine("Atmosphere");
-                    var altitude = primaryBody.Altitude(state.Position);
-
-                    (var pressure, var temperature) = atmosphericModel.PressureAndTemperature(altitude);
-                    infoBuilder.AppendLine($"Pressure: {DataFormatter.Format(pressure, DataUnit.Pressure)}");
-                    infoBuilder.AppendLine($"Temperature: {DataFormatter.Format(temperature, DataUnit.TemperatureCelsius)}");
-
-                    if (atmosphericModel is EarthAtmosphericModel earthAtmosphericModel)
                     {
-                        var densityOfAir = AtmosphericFormulas.DensityOfAir(pressure, temperature);
-                        var dynamicPressure = AtmosphericFormulas.DynamicPressure(densityOfAir, (state.Velocity - refVelocity).Length());
-                        infoBuilder.AppendLine($"Density of air: {DataFormatter.Format(densityOfAir, DataUnit.Density, useBase10: true)}");
-                        infoBuilder.AppendLine($"Dynamic pressure: {DataFormatter.Format(dynamicPressure, DataUnit.Pressure)}");
+                        infoBuilder.AppendLine("");
+                        infoBuilder.AppendLine("Atmosphere");
+                        var altitude = primaryBody.Altitude(state.Position);
+
+                        (var pressure, var temperature) = atmosphericModel.PressureAndTemperature(altitude);
+                        infoBuilder.AppendLine($"Pressure: {DataFormatter.Format(pressure, DataUnit.Pressure)}");
+                        infoBuilder.AppendLine($"Temperature: {DataFormatter.Format(temperature, DataUnit.TemperatureCelsius)}");
+
+                        if (atmosphericModel is EarthAtmosphericModel earthAtmosphericModel)
+                        {
+                            var densityOfAir = AtmosphericFormulas.DensityOfAir(pressure, temperature);
+                            var dynamicPressure = AtmosphericFormulas.DynamicPressure(densityOfAir, (state.Velocity - refVelocity).Length());
+                            infoBuilder.AppendLine($"Density of air: {DataFormatter.Format(densityOfAir, DataUnit.Density, useBase10: true)}");
+                            infoBuilder.AppendLine($"Dynamic pressure: {DataFormatter.Format(dynamicPressure, DataUnit.Pressure)}");
+                        }
                     }
                 }
             }
 
-            if (physicsObject == null || !physicsObject.Impacted)
+            if (physicsObject == null || !physicsObject.HasImpacted)
             {
                 infoBuilder.AppendLine();
 

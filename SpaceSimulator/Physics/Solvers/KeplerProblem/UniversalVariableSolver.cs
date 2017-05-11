@@ -127,7 +127,7 @@ namespace SpaceSimulator.Physics.Solvers
                 return initialState;
             }
 
-            if (initialState.Impacted)
+            if (initialState.HasImpacted)
             {
                 return SolverHelpers.MoveImpactedObject(
                     initialOrbit.PrimaryBody.Configuration,

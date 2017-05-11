@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Physics.Rocket
 {
@@ -71,6 +72,24 @@ namespace SpaceSimulator.Physics.Rocket
         public double FuelMassRemaining
         {
             get { return this.CurrentStage.FuelMassRemaining; }
+        }
+
+        /// <summary>
+        /// The atmospheric properties for the stage
+        /// </summary>
+        public AtmosphericProperties AtmosphericProperties
+        {
+            get
+            {
+                if (this.stages.Count > 0)
+                {
+                    return this.stages.Last().AtmosphericProperties;
+                }
+                else
+                {
+                    return this.CurrentStage.AtmosphericProperties;
+                }
+            }
         }
 
         /// <summary>

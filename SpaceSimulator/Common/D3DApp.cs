@@ -71,7 +71,8 @@ namespace SpaceSimulator.Common
 			this.title = title;
             this.renderForm = new RenderForm(title)
             {
-                ClientSize = new System.Drawing.Size(1280, 720)
+                //ClientSize = new System.Drawing.Size(1280, 720)
+                ClientSize = new System.Drawing.Size(1440, 900)
             };
 
             this.renderingManager2D = new RenderingManager2D(this.renderForm);

@@ -188,6 +188,7 @@
     <Compile Include="Rendering\Sphere.cs" />
     <Compile Include="Simulator\PhysicsObject.cs" />
     <Compile Include="Simulator\RocketObject.cs" />
+    <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
     <Compile Include="Simulator\SolarSystem.cs" />
