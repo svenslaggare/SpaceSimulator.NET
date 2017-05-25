@@ -18,7 +18,7 @@ namespace SpaceSimulator.Physics
         public double Mass { get; }
 
         /// <summary>
-        /// The rotational period (time to complete one rotation around it's axis) of the object
+        /// The rotational period (time to complete one rotation around its axis) of the object
         /// </summary>
         public double RotationalPeriod { get; }
 
@@ -27,7 +27,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         public Vector3d AxisOfRotation { get; }
 
-        private static readonly ObjectConfig empty = new ObjectConfig(0, 0);
+        private static readonly ObjectConfig empty = new ObjectConfig(0);
 
         /// <summary>
         /// Creates a new configuration

@@ -83,7 +83,7 @@ namespace SpaceSimulator.Environments
 
             //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
             //    "Satellite 1",
-            //    new ObjectConfig(10, 1000),
+            //    new ObjectConfig(1000),
             //    new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
 
@@ -93,7 +93,7 @@ namespace SpaceSimulator.Environments
 
             var object2 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 2",
-                new ObjectConfig(10, 1000),
+                new ObjectConfig(1000),
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 orbitPosition2);
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", object2));
@@ -102,7 +102,7 @@ namespace SpaceSimulator.Environments
             //    PhysicsObjectType.ArtificialSatellite,
             //    earth,
             //    "Rocket 1",
-            //    new ObjectConfig(10, 1000),
+            //    new ObjectConfig(1000),
             //    OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
             //    //OrbitHelpers.FromCoordinates(earth, 0 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
             //    Vector3d.Zero);

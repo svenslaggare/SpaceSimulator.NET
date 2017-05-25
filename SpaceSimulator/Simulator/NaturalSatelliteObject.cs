@@ -36,7 +36,7 @@ namespace SpaceSimulator.Simulator
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, type, config, primaryBody, initialState, initialOrbit, true)
+            : base(name, type, config, primaryBody, initialState, initialOrbit)
         {
             this.Radius = radius;
         }

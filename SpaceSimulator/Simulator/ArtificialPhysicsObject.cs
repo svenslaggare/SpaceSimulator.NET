@@ -32,7 +32,7 @@ namespace SpaceSimulator.Simulator
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit, false)
+            : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit)
         {
 
         }

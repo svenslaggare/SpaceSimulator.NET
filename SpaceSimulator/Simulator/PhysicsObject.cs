@@ -65,11 +65,6 @@ namespace SpaceSimulator.Simulator
         IPrimaryBodyObject IPhysicsObject.PrimaryBody => (IPrimaryBodyObject)PrimaryBody;
 
         /// <summary>
-        /// Indicates if the object is drawn at real scale
-        /// </summary>
-        public bool IsRealSize { get; }
-
-        /// <summary>
         /// The reference state
         /// </summary>
         public ObjectState ReferenceState { get; protected set; }
@@ -103,22 +98,19 @@ namespace SpaceSimulator.Simulator
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
-        /// <param name="isRealSize">Indicates if the size of the drawn object is real</param>
         public PhysicsObject(
             string name,
             PhysicsObjectType type,
             ObjectConfig config,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
-            Orbit initialOrbit,
-            bool isRealSize = true)
+            Orbit initialOrbit)
         {
             this.Name = name;
             this.Type = type;
             this.Config = config;
             this.state = initialState;
             this.PrimaryBody = primaryBody;
-            this.IsRealSize = isRealSize;
             this.ReferenceOrbit = initialOrbit;
             this.ReferenceState = initialState;
 

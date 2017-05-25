@@ -431,7 +431,7 @@ namespace SpaceSimulator.Simulator
 
             var newObject = new RocketObject(
                 name,
-                new ObjectConfig(radius, rocketStages.InitialTotalMass),
+                new ObjectConfig(rocketStages.InitialTotalMass),
                 primaryBody,
                 initialState,
                 Orbit.CalculateOrbit(primaryBody, ref initialState),
@@ -461,7 +461,7 @@ namespace SpaceSimulator.Simulator
             var primaryBodyState = orbit.PrimaryBody.State;
             var newObject = new RocketObject(
                 name,
-                new ObjectConfig(radius, rocketStages.InitialTotalMass),
+                new ObjectConfig(rocketStages.InitialTotalMass),
                 (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit,
