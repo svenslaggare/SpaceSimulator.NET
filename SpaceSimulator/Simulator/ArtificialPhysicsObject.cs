@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
 
@@ -22,17 +23,17 @@ namespace SpaceSimulator.Simulator
         /// Creates a new artificial object object
         /// </summary>
         /// <param name="name">The name of the object</param>
-        /// <param name="config">The configuration for the object</param>
+        /// <param name="mass">The mass of the object</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         public ArtificialPhysicsObject(
             string name,
-            ObjectConfig config,
+            double mass,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, PhysicsObjectType.ArtificialSatellite, config, primaryBody, initialState, initialOrbit)
+            : base(name, PhysicsObjectType.ArtificialSatellite, mass, 0, Vector3d.Zero, primaryBody, initialState, initialOrbit)
         {
 
         }

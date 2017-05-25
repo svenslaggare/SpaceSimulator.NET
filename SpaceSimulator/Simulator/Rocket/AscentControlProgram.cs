@@ -217,7 +217,7 @@ namespace SpaceSimulator.Simulator.Rocket
             var textOutputWriter = new NullTextOutputWriter();
             var currentObject = new RocketObject(
                 rocketObject.Name,
-                rocketObject.Config,
+                rocketObject.Mass,
                 rocketObject.PrimaryBody,
                 rocketObject.State,
                 rocketObject.ReferenceOrbit,

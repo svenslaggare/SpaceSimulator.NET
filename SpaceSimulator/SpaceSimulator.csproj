@@ -147,7 +147,6 @@
     <Compile Include="Physics\Maneuvers\InterplanetaryManeuver.cs" />
     <Compile Include="Physics\Maneuvers\OrbitManeuver.cs" />
     <Compile Include="Physics\Maneuvers\RendevouzManeuver.cs" />
-    <Compile Include="Physics\ObjectConfig.cs" />
     <Compile Include="Physics\ObjectState.cs" />
     <Compile Include="Physics\Orbit.cs" />
     <Compile Include="Physics\OrbitCalculators.cs" />

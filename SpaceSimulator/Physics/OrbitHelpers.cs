@@ -175,12 +175,12 @@ namespace SpaceSimulator.Physics
         /// <param name="latitude">The latitude of the object</param>
         public static double SurfaceSpeedDueToRotation(IPrimaryBodyObject primaryBody, double latitude)
         {
-            if (primaryBody.Config.RotationalPeriod == 0)
+            if (primaryBody.RotationalPeriod == 0)
             {
                 return 0;
             }
 
-            return ((2.0 * Math.PI * primaryBody.Radius) / primaryBody.Config.RotationalPeriod) * Math.Cos(latitude);
+            return ((2.0 * Math.PI * primaryBody.Radius) / primaryBody.RotationalPeriod) * Math.Cos(latitude);
         }
 
         /// <summary>

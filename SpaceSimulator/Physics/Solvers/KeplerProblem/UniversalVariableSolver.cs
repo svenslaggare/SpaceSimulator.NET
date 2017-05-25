@@ -108,14 +108,14 @@ namespace SpaceSimulator.Physics.Solvers
         /// <summary>
         /// Returns the state at the given time
         /// </summary>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         /// <param name="primaryBodyStateAtTime">The primary body state at the time</param>
         /// <param name="time">The time since the initial state/orbit</param>
         public ObjectState Solve(
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ref ObjectState initialPrimaryBodyState,
             ref ObjectState initialState,
             Orbit initialOrbit,
@@ -168,7 +168,7 @@ namespace SpaceSimulator.Physics.Solvers
             var fp = (sqrtMu / (r0Length * rLength)) * x * (z * Sz - 1);
             var v = fp * r0 + gp * v0;
 
-            var rotation = SolverHelpers.CalculateRotation(config.RotationalPeriod, initialState.Rotation, time);
+            var rotation = SolverHelpers.CalculateRotation(physicsObject.RotationalPeriod, initialState.Rotation, time);
 
             //The acceleration is merely used for display
             return new ObjectState(

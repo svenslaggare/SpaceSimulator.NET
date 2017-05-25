@@ -342,9 +342,9 @@ namespace SpaceSimulator.Helpers
                     {
                         closestApproach = OrbitCalculators.ClosestApproach(
                             simulatorEngine.KeplerProblemSolver,
-                            physicsObject.Config,
+                            physicsObject,
                             orbitPosition,
-                            target.Config,
+                            target,
                             targetOrbitPosition);
                     }
 

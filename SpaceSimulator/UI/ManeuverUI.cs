@@ -306,7 +306,7 @@ namespace SpaceSimulator.UI
                 InterceptManeuver.Intercept(
                     this.SimulatorEngine,
                     this.SelectedObject,
-                    selectedObject.Target.Config,
+                    selectedObject.Target,
                     targetOrbitPosition,
                     hohmannCoastTime * 0.5,
                     hohmannCoastTime * 2.0,
@@ -333,7 +333,7 @@ namespace SpaceSimulator.UI
                 InterceptManeuver.Intercept(
                     this.SimulatorEngine,
                     this.SelectedObject,
-                    selectedObject.Target.Config,
+                    selectedObject.Target,
                     targetOrbitPosition,
                     targetOrbitPosition.Orbit.Period * 0.1,
                     targetOrbitPosition.Orbit.Period,

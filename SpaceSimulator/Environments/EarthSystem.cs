@@ -32,8 +32,10 @@ namespace SpaceSimulator.Environments
             var earth = new PlanetObject(
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
+                Simulator.SolarSystem.Earth.Mass,
                 Simulator.SolarSystem.Earth.Radius,
-                Simulator.SolarSystem.Earth.CreateConfig(),
+                Simulator.SolarSystem.Earth.RotationalPeriod,
+                Simulator.SolarSystem.Earth.AxisOfRotation,
                 new EarthAtmosphericModel(),
                 null,
                 new ObjectState(),
@@ -75,11 +77,11 @@ namespace SpaceSimulator.Environments
             //    falcon9Object,
             //    2E3,
             //    falcon9TargetOrbit);
-            //var bestPitchStart = 2E3;
-            //var bestPitchEnd = 12.8625E3;
-            //falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
-            //falcon9Object.CheckImpacted(0);
-            //falcon9Object.StartEngine();
+            var bestPitchStart = 2E3;
+            var bestPitchEnd = 12.8625E3;
+            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
+            falcon9Object.CheckImpacted(0);
+            falcon9Object.StartEngine();
 
             //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
             //    "Satellite 1",
@@ -93,7 +95,7 @@ namespace SpaceSimulator.Environments
 
             var object2 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 2",
-                new ObjectConfig(1000),
+                1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 orbitPosition2);
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", object2));

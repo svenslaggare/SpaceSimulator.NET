@@ -22,14 +22,14 @@ namespace SpaceSimulator.Physics.Solvers
         /// Solves the given integration problem
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="state">The state</param>
         /// <param name="totalTime">The total time</param>
         /// <param name="deltaTime">The delta time</param>
         /// <param name="calculateAcceleration">Calculates the acceleration</param>
        ObjectState Solve(
             IPrimaryBodyObject primaryBody,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ref ObjectState state,
             double totalTime,
             double deltaTime, 

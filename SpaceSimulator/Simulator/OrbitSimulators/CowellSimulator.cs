@@ -122,7 +122,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             var currentState = currentObject.State;
             var nextState = this.numericIntegrator.Solve(
                 currentObject.PrimaryBody,
-                currentObject.Config,
+                currentObject,
                 ref currentState,
                 totalTime,
                 timeStep,

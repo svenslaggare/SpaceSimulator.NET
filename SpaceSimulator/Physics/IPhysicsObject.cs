@@ -13,36 +13,34 @@ namespace SpaceSimulator.Physics
     public interface IPhysicsObject
     {
         /// <summary>
-        /// Returns the state of the object
+        /// The mass
         /// </summary>
-        ObjectState State
-        {
-            get;
-        }
+        double Mass { get; }
 
         /// <summary>
-        /// Returns the configuration of the object
+        /// The rotational period (time to complete one rotation around its axis) of the object
         /// </summary>
-        ObjectConfig Config
-        {
-            get;
-        }
+        double RotationalPeriod { get; }
+
+        /// <summary>
+        /// The axis-of-rotation
+        /// </summary>
+        Vector3d AxisOfRotation { get; }
 
         /// <summary>
         /// Returns the standard gravitational parameter
         /// </summary>
-        double StandardGravitationalParameter
-        {
-            get;
-        }
+        double StandardGravitationalParameter { get; }
+
+        /// <summary>
+        /// Returns the state of the object
+        /// </summary>
+        ObjectState State { get; }
 
         /// <summary>
         /// The primary body
         /// </summary>
-        IPrimaryBodyObject PrimaryBody
-        {
-            get;
-        }
+        IPrimaryBodyObject PrimaryBody { get; }
 
         /// <summary>
         /// Indicates if the object is the object of reference
@@ -72,7 +70,7 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetRotationalTransform(this IPhysicsObject physicsObject)
         {
-            return Matrix3x3d.RotationAxis(physicsObject.Config.AxisOfRotation, physicsObject.State.Rotation);
+            return Matrix3x3d.RotationAxis(physicsObject.AxisOfRotation, physicsObject.State.Rotation);
         }
 
         /// <summary>
@@ -81,7 +79,16 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetInverseRotationalTransform(this IPhysicsObject physicsObject)
         {
-             return Matrix3x3d.RotationAxis(physicsObject.Config.AxisOfRotation, -physicsObject.State.Rotation);
+             return Matrix3x3d.RotationAxis(physicsObject.AxisOfRotation, -physicsObject.State.Rotation);
+        }
+
+        /// <summary>
+        /// Returns the rotational speed in radians/second
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public static double RotationalSpeed(this IPhysicsObject physicsObject)
+        {
+            return (2.0 * Math.PI) / physicsObject.RotationalPeriod;
         }
     }
 }

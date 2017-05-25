@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
 
@@ -32,6 +33,11 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double RotationalPeriod { get; }
 
+        /// <summary>
+        /// The axis-of-rotation
+        /// </summary>
+        public Vector3d AxisOfRotation { get; }
+
         private readonly Orbit referenceOrbit;
 
         /// <summary>
@@ -41,13 +47,15 @@ namespace SpaceSimulator.Simulator
         /// <param name="meanRadius">The mean radius of the body</param>
         /// <param name="mass">The mass of the body</param>
         /// <param name="rotationalPeriod">The rotational period</param>
+        /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="orbit">The orbit around the primary body</param>
-        public SolarSystemBody(double equatorialRadius, double meanRadius, double mass, double rotationalPeriod, Orbit orbit)
+        public SolarSystemBody(double equatorialRadius, double meanRadius, double mass, double rotationalPeriod, Vector3d axisOfRotation, Orbit orbit)
         {
             this.EquatorialRadius = equatorialRadius;
             this.MeanRadius = meanRadius;
             this.Mass = mass;
             this.RotationalPeriod = rotationalPeriod;
+            this.AxisOfRotation = axisOfRotation;
             this.referenceOrbit = orbit;
         }
 
@@ -75,14 +83,6 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Creates the configuration
-        /// </summary>
-        public ObjectConfig CreateConfig()
-        {
-            return new ObjectConfig(this.Mass, this.RotationalPeriod);
-        }
-
-        /// <summary>
         /// Creates a physics object using the current body around the given body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
@@ -94,8 +94,10 @@ namespace SpaceSimulator.Simulator
             return new PlanetObject(
                 name,
                 PhysicsObjectType.NaturalSatellite,
+                this.Mass,
                 this.Radius,
-                this.CreateConfig(),
+                this.RotationalPeriod,
+                this.AxisOfRotation,
                 new NoAtmosphereModel(),
                 primaryBody,
                 initialOrbit.CalculateState(initialTrueAnomaly, primaryBody.State),

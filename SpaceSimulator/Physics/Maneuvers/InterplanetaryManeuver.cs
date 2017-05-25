@@ -50,14 +50,14 @@ namespace SpaceSimulator.Physics.Maneuvers
             timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(injectionOrbit) ?? 0;
 
             var leaveSOIPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.PrimaryBody.Config,
+                physicsObject.PrimaryBody,
                 sun.State,
                 injectionPrimaryState,
                 primaryBodyOrbit,
                 timeToLeaveSOI);
 
             leaveSOIState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.Config,
+                physicsObject,
                 injectionPrimaryState,
                 injectionState,
                 injectionOrbit.Orbit,
@@ -117,14 +117,14 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             //Compute the time
             var injectionPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
-                currentPlanet.Config,
+                currentPlanet,
                 sun.State,
                 currentPlanet.State,
                 currentPlanetOrbit,
                 alignmentTime);
 
             var injectionState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.Config,
+                physicsObject,
                 currentPlanet.State,
                 physicsObject.State,
                 objectOrbit,
@@ -190,10 +190,10 @@ namespace SpaceSimulator.Physics.Maneuvers
             var possibleLaunches = InterceptManeuver.Intercept(
                 simulatorEngine,
                 sun,
-                currentPlanet.Config,
+                currentPlanet,
                 currentPlanet.State,
                 currentPlanetOrbitPosition,
-                target.Config,
+                target,
                 targetOrbitPosition,
                 hohmannCoastTime * 0.5,
                 hohmannCoastTime * 2.0,
@@ -242,14 +242,14 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var injectionState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                physicsObject.Config,
+                physicsObject,
                 physicsObject.State,
                 objectOrbit,
                 t);
 
             var injectionPrimaryState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                physicsObject.PrimaryBody.Config,
+                physicsObject.PrimaryBody,
                 physicsObject.PrimaryBody.State,
                 currentPlanetOrbit,
                 t);
@@ -274,7 +274,7 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var targetStateAtSOILeave = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                target.Config,
+                target,
                 target.State,
                 targetOrbit,
                 t + timeToLeaveSOI);
@@ -286,10 +286,10 @@ namespace SpaceSimulator.Physics.Maneuvers
             InterceptManeuver.Intercept(
                 simulatorEngine,
                 sun,
-                physicsObject.Config,
+                physicsObject,
                 leaveSOIState,
                 bestHeliocentricOrbitPosition,
-                target.Config,
+                target,
                 targetOrbitAtSOILeave,
                 MiscHelpers.RoundToDays(coastTime) * 0.75,
                 MiscHelpers.RoundToDays(coastTime) * 2.0,
@@ -306,9 +306,9 @@ namespace SpaceSimulator.Physics.Maneuvers
             testStartTime = DateTime.UtcNow;
             var minDistance = OrbitCalculators.ClosestApproach(
                 simulatorEngine.KeplerProblemSolver,
-                currentPlanet.Config,
+                currentPlanet,
                 bestHeliocentricOrbitPosition,
-                target.Config,
+                target,
                 targetOrbitAtSOILeave,
                 deltaTime: 12.0 * 60 * 60.0).Distance;
             Console.WriteLine((DateTime.UtcNow - testStartTime));

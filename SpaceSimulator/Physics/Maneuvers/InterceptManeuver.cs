@@ -62,7 +62,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         private static bool IsValidLaunch(
             ISimulatorEngine simulatorEngine,
             IPrimaryBodyObject primaryBody,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ref ObjectState launchState,
             ref ObjectState primaryLaunchState,
             double impactCheckDeltaTime,
@@ -84,7 +84,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             for (double t = 0.0; t <= maxImpactCheckTime; t += impactCheckDeltaTime)
             {
                 var nextState = simulatorEngine.KeplerProblemSolver.Solve(
-                    config,
+                    physicsObject,
                     ref primaryLaunchState,
                     ref launchState,
                     launchOrbit,
@@ -108,7 +108,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             ObjectState primaryBodyStateInitial,
             ObjectState primaryBodyStateAtLaunch,
             Orbit primaryBodyOrbit,
-            ObjectConfig targetConfig,
+            IPhysicsObject target,
             Orbit targetOrbit,
             ObjectState s1,
             ObjectState objectLaunchState,
@@ -122,7 +122,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 if (!primaryBody.IsObjectOfReference)
                 {
                     primaryBodyStateAtIntercept = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody.Config,
+                        primaryBody,
                         primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
                         primaryBodyOrbit,
@@ -130,7 +130,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 }
 
                 var targetInterceptState = simulatorEngine.KeplerProblemSolver.Solve(
-                    targetConfig,
+                    target,
                     ref primaryBodyStateAtLaunch,
                     ref s1,
                     targetOrbit,
@@ -189,11 +189,11 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// </summary>
         /// <param name="simulatorEngine">The simulation engine</param>
         /// <param name="primaryBody">The primary body</param>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="state">The state of the object</param>
-        /// <param name="orbit">The orbit of the object</param>
-        /// <param name="targetConfig">The configuration of the target object</param>
-        /// <param name="targetOrbit">The target orbit</param>
+        /// <param name="orbitPosition">The orbit of the object</param>
+        /// <param name="target">The target object</param>
+        /// <param name="targetOrbitPosition">The target orbit</param>
         /// <param name="minInterceptTime">The minimum intercept time</param>
         /// <param name="maxInterceptTime">The maximum intercept time</param>
         /// <param name="minLaunchTime">The minimum launch time</param>
@@ -209,10 +209,10 @@ namespace SpaceSimulator.Physics.Maneuvers
         public static IList<PossibleLaunch> Intercept(
             ISimulatorEngine simulatorEngine,
             IPrimaryBodyObject primaryBody,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState state,
             OrbitPosition orbitPosition,
-            ObjectConfig targetConfig,
+            IPhysicsObject target,
             OrbitPosition targetOrbitPosition,
             double minInterceptTime, double maxInterceptTime, double minLaunchTime, double maxLaunchTime,
             out Vector3d optimalDeltaV, out double optimalLaunchTime, out double optimalInterceptTime,
@@ -252,7 +252,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 return IsValidLaunch(
                     simulatorEngine,
                     primaryBody,
-                    config,
+                    physicsObject,
                     ref launchState,
                     ref primaryLaunchState,
                     impactCheckDeltaTime,
@@ -268,7 +268,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 if (!primaryBody.IsObjectOfReference)
                 {
                     primaryBodyStateAtLaunch = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody.Config,
+                        primaryBody,
                         primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
                         primaryBodyOrbit,
@@ -276,7 +276,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 }
 
                 var objectLaunchState = simulatorEngine.KeplerProblemSolver.Solve(
-                    config,
+                    physicsObject,
                     ref primaryBodyStateInitial,
                     ref objectInitial,
                     objectOrbit,
@@ -284,7 +284,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                     launchTime);
 
                 var targetLaunchState = simulatorEngine.KeplerProblemSolver.Solve(
-                    targetConfig,
+                    target,
                     ref primaryBodyStateInitial,
                     ref targetInitial,
                     targetOrbit,
@@ -300,7 +300,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                         primaryBodyStateInitial,
                         primaryBodyStateAtLaunch,
                         primaryBodyOrbit,
-                        targetConfig,
+                        target,
                         targetOrbit,
                         targetLaunchState,
                         objectLaunchState,
@@ -353,7 +353,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// </summary>
         /// <param name="simulatorEngine">The simulation engine</param>
         /// <param name="physicsObject">The object to apply for</param>
-        /// <param name="targetConfig">The configuration of the target orbit</param>
+        /// <param name="target">The target object</param>
         /// <param name="targetOrbitPosition">The target orbit position</param>
         /// <param name="minInterceptTime">The minimum intercept time</param>
         /// <param name="maxInterceptTime">The maximum intercept time</param>
@@ -364,7 +364,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         public static OrbitalManeuvers Intercept(
             ISimulatorEngine simulatorEngine,
             IPhysicsObject physicsObject,
-            ObjectConfig targetConfig,
+            IPhysicsObject target,
             OrbitPosition targetOrbitPosition,
             double minInterceptTime, double maxInterceptTime, double minLaunchTime, double maxLaunchTime,
             double deltaTime = 1.0 * 60.0)
@@ -373,10 +373,10 @@ namespace SpaceSimulator.Physics.Maneuvers
             Intercept(
                  simulatorEngine,
                  physicsObject.PrimaryBody,
-                 physicsObject.Config,
+                 physicsObject,
                  physicsObject.State,
                  OrbitPosition.CalculateOrbitPosition(physicsObject),
-                 targetConfig,
+                 target,
                  targetOrbitPosition,
                  minInterceptTime,
                  maxInterceptTime,

@@ -44,7 +44,7 @@ namespace SpaceSimulator.Physics.Solvers
             ObjectState state,
             double time)
         {
-            if (primaryBody.Config.RotationalPeriod == 0)
+            if (primaryBody.RotationalPeriod == 0)
             {
                 state.SwapReferenceFrame(initialPrimaryBodyState, nextPrimaryBodyState);
                 state.Time += time;
@@ -54,11 +54,11 @@ namespace SpaceSimulator.Physics.Solvers
             //Calculate the new position
             var r = state.Position - initialPrimaryBodyState.Position;
             OrbitHelpers.GetSphericalCoordinates(r, out var latitude, out var longitude);
-            longitude += primaryBody.Config.RotationalSpeed * time;
+            longitude += primaryBody.RotationalSpeed() * time;
             var rNext = OrbitHelpers.FromSphericalCoordinates(latitude, longitude, r.Length());
 
             //Calculate the surface velocity due to rotation of primary body
-            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(rNext), primaryBody.Config.AxisOfRotation);
+            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(rNext), primaryBody.AxisOfRotation);
             surfaceSpeedDir.Normalize();
             var velocity = OrbitHelpers.SurfaceSpeedDueToRotation(primaryBody, Math.PI / 2.0 - latitude) * surfaceSpeedDir;
 
@@ -75,7 +75,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// Calculates the state after the given amount of time
         /// </summary>
         /// <param name="keplerProblemSolver">A solver for the kepler problem</param>
-        /// <param name="config">The configuration</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="state">The state</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="time">The time</param>
@@ -85,7 +85,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// <remarks>This method does not take SOI changes or maneuvers into account.</remarks>
         public static void AfterTime(
             IKeplerProblemSolver keplerProblemSolver,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState state,
             Orbit orbit,
             double time,
@@ -99,7 +99,7 @@ namespace SpaceSimulator.Physics.Solvers
                 var primaryBodyOrbit = Orbit.CalculateOrbit(orbit.PrimaryBody);
                 primaryBodyState = AfterTime(
                     keplerProblemSolver,
-                    orbit.PrimaryBody.Config,
+                    orbit.PrimaryBody,
                     orbit.PrimaryBody.State,
                     primaryBodyOrbit,
                     time,
@@ -107,7 +107,7 @@ namespace SpaceSimulator.Physics.Solvers
             }
 
             nextState = keplerProblemSolver.Solve(
-                config,
+                physicsObject,
                 orbit.PrimaryBody.State,
                 state,
                 orbit,
@@ -121,7 +121,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// Calculates the state after the given amount of time
         /// </summary>
         /// <param name="keplerProblemSolver">A solver for the kepler problem</param>
-        /// <param name="config">The configuration</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="state">The state</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="time">The time</param>
@@ -129,7 +129,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// <remarks>This method does not take SOI changes or maneuvers into account.</remarks>
         public static ObjectState AfterTime(
             IKeplerProblemSolver keplerProblemSolver,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState state,
             Orbit orbit,
             double time,
@@ -137,7 +137,7 @@ namespace SpaceSimulator.Physics.Solvers
         {
             AfterTime(
                 keplerProblemSolver,
-                config,
+                physicsObject,
                 state,
                 orbit,
                 time,

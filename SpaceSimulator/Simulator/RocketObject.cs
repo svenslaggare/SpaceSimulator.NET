@@ -29,7 +29,7 @@ namespace SpaceSimulator.Simulator
         /// Creates a new rocket object
         /// </summary>
         /// <param name="name">The name of the object</param>
-        /// <param name="config">The configuration</param>
+        /// <param name="mass">The mass of the object</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
@@ -37,13 +37,13 @@ namespace SpaceSimulator.Simulator
         /// <param name="textOutputWriter">The text output writer</param>
         public RocketObject(
             string name,
-            ObjectConfig config,
+            double mass,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
             RocketStages rocketStages,
             ITextOutputWriter textOutputWriter)
-            : base(name, config, primaryBody, initialState, initialOrbit)
+            : base(name, mass, primaryBody, initialState, initialOrbit)
         {
             this.rocketStages = rocketStages;
             this.textOutputWriter = textOutputWriter;
@@ -133,7 +133,7 @@ namespace SpaceSimulator.Simulator
             var deltaMass = this.rocketStages.UseFuel(time);
             if (deltaMass != null)
             {
-                this.Config = this.Config.WithMass(this.Mass - deltaMass.Value);
+                this.Mass -= deltaMass.Value;
             }
             else
             {
@@ -154,7 +154,7 @@ namespace SpaceSimulator.Simulator
             {
                 var spentStageObject = new SatelliteObject(
                     $"{this.Name} - {oldStage.Name}",
-                    this.Config.WithMass(oldStage.Mass),
+                    oldStage.Mass,
                     this.AtmosphericProperties,
                     this.PrimaryBody,
                     this.ReferenceState,
@@ -162,7 +162,7 @@ namespace SpaceSimulator.Simulator
                 spentStageObject.SetNextState(this.ReferenceState);
                 this.toStage.Add(spentStageObject);
 
-                this.Config = this.Config.WithMass(this.rocketStages.TotalMass);
+                this.Mass = this.rocketStages.TotalMass;
                 this.textOutputWriter.WriteLine($"{this.Name}: staged '{oldStage.Name}'.");
                 return true;
             }

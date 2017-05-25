@@ -29,8 +29,10 @@ namespace SpaceSimulator.Environments
             var sun = new PlanetObject(
                 "Sun",
                 PhysicsObjectType.ObjectOfReference,
+                Simulator.SolarSystem.Sun.Mass,
                 Simulator.SolarSystem.Sun.Radius,
-                Simulator.SolarSystem.Sun.CreateConfig(),
+                Simulator.SolarSystem.Sun.RotationalPeriod,
+                Simulator.SolarSystem.Sun.AxisOfRotation,
                 new NoAtmosphereModel(),
                 null,
                 new ObjectState(),
@@ -45,8 +47,10 @@ namespace SpaceSimulator.Environments
                 var newObject = simulatorEngine.AddPlanetInOrbit(
                     name,
                     PhysicsObjectType.NaturalSatellite,
+                    body.Mass,
                     body.Radius,
-                    body.CreateConfig(),
+                    body.RotationalPeriod,
+                    body.AxisOfRotation,
                     new NoAtmosphereModel(),
                     orbit);
                 renderingObjects.Add(new RenderingObject(graphicsDevice, color, textureName, newObject));
@@ -70,7 +74,7 @@ namespace SpaceSimulator.Environments
 
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",
-                new ObjectConfig(1000),
+                1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));

@@ -247,7 +247,7 @@ namespace SpaceSimulator.Rendering
 
                     SolverHelpers.AfterTime(
                         simulatorEngine.KeplerProblemSolver,
-                        nextManeuver.Object.Config,
+                        nextManeuver.Object,
                         nextManeuver.Object.State,
                         currentOrbit,
                         nextManeuver.Maneuver.ManeuverTime - simulatorEngine.TotalTime,

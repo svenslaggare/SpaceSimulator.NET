@@ -45,14 +45,24 @@ namespace SpaceSimulator.Simulator
         public string Name { get; }
 
         /// <summary>
+        /// The mass of the object
+        /// </summary>
+        public double Mass { get; protected set; }
+
+        /// <summary>
+        /// The rotational period
+        /// </summary>
+        public double RotationalPeriod { get; }
+
+        /// <summary>
+        /// The axis-of-rotation
+        /// </summary>
+        public Vector3d AxisOfRotation { get; }
+
+        /// <summary>
         /// The type of the object
         /// </summary>
         public PhysicsObjectType Type { get; }
-
-        /// <summary>
-        /// The configuration for the object
-        /// </summary>
-        public ObjectConfig Config { get; protected set; }
 
         /// <summary>
         /// The object that the current object orbits around
@@ -94,21 +104,27 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="type">The type of the object</param>
-        /// <param name="config">The configuration for the object</param>
+        /// <param name="mass">The mass of the object</param>
+        /// <param name="rotationalPeriod">The rotational period</param>
+        /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         public PhysicsObject(
             string name,
             PhysicsObjectType type,
-            ObjectConfig config,
+            double mass,
+            double rotationalPeriod,
+            Vector3d axisOfRotation,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
         {
             this.Name = name;
             this.Type = type;
-            this.Config = config;
+            this.Mass = mass;
+            this.RotationalPeriod = rotationalPeriod;
+            this.AxisOfRotation = axisOfRotation;
             this.state = initialState;
             this.PrimaryBody = primaryBody;
             this.ReferenceOrbit = initialOrbit;
@@ -133,23 +149,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double StandardGravitationalParameter
         {
-            get { return this.Config.Mass * Constants.G; }
-        }
-
-        /// <summary>
-        /// The mass
-        /// </summary>
-        public double Mass
-        {
-            get { return this.Config.Mass; }
-        }
-
-        /// <summary>
-        /// The rotational period (time to complete one rotation around it's axis) of the object
-        /// </summary>
-        public double RotationalPeriod
-        {
-            get { return this.Config.RotationalPeriod; }
+            get { return this.Mass * Constants.G; }
         }
 
         /// <summary>
@@ -240,17 +240,6 @@ namespace SpaceSimulator.Simulator
         public bool IsObjectOfReference
         {
             get { return this.Type == PhysicsObjectType.ObjectOfReference; }
-        }
-
-        /// <summary>
-        /// Returns the axis-of-rotation
-        /// </summary>
-        public Vector3d AxisOfRotation
-        {
-            get
-            {
-                return this.Config.AxisOfRotation;
-            }
         }
 
         /// <summary>

@@ -33,17 +33,17 @@ namespace SpaceSimulator.Physics
         /// Calculates the closest approach between the given orbits
         /// </summary>
         /// <param name="keplerProblemSolver">A solver for the kepler problem</param>
-        /// <param name="config1">The configuration of the first object</param>
-        /// <param name="orbit1">The first orbit</param>
-        /// <param name="config2">The configuration of the second object</param>
-        /// <param name="orbit2">The second orbit</param>
+        /// <param name="object1">The first object</param>
+        /// <param name="orbitPosition1">The first orbit</param>
+        /// <param name="object2">The second object</param>
+        /// <param name="orbitPosition2">The second orbit</param>
         /// <param name="deltaTime">The delta time</param>
         /// <exception cref="ArgumentException">If the primary bodies are not the same.</exception>
         public static ApproachData ClosestApproach(
             IKeplerProblemSolver keplerProblemSolver,
-            ObjectConfig config1,
+            IPhysicsObject object1,
             OrbitPosition orbitPosition1,
-            ObjectConfig config2,
+            IPhysicsObject object2,
             OrbitPosition orbitPosition2,
             double deltaTime = 600.0 * 30)
         {
@@ -87,14 +87,14 @@ namespace SpaceSimulator.Physics
             while (t <= synodicPeriod)
             {
                 var s1 = keplerProblemSolver.Solve(
-                    config1,
+                    object1,
                     ref initPrimaryState,
                     ref initState1,
                     orbit1,
                     t);
 
                 var s2 = keplerProblemSolver.Solve(
-                    config2,
+                    object2,
                     ref initPrimaryState,
                     ref initState2,
                     orbit2,
@@ -155,8 +155,8 @@ namespace SpaceSimulator.Physics
                 {
                     var soi = OrbitFormulas.SphereOfInfluence(
                         Orbit.CalculateOrbit(soiObject).SemiMajorAxis,
-                        soiObject.Config.Mass,
-                        nextSoiObject.Config.Mass);
+                        soiObject.Mass,
+                        nextSoiObject.Mass);
 
                     var found = OrbitFormulas.TrueAnomalyAt(
                         soi,

@@ -24,8 +24,10 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="type">The type of the object</param>
+        /// <param name="mass">The mass of the object</param>
         /// <param name="radius">The radius of the object</param>
-        /// <param name="config">The configuration for the object</param>
+        /// <param name="rotationalPeriod">The rotational period</param>
+        /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
@@ -33,13 +35,15 @@ namespace SpaceSimulator.Simulator
         public PlanetObject(
             string name,
             PhysicsObjectType type,
+            double mass,
             double radius,
-            ObjectConfig config,
+            double rotationalPeriod,
+            Vector3d axisOfRotation,
             IAtmosphericModel atmosphericModel,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, type, radius, config, primaryBody, initialState, initialOrbit)
+            : base(name, type, mass, radius, rotationalPeriod, axisOfRotation, primaryBody, initialState, initialOrbit)
         {
             this.AtmosphericModel = atmosphericModel;
         }

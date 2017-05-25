@@ -346,7 +346,10 @@ namespace SpaceSimulator.Simulator
         /// Adds a planet object in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
+        /// <param name="mass">The mass of the object</param>
         /// <param name="radius">The radius of the object</param>
+        /// <param name="rotationalPeriod">The rotational period</param>
+        /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="config">The configuration</param>
         /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="orbitPosition">The position in the orbit</param>
@@ -355,8 +358,10 @@ namespace SpaceSimulator.Simulator
         public PlanetObject AddPlanetInOrbit(
             string name,
             PhysicsObjectType type,
+            double mass,
             double radius,
-            ObjectConfig config,
+            double rotationalPeriod,
+            Vector3d axisOfRotation,
             IAtmosphericModel atmosphericModel,
             OrbitPosition orbitPosition)
         {
@@ -370,8 +375,10 @@ namespace SpaceSimulator.Simulator
             var newObject = new PlanetObject(
                 name,
                 type,
+                mass,
                 radius,
-                config,
+                rotationalPeriod,
+                axisOfRotation,
                 atmosphericModel,
                 (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
@@ -385,13 +392,13 @@ namespace SpaceSimulator.Simulator
         /// Adds a satellite in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
-        /// <param name="config">The configuration</param>
+        /// <param name="mass">The mass of the object</param>
         /// <param name="atmosphericProperties">The atmospheric properties</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <returns>The created object</returns>
         public PhysicsObject AddSatelliteInOrbit(
             string name,
-            ObjectConfig config,
+            double mass,
             AtmosphericProperties atmosphericProperties,
             OrbitPosition orbitPosition)
         {
@@ -399,7 +406,7 @@ namespace SpaceSimulator.Simulator
             var primaryBodyState = orbit.PrimaryBody.State;
             var newObject = new SatelliteObject(
                 name,
-                config,
+                mass,
                 atmosphericProperties,
                 (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
@@ -431,7 +438,7 @@ namespace SpaceSimulator.Simulator
 
             var newObject = new RocketObject(
                 name,
-                new ObjectConfig(rocketStages.InitialTotalMass),
+                rocketStages.InitialTotalMass,
                 primaryBody,
                 initialState,
                 Orbit.CalculateOrbit(primaryBody, ref initialState),
@@ -461,7 +468,7 @@ namespace SpaceSimulator.Simulator
             var primaryBodyState = orbit.PrimaryBody.State;
             var newObject = new RocketObject(
                 name,
-                new ObjectConfig(rocketStages.InitialTotalMass),
+                rocketStages.InitialTotalMass,
                 (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit,
@@ -622,7 +629,7 @@ namespace SpaceSimulator.Simulator
             //Calculate the state at the burn
             var orbit = Orbit.CalculateOrbit(maneuver.Object);
             var stateAtBurn = this.AfterTime(
-                maneuver.Object.Config,
+                maneuver.Object,
                 maneuver.Object.State,
                 orbit,
                 maneuver.Maneuver.ManeuverTime - this.TotalTime,
@@ -971,20 +978,20 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Calculates the state after the given amount of time
         /// </summary>
-        /// <param name="config">The configuration</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="state">The state</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="time">The time</param>
         /// <param name="relative">Indicates if the that should be relative</param>
         /// <remarks>This method does not take SOI changes or maneuvers into account.</remarks>
         public ObjectState AfterTime(
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState state,
             Orbit orbit,
             double time,
             bool relative = false)
         {
-            return SolverHelpers.AfterTime(this.keplerProblemSolver, config, state, orbit, time, relative);
+            return SolverHelpers.AfterTime(this.keplerProblemSolver, physicsObject, state, orbit, time, relative);
         }
     }
 }

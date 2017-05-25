@@ -119,7 +119,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             var targetOrbitState = targetOrbitPosition.CalculateState();
             var initalPrimaryBodyState = physicsObject.PrimaryBody.State;
             var targetOrbitWhenPeriapsis = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.Config,
+                physicsObject,
                 ref initalPrimaryBodyState,
                 ref targetOrbitState,
                 targetOrbit,

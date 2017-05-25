@@ -37,7 +37,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             var initialState = currentObject.ReferenceState;
             var initialOrbit = currentObject.ReferenceOrbit;
             var nextState = this.keplerProblemSolver.Solve(
-                currentObject.Config,
+                currentObject,
                 ref initialPrimaryState,
                 ref initialState,
                 initialOrbit,

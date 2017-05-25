@@ -13,14 +13,14 @@ namespace SpaceSimulator.Physics.Solvers
         /// <summary>
         /// Returns the state at the given time
         /// </summary>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         /// <param name="primaryBodyStateAtTime">The primary body state at the time</param>
         /// <param name="time">The time since the initial state/orbit</param>
         ObjectState Solve(
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ref ObjectState initialPrimaryBodyState,
             ref ObjectState initialState,
             Orbit initialOrbit,
@@ -37,14 +37,14 @@ namespace SpaceSimulator.Physics.Solvers
         /// Returns the state at the given time
         /// </summary>
         /// <param name="solver">The solver</param>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         /// <param name="time">The time since the initial state/orbit</param>
         public static ObjectState Solve(
             this IKeplerProblemSolver solver,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ref ObjectState initialPrimaryBodyState,
             ref ObjectState initialState,
             Orbit initialOrbit,
@@ -52,7 +52,7 @@ namespace SpaceSimulator.Physics.Solvers
         {
             var primaryBodyStateAtTime = initialOrbit.PrimaryBody.State;
             return solver.Solve(
-                config,
+                physicsObject,
                 ref initialPrimaryBodyState,
                 ref initialState,
                 initialOrbit,
@@ -64,7 +64,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// Returns the state at the given time
         /// </summary>
         /// <param name="solver">The solver</param>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
@@ -73,7 +73,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// 
         public static ObjectState Solve(
             this IKeplerProblemSolver solver,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState initialPrimaryBodyState,
             ObjectState initialState,
             Orbit initialOrbit,
@@ -81,7 +81,7 @@ namespace SpaceSimulator.Physics.Solvers
             double time)
         {
             return solver.Solve(
-                config,
+                physicsObject,
                 ref initialPrimaryBodyState,
                 ref initialState,
                 initialOrbit,
@@ -93,14 +93,14 @@ namespace SpaceSimulator.Physics.Solvers
         /// Returns the state at the given time
         /// </summary>
         /// <param name="solver">The solver</param>
-        /// <param name="config">The configuration of the object</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
         /// <param name="time">The time since the initial state/orbit</param>
         public static ObjectState Solve(
             this IKeplerProblemSolver solver,
-            ObjectConfig config,
+            IPhysicsObject physicsObject,
             ObjectState initialPrimaryBodyState,
             ObjectState initialState,
             Orbit initialOrbit,
@@ -108,7 +108,7 @@ namespace SpaceSimulator.Physics.Solvers
         {
             var primaryBodyStateAtTime = initialOrbit.PrimaryBody.State;
             return solver.Solve(
-                config,
+                physicsObject,
                 ref initialPrimaryBodyState,
                 ref initialState,
                 initialOrbit,
