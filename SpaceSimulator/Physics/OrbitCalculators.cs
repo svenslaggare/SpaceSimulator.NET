@@ -155,8 +155,8 @@ namespace SpaceSimulator.Physics
                 {
                     var soi = OrbitFormulas.SphereOfInfluence(
                         Orbit.CalculateOrbit(soiObject).SemiMajorAxis,
-                        soiObject.Configuration.Mass,
-                        nextSoiObject.Configuration.Mass);
+                        soiObject.Config.Mass,
+                        nextSoiObject.Config.Mass);
 
                     var found = OrbitFormulas.TrueAnomalyAt(
                         soi,
@@ -201,9 +201,9 @@ namespace SpaceSimulator.Physics
         public static double? TimeToImpact(OrbitPosition orbitPosition)
         {
             var orbit = orbitPosition.Orbit;
-            if (orbit.Periapsis <= orbit.PrimaryBody.Configuration.Radius)
+            if (orbit.Periapsis <= orbit.PrimaryBody.Radius)
             {
-                if (OrbitFormulas.TrueAnomalyAt(orbit.PrimaryBody.Configuration.Radius, orbit.Parameter, orbit.Eccentricity, out var trueAnomaly1, out var trueAnomaly2))
+                if (OrbitFormulas.TrueAnomalyAt(orbit.PrimaryBody.Radius, orbit.Parameter, orbit.Eccentricity, out var trueAnomaly1, out var trueAnomaly2))
                 {
                     var impactAngle = 0.0;
                     if (Math.Abs(orbitPosition.TrueAnomaly - trueAnomaly1) < Math.Abs(orbitPosition.TrueAnomaly - trueAnomaly2))

@@ -50,14 +50,14 @@ namespace SpaceSimulator.Physics.Maneuvers
             timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(injectionOrbit) ?? 0;
 
             var leaveSOIPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.PrimaryBody.Configuration,
+                physicsObject.PrimaryBody.Config,
                 sun.State,
                 injectionPrimaryState,
                 primaryBodyOrbit,
                 timeToLeaveSOI);
 
             leaveSOIState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.Configuration,
+                physicsObject.Config,
                 injectionPrimaryState,
                 injectionState,
                 injectionOrbit.Orbit,
@@ -117,14 +117,14 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             //Compute the time
             var injectionPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
-                currentPlanet.Configuration,
+                currentPlanet.Config,
                 sun.State,
                 currentPlanet.State,
                 currentPlanetOrbit,
                 alignmentTime);
 
             var injectionState = simulatorEngine.KeplerProblemSolver.Solve(
-                physicsObject.Configuration,
+                physicsObject.Config,
                 currentPlanet.State,
                 physicsObject.State,
                 objectOrbit,
@@ -190,10 +190,10 @@ namespace SpaceSimulator.Physics.Maneuvers
             var possibleLaunches = InterceptManeuver.Intercept(
                 simulatorEngine,
                 sun,
-                currentPlanet.Configuration,
+                currentPlanet.Config,
                 currentPlanet.State,
                 currentPlanetOrbitPosition,
-                target.Configuration,
+                target.Config,
                 targetOrbitPosition,
                 hohmannCoastTime * 0.5,
                 hohmannCoastTime * 2.0,
@@ -242,14 +242,14 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var injectionState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                physicsObject.Configuration,
+                physicsObject.Config,
                 physicsObject.State,
                 objectOrbit,
                 t);
 
             var injectionPrimaryState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                physicsObject.PrimaryBody.Configuration,
+                physicsObject.PrimaryBody.Config,
                 physicsObject.PrimaryBody.State,
                 currentPlanetOrbit,
                 t);
@@ -274,7 +274,7 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var targetStateAtSOILeave = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                target.Configuration,
+                target.Config,
                 target.State,
                 targetOrbit,
                 t + timeToLeaveSOI);
@@ -286,10 +286,10 @@ namespace SpaceSimulator.Physics.Maneuvers
             InterceptManeuver.Intercept(
                 simulatorEngine,
                 sun,
-                physicsObject.Configuration,
+                physicsObject.Config,
                 leaveSOIState,
                 bestHeliocentricOrbitPosition,
-                target.Configuration,
+                target.Config,
                 targetOrbitAtSOILeave,
                 MiscHelpers.RoundToDays(coastTime) * 0.75,
                 MiscHelpers.RoundToDays(coastTime) * 2.0,
@@ -306,9 +306,9 @@ namespace SpaceSimulator.Physics.Maneuvers
             testStartTime = DateTime.UtcNow;
             var minDistance = OrbitCalculators.ClosestApproach(
                 simulatorEngine.KeplerProblemSolver,
-                currentPlanet.Configuration,
+                currentPlanet.Config,
                 bestHeliocentricOrbitPosition,
-                target.Configuration,
+                target.Config,
                 targetOrbitAtSOILeave,
                 deltaTime: 12.0 * 60 * 60.0).Distance;
             Console.WriteLine((DateTime.UtcNow - testStartTime));

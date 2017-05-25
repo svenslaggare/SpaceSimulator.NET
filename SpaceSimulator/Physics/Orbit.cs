@@ -53,7 +53,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// The primary body
         /// </summary>
-        public IPhysicsObject PrimaryBody { get; }
+        public IPrimaryBodyObject PrimaryBody { get; }
 
         /// <summary>
         /// The epsilon used for eccentricity calcuations
@@ -77,7 +77,7 @@ namespace SpaceSimulator.Physics
         /// <param name="inclination">The inclination</param>
         /// <param name="longitudeOfAscendingNode">The longitude of the ascending node</param>
         /// <param name="argumentOfPeriapsis">The argument of periapsis</param>
-        public Orbit(IPhysicsObject primaryBody, double parameter, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis)
+        public Orbit(IPrimaryBodyObject primaryBody, double parameter, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis)
         {
             this.PrimaryBody = primaryBody;
             this.Parameter = parameter;
@@ -100,7 +100,7 @@ namespace SpaceSimulator.Physics
         /// <param name="trueAnomaly">The true anomaly</param>
         /// <remarks>If both the parameter and semi-major axis is set, then the semi-major axis is used to calculate the parameter.</remarks>
         public static Orbit New(
-            IPhysicsObject primaryBody = null,
+            IPrimaryBodyObject primaryBody = null,
             double parameter = 0,
             double semiMajorAxis = 0,
             double eccentricity = 0,
@@ -230,7 +230,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         public double RelativePeriapsis
         {
-            get { return this.Periapsis - this.PrimaryBody.Configuration.Radius; }
+            get { return this.Periapsis - this.PrimaryBody.Radius; }
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         public double RelativeApoapsis
         {
-            get { return this.Apoapsis - this.PrimaryBody.Configuration.Radius; }
+            get { return this.Apoapsis - this.PrimaryBody.Radius; }
         }
 
         /// <summary>
@@ -420,7 +420,7 @@ namespace SpaceSimulator.Physics
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="state">The state of the object</param>
         /// <remarks>This does not calculate the true anomaly (position in the orbit), see <see cref="SpaceSimulator.Physics.OrbitPosition.CalculateOrbitPosition"/>.</remarks>
-        public static Orbit CalculateOrbit(IPhysicsObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
+        public static Orbit CalculateOrbit(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
         {
             return OrbitPosition.CalculateOrbitPosition(primaryBody, ref primaryBodyState, ref state).Orbit;
         }
@@ -430,7 +430,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="primaryBody">The object the orbit is around</param>
         /// <param name="state">The state of the object</param>
-        public static Orbit CalculateOrbit(IPhysicsObject primaryBody, ObjectState state)
+        public static Orbit CalculateOrbit(IPrimaryBodyObject primaryBody, ObjectState state)
         {
             return CalculateOrbit(primaryBody, ref state);
         }
@@ -440,7 +440,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="primaryBody">The object the orbit is around</param>
         /// <param name="state">The state of the object</param>
-        public static Orbit CalculateOrbit(IPhysicsObject primaryBody, ref ObjectState state)
+        public static Orbit CalculateOrbit(IPrimaryBodyObject primaryBody, ref ObjectState state)
         {
             var primaryBodyState = primaryBody.State;
             return CalculateOrbit(primaryBody, ref primaryBodyState, ref state);

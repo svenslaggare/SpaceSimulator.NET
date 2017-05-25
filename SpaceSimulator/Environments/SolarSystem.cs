@@ -29,6 +29,7 @@ namespace SpaceSimulator.Environments
             var sun = new PlanetObject(
                 "Sun",
                 PhysicsObjectType.ObjectOfReference,
+                Simulator.SolarSystem.Sun.Radius,
                 Simulator.SolarSystem.Sun.CreateConfig(),
                 new NoAtmosphereModel(),
                 null,
@@ -38,12 +39,13 @@ namespace SpaceSimulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();
 
-            PhysicsObject AddPlanet(PhysicsObject primaryBody, string name, SolarSystemBody body, Color color, string textureName)
+            PlanetObject AddPlanet(NaturalSatelliteObject primaryBody, string name, SolarSystemBody body, Color color, string textureName)
             {
                 var orbit = new OrbitPosition(body.Orbit(primaryBody), 0.0);
                 var newObject = simulatorEngine.AddPlanetInOrbit(
                     name,
                     PhysicsObjectType.NaturalSatellite,
+                    body.Radius,
                     body.CreateConfig(),
                     new NoAtmosphereModel(),
                     orbit);

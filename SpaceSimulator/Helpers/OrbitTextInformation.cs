@@ -23,7 +23,7 @@ namespace SpaceSimulator.Helpers
         /// <param name="orbit">The orbit and the position in it</param>
         /// <param name="physicsObject">The optional physics object</param>
         public static string FullInformation(
-            PhysicsObject primaryBody,
+            NaturalSatelliteObject primaryBody,
             ObjectState state,
             OrbitPosition orbitPosition,
             PhysicsObject physicsObject = null)
@@ -180,7 +180,7 @@ namespace SpaceSimulator.Helpers
                 var primaryBodyRadius = 0.0;
                 if (physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
                 {
-                    primaryBodyRadius = primaryBody.Configuration.Radius;
+                    primaryBodyRadius = primaryBody.Radius;
                 }
 
                 var parameter = orbit.Parameter;
@@ -342,9 +342,9 @@ namespace SpaceSimulator.Helpers
                     {
                         closestApproach = OrbitCalculators.ClosestApproach(
                             simulatorEngine.KeplerProblemSolver,
-                            physicsObject.Configuration,
+                            physicsObject.Config,
                             orbitPosition,
-                            target.Configuration,
+                            target.Config,
                             targetOrbitPosition);
                     }
 
@@ -360,12 +360,12 @@ namespace SpaceSimulator.Helpers
                 }
             }
 
-            if (target.Type != PhysicsObjectType.ArtificialSatellite)
+            if (target is NaturalSatelliteObject targetNatrual)
             {
                 infoBuilder.AppendLine(
                     "Sphere of influence: " + DataFormatter.Format(target.SphereOfInfluence ?? 0, DataUnit.Distance));
 
-                var enterOrbitPosition = OrbitPosition.CalculateOrbitPosition(target, state);
+                var enterOrbitPosition = OrbitPosition.CalculateOrbitPosition(targetNatrual, state);
                 var timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(enterOrbitPosition);
                 if (timeToLeaveSOI != null)
                 {

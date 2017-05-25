@@ -28,7 +28,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// <param name="deltaTime">The delta time</param>
         /// <param name="calculateAcceleration">Calculates the acceleration</param>
        ObjectState Solve(
-            IPhysicsObject primaryBody,
+            IPrimaryBodyObject primaryBody,
             ObjectConfig config,
             ref ObjectState state,
             double totalTime,

@@ -13,11 +13,6 @@ namespace SpaceSimulator.Physics
     public sealed class ObjectConfig
     {
         /// <summary>
-        /// The radius
-        /// </summary>
-        public double Radius { get; }
-
-        /// <summary>
         /// The mass
         /// </summary>
         public double Mass { get; }
@@ -32,18 +27,16 @@ namespace SpaceSimulator.Physics
         /// </summary>
         public Vector3d AxisOfRotation { get; }
 
-        private static readonly ObjectConfig empty = new ObjectConfig(0, 0, 0);
+        private static readonly ObjectConfig empty = new ObjectConfig(0, 0);
 
         /// <summary>
         /// Creates a new configuration
         /// </summary>
-        /// <param name="radius">The radius</param>
         /// <param name="mass">The mass</param>
         /// <param name="rotationalPeriod">The rotational period </param>
         /// <param name="axisOfRotation">The axis-of-rotation, defaults to Vector3d.Up</param>
-        public ObjectConfig(double radius, double mass, double rotationalPeriod = 0, Vector3d? axisOfRotation = null)
+        public ObjectConfig(double mass, double rotationalPeriod = 0, Vector3d? axisOfRotation = null)
         {
-            this.Radius = radius;
             this.Mass = mass;
             this.RotationalPeriod = rotationalPeriod;
             this.AxisOfRotation = axisOfRotation ?? Vector3d.Up;
@@ -72,7 +65,7 @@ namespace SpaceSimulator.Physics
         /// <returns>A new configuration with the changed mass</returns>
         public ObjectConfig WithMass(double newMass)
         {
-            return new ObjectConfig(this.Radius, newMass, this.RotationalPeriod, this.AxisOfRotation);
+            return new ObjectConfig(newMass, this.RotationalPeriod, this.AxisOfRotation);
         }
     }
 }

@@ -5,58 +5,49 @@ using System.Text;
 using System.Threading.Tasks;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
-using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Simulator
 {
     /// <summary>
-    /// Represents a planet physics object
+    /// Represents a natural satellite object
     /// </summary>
-    public class PlanetObject : NaturalSatelliteObject
+    public abstract class NaturalSatelliteObject : PhysicsObject, IPrimaryBodyObject
     {
         /// <summary>
-        /// The atmospheric model
+        /// The radius
         /// </summary>
-        public IAtmosphericModel AtmosphericModel { get; }
+        public double Radius { get; }
 
         /// <summary>
-        /// Creates a new planet object
+        /// Creates a new natrual satellite object
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="type">The type of the object</param>
         /// <param name="radius">The radius of the object</param>
         /// <param name="config">The configuration for the object</param>
-        /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="initialState">The initial state</param>
         /// <param name="initialOrbit">The initial orbit</param>
-        public PlanetObject(
+        public NaturalSatelliteObject(
             string name,
             PhysicsObjectType type,
             double radius,
             ObjectConfig config,
-            IAtmosphericModel atmosphericModel,
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, type, radius, config, primaryBody, initialState, initialOrbit)
+            : base(name, type, config, primaryBody, initialState, initialOrbit, true)
         {
-            this.AtmosphericModel = atmosphericModel;
+            this.Radius = radius;
         }
 
         /// <summary>
-        /// Calculates the drag force on the given object
+        /// Returns the altitude over the current object for the given object
         /// </summary>
-        /// <param name="rocketObject">The object</param>
-        /// <param name="state">The state of the object</param>
-        public Vector3d DragOnObject(ArtificialPhysicsObject rocketObject, ref ObjectState state)
+        /// <param name="position">The position of the object</param>
+        public double Altitude(Vector3d position)
         {
-            var primaryState = this.State;
-            return this.AtmosphericModel.CalculateDrag(
-                this,
-                ref primaryState,
-                rocketObject.AtmosphericProperties,
-                ref state);
+            return (position - this.Position).Length() - this.Radius;
         }
     }
 }

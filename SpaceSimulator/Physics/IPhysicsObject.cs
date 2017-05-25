@@ -23,7 +23,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the configuration of the object
         /// </summary>
-        ObjectConfig Configuration
+        ObjectConfig Config
         {
             get;
         }
@@ -39,7 +39,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// The primary body
         /// </summary>
-        IPhysicsObject PrimaryBody
+        IPrimaryBodyObject PrimaryBody
         {
             get;
         }
@@ -48,6 +48,17 @@ namespace SpaceSimulator.Physics
         /// Indicates if the object is the object of reference
         /// </summary>
         bool IsObjectOfReference { get; }
+    }
+
+    /// <summary>
+    /// Represents an object affected by physics that can be a primary body
+    /// </summary>
+    public interface IPrimaryBodyObject : IPhysicsObject
+    {
+        /// <summary>
+        /// Returns the radius of the object
+        /// </summary>
+        double Radius { get; }
     }
 
     /// <summary>
@@ -61,7 +72,7 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetRotationalTransform(this IPhysicsObject physicsObject)
         {
-            return Matrix3x3d.RotationAxis(physicsObject.Configuration.AxisOfRotation, physicsObject.State.Rotation);
+            return Matrix3x3d.RotationAxis(physicsObject.Config.AxisOfRotation, physicsObject.State.Rotation);
         }
 
         /// <summary>
@@ -70,7 +81,7 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetInverseRotationalTransform(this IPhysicsObject physicsObject)
         {
-             return Matrix3x3d.RotationAxis(physicsObject.Configuration.AxisOfRotation, -physicsObject.State.Rotation);
+             return Matrix3x3d.RotationAxis(physicsObject.Config.AxisOfRotation, -physicsObject.State.Rotation);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace SpaceSimulator.Simulator
             string name,
             ObjectConfig config,
             AtmosphericProperties atmosphericProperties,
-            PhysicsObject primaryBody,
+            NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
             : base(name, config, primaryBody, initialState, initialOrbit)

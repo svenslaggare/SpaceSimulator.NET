@@ -64,27 +64,27 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <summary>
         /// Indicates if the given object is inside the atmosphere
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="state">The state of the object</param>
-        public bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state)
+        public bool Inside(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
         {
-            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBodyConfig.Radius, state.Position);
+            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBody.Radius, state.Position);
             return altitude < EndOfAtmosphereAltitude;
         }
 
         /// <summary>
         /// Calculates the drag of the given object
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="properties">The atmospheric properties of the object</param>
         /// <param name="state">The state of the object</param>
         /// <returns>The drag force</returns>
-        public Vector3d CalculateDrag(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state)
+        public Vector3d CalculateDrag(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state)
         {
             var v = state.Velocity - primaryBodyState.Velocity;
-            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBodyConfig.Radius, state.Position);
+            var altitude = OrbitFormulas.Altitude(primaryBodyState.Position, primaryBody.Radius, state.Position);
             if (altitude >= EndOfAtmosphereAltitude)
             {
                 return Vector3d.Zero;

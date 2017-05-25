@@ -161,7 +161,7 @@ namespace SpaceSimulator.Physics.Maneuvers
 
              SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
-                physicsObject.Configuration,
+                physicsObject.Config,
                 state,
                 orbit,
                 t1,

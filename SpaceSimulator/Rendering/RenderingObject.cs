@@ -72,9 +72,18 @@ namespace SpaceSimulator.Rendering
 
             this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
 
-            var nonRealSize = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
-            this.scalingMatrix = Matrix.Scaling(physicsObject.IsRealSize ? MathHelpers.ToDraw(this.physicsObject.Radius) : nonRealSize);
+            var size = 0.0f;
 
+            if (physicsObject is NaturalSatelliteObject naturalObject)
+            {
+                size = MathHelpers.ToDraw(naturalObject.Radius);
+            }
+            else
+            {
+                size = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
+            }
+
+            this.scalingMatrix = Matrix.Scaling(size);
             this.baseRotationY = baseRotationY;
         }
         
@@ -238,7 +247,7 @@ namespace SpaceSimulator.Rendering
 
                     SolverHelpers.AfterTime(
                         simulatorEngine.KeplerProblemSolver,
-                        nextManeuver.Object.Configuration,
+                        nextManeuver.Object.Config,
                         nextManeuver.Object.State,
                         currentOrbit,
                         nextManeuver.Maneuver.ManeuverTime - simulatorEngine.TotalTime,

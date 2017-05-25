@@ -131,6 +131,7 @@
     <Compile Include="Mathematics\Quaterniond.cs" />
     <Compile Include="Mathematics\Vector3d.cs" />
     <Compile Include="Mathematics\Vector4d.cs" />
+    <Compile Include="Physics\GeometricShape.cs" />
     <Compile Include="Simulator\ArtificialPhysicsObject.cs" />
     <Compile Include="Physics\Atmosphere\AtmosphericFormulas.cs" />
     <Compile Include="Physics\Atmosphere\AtmosphericProperties.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Physics\Rocket\RocketStage.cs" />
     <Compile Include="Rendering\Plot2D.cs" />
     <Compile Include="Simulator\ITextOutputWriter.cs" />
+    <Compile Include="Simulator\NaturalSatelliteObject.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />

@@ -265,7 +265,7 @@ namespace SpaceSimulator.Physics
         /// <param name="primaryBody">The object the orbit is around</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="state">The state of the object</param>
-        public static OrbitPosition CalculateOrbitPosition(IPhysicsObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
+        public static OrbitPosition CalculateOrbitPosition(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state)
         {
             var r = MathHelpers.SwapYZ(state.Position - primaryBodyState.Position);
             var v = MathHelpers.SwapYZ(state.Velocity - primaryBodyState.Velocity);
@@ -359,7 +359,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="primaryBody">The object the orbit is around</param>
         /// <param name="state">The state of the object</param>
-        public static OrbitPosition CalculateOrbitPosition(IPhysicsObject primaryBody, ref ObjectState state)
+        public static OrbitPosition CalculateOrbitPosition(IPrimaryBodyObject primaryBody, ref ObjectState state)
         {
             var primaryBodyState = primaryBody.State;
             return CalculateOrbitPosition(primaryBody, ref primaryBodyState, ref state);
@@ -370,7 +370,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="primaryBody">The object the orbit is around</param>
         /// <param name="state">The state of the object</param>
-        public static OrbitPosition CalculateOrbitPosition(IPhysicsObject primaryBody, ObjectState state)
+        public static OrbitPosition CalculateOrbitPosition(IPrimaryBodyObject primaryBody, ObjectState state)
         {
             var primaryBodyState = primaryBody.State;
             return CalculateOrbitPosition(primaryBody, ref primaryBodyState, ref state);

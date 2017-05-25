@@ -63,7 +63,7 @@ namespace SpaceSimulator.Simulator
         /// Returns an orbit around the primary body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
-        public Orbit Orbit(IPhysicsObject primaryBody)
+        public Orbit Orbit(IPrimaryBodyObject primaryBody)
         {
             return new Physics.Orbit(
                 primaryBody,
@@ -79,7 +79,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public ObjectConfig CreateConfig()
         {
-            return new ObjectConfig(this.Radius, this.Mass, this.RotationalPeriod);
+            return new ObjectConfig(this.Mass, this.RotationalPeriod);
         }
 
         /// <summary>
@@ -88,12 +88,13 @@ namespace SpaceSimulator.Simulator
         /// <param name="primaryBody">The primary body</param>
         /// <param name="name">The name of the body</param>
         /// <param name="initialTrueAnomaly">The initial true anomaly</param>
-        public PlanetObject Create(PhysicsObject primaryBody, string name, double initialTrueAnomaly)
+        public PlanetObject Create(NaturalSatelliteObject primaryBody, string name, double initialTrueAnomaly)
         {
             var initialOrbit = this.Orbit(primaryBody);
             return new PlanetObject(
                 name,
                 PhysicsObjectType.NaturalSatellite,
+                this.Radius,
                 this.CreateConfig(),
                 new NoAtmosphereModel(),
                 primaryBody,

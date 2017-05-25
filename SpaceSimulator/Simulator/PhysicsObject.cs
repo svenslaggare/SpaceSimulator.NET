@@ -52,17 +52,17 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// The configuration for the object
         /// </summary>
-        public ObjectConfig Configuration { get; protected set; }
+        public ObjectConfig Config { get; protected set; }
 
         /// <summary>
         /// The object that the current object orbits around
         /// </summary>
-        public PhysicsObject PrimaryBody { get; protected set; }
+        public NaturalSatelliteObject PrimaryBody { get; protected set; }
 
         /// <summary>
         /// The object that the current object orbits around
         /// </summary>
-        IPhysicsObject IPhysicsObject.PrimaryBody => (IPhysicsObject)PrimaryBody;
+        IPrimaryBodyObject IPhysicsObject.PrimaryBody => (IPrimaryBodyObject)PrimaryBody;
 
         /// <summary>
         /// Indicates if the object is drawn at real scale
@@ -108,14 +108,14 @@ namespace SpaceSimulator.Simulator
             string name,
             PhysicsObjectType type,
             ObjectConfig config,
-            PhysicsObject primaryBody,
+            NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
             bool isRealSize = true)
         {
             this.Name = name;
             this.Type = type;
-            this.Configuration = config;
+            this.Config = config;
             this.state = initialState;
             this.PrimaryBody = primaryBody;
             this.IsRealSize = isRealSize;
@@ -141,15 +141,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double StandardGravitationalParameter
         {
-            get { return this.Configuration.Mass * Constants.G; }
-        }
-
-        /// <summary>
-        /// The radius
-        /// </summary>
-        public double Radius
-        {
-            get { return this.Configuration.Radius; }
+            get { return this.Config.Mass * Constants.G; }
         }
 
         /// <summary>
@@ -157,7 +149,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double Mass
         {
-            get { return this.Configuration.Mass; }
+            get { return this.Config.Mass; }
         }
 
         /// <summary>
@@ -165,7 +157,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double RotationalPeriod
         {
-            get { return this.Configuration.RotationalPeriod; }
+            get { return this.Config.RotationalPeriod; }
         }
 
         /// <summary>
@@ -265,7 +257,7 @@ namespace SpaceSimulator.Simulator
         {
             get
             {
-                return this.Configuration.AxisOfRotation;
+                return this.Config.AxisOfRotation;
             }
         }
 
@@ -325,15 +317,6 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Returns the altitude over the current object for the given object
-        /// </summary>
-        /// <param name="position">The position of the object</param>
-        public double Altitude(Vector3d position)
-        {
-            return (position - this.Position).Length() - this.Radius;
-        }
-
-        /// <summary>
         /// Sets the next state
         /// </summary>
         /// <param name="nextState">The next state</param>
@@ -374,7 +357,7 @@ namespace SpaceSimulator.Simulator
         /// Changes the primary body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
-        public void ChangePrimaryBody(PhysicsObject primaryBody)
+        public void ChangePrimaryBody(NaturalSatelliteObject primaryBody)
         {
             this.PrimaryBody = primaryBody;
             this.ReferenceState = this.state;
@@ -391,9 +374,15 @@ namespace SpaceSimulator.Simulator
         {
             if (this.PrimaryBody != null)
             {
+                var radius = 10.0;
+                if (this is NaturalSatelliteObject naturalObject)
+                {
+                    radius = naturalObject.Radius;
+                }
+
                 var impacted = CollisionHelpers.SphereIntersection(
                     this.state.Position,
-                    this.Radius,
+                    radius,
                     this.PrimaryBody.NextState.Position,
                     this.PrimaryBody.Radius);
 
@@ -401,7 +390,7 @@ namespace SpaceSimulator.Simulator
                 if (impacted)
                 {
                     var dir = MathHelpers.Normalized(this.state.Position - this.PrimaryBody.nextState.Position);
-                    var newDistance = this.PrimaryBody.Radius + this.Radius + 1;
+                    var newDistance = this.PrimaryBody.Radius + radius + 1;
                     this.state.Position = this.PrimaryBody.nextState.Position + dir * newDistance;
                     this.state.Velocity = Vector3d.Zero;
                     this.state.Acceleration = OrbitFormulas.GravityAcceleration(

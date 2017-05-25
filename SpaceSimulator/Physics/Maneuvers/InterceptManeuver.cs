@@ -61,7 +61,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// </summary>
         private static bool IsValidLaunch(
             ISimulatorEngine simulatorEngine,
-            IPhysicsObject primaryBody,
+            IPrimaryBodyObject primaryBody,
             ObjectConfig config,
             ref ObjectState launchState,
             ref ObjectState primaryLaunchState,
@@ -81,7 +81,7 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var launchOrbit = Orbit.CalculateOrbit(primaryBody, ref primaryLaunchState, ref launchState);
 
-            for (double t = 0; t <= maxImpactCheckTime; t += impactCheckDeltaTime)
+            for (double t = 0.0; t <= maxImpactCheckTime; t += impactCheckDeltaTime)
             {
                 var nextState = simulatorEngine.KeplerProblemSolver.Solve(
                     config,
@@ -90,7 +90,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                     launchOrbit,
                     t);
 
-                if (CollisionHelpers.SphereIntersection(primaryLaunchState.Position, primaryBody.Configuration.Radius, nextState.Position, config.Radius))
+                if (CollisionHelpers.SphereIntersection(primaryLaunchState.Position, primaryBody.Radius, nextState.Position, 10))
                 {
                     return false;
                 }
@@ -122,7 +122,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 if (!primaryBody.IsObjectOfReference)
                 {
                     primaryBodyStateAtIntercept = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody.Configuration,
+                        primaryBody.Config,
                         primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
                         primaryBodyOrbit,
@@ -208,7 +208,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// <remarks>This method does not execute the maneuver, only plans it.</remarks>
         public static IList<PossibleLaunch> Intercept(
             ISimulatorEngine simulatorEngine,
-            IPhysicsObject primaryBody,
+            IPrimaryBodyObject primaryBody,
             ObjectConfig config,
             ObjectState state,
             OrbitPosition orbitPosition,
@@ -249,7 +249,15 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             Func<ObjectState, ObjectState, bool> validLaunch = (primaryLaunchState, launchState) =>
             {
-                return IsValidLaunch(simulatorEngine, primaryBody, config, ref launchState, ref primaryLaunchState, impactCheckDeltaTime, maxImpactCheckTime, stationary);
+                return IsValidLaunch(
+                    simulatorEngine,
+                    primaryBody,
+                    config,
+                    ref launchState,
+                    ref primaryLaunchState,
+                    impactCheckDeltaTime,
+                    maxImpactCheckTime,
+                    stationary);
             };
 
             var primaryBodyStateInitial = primaryBody.State;
@@ -260,7 +268,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 if (!primaryBody.IsObjectOfReference)
                 {
                     primaryBodyStateAtLaunch = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody.Configuration,
+                        primaryBody.Config,
                         primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
                         primaryBodyOrbit,
@@ -365,7 +373,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             Intercept(
                  simulatorEngine,
                  physicsObject.PrimaryBody,
-                 physicsObject.Configuration,
+                 physicsObject.Config,
                  physicsObject.State,
                  OrbitPosition.CalculateOrbitPosition(physicsObject),
                  targetConfig,

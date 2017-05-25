@@ -32,6 +32,7 @@ namespace SpaceSimulator.Environments
             var earth = new PlanetObject(
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
+                Simulator.SolarSystem.Earth.Radius,
                 Simulator.SolarSystem.Earth.CreateConfig(),
                 new EarthAtmosphericModel(),
                 null,
@@ -74,11 +75,11 @@ namespace SpaceSimulator.Environments
             //    falcon9Object,
             //    2E3,
             //    falcon9TargetOrbit);
-            var bestPitchStart = 2E3;
-            var bestPitchEnd = 12.8625E3;
-            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
-            falcon9Object.CheckImpacted(0);
-            falcon9Object.StartEngine();
+            //var bestPitchStart = 2E3;
+            //var bestPitchEnd = 12.8625E3;
+            //falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
+            //falcon9Object.CheckImpacted(0);
+            //falcon9Object.StartEngine();
 
             //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
             //    "Satellite 1",

@@ -23,20 +23,20 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <summary>
         /// Indicates if the given object is inside the atmosphere
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="state">The state of the object</param>
-        bool Inside(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, ref ObjectState state);
+        bool Inside(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, ref ObjectState state);
 
         /// <summary>
         /// Calculates the drag force of the given object
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
         /// <param name="properties">The atmospheric properties of the object</param>
         /// <param name="state">The state of the object</param>
         /// <returns>The drag force</returns>
-        Vector3d CalculateDrag(ObjectConfig primaryBodyConfig, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state);
+        Vector3d CalculateDrag(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state);
     }
 
     /// <summary>
@@ -50,10 +50,10 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// <param name="model">The current model</param>
         /// <param name="primaryBody">The body that the atmosphere is applied to</param>
         /// <param name="state">The state of the object</param>
-        public static bool Inside(this IAtmosphericModel model, IPhysicsObject primaryBody, ref ObjectState state)
+        public static bool Inside(this IAtmosphericModel model, IPrimaryBodyObject primaryBody, ref ObjectState state)
         {
             var primaryBodyState = primaryBody.State;
-            return model.Inside(primaryBody.Configuration, ref primaryBodyState, ref state);
+            return model.Inside(primaryBody, ref primaryBodyState, ref state);
         }
     }
 }

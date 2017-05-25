@@ -44,7 +44,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// Evaluates the state at the given time
         /// </summary>
         private DerivativeState Evaluate(
-            IPhysicsObject primaryBody,
+            IPrimaryBodyObject primaryBody,
             ref ObjectState initial,
             double totalTime,
             double deltaTime,
@@ -71,7 +71,7 @@ namespace SpaceSimulator.Physics.Solvers
         /// <param name="deltaTime">The delta time</param>
         /// <param name="calculateAcceleration">Calculates the acceleration</param>
         public ObjectState Solve(
-            IPhysicsObject primaryBody,
+            IPrimaryBodyObject primaryBody,
             ObjectConfig config,
             ref ObjectState state,
             double totalTime,
@@ -81,7 +81,7 @@ namespace SpaceSimulator.Physics.Solvers
             if (state.HasImpacted)
             {
                 return SolverHelpers.MoveImpactedObject(
-                    primaryBody.Configuration,
+                    primaryBody,
                     primaryBody.State,
                     primaryBody.State,
                     state,

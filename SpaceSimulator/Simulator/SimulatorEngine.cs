@@ -172,7 +172,7 @@ namespace SpaceSimulator.Simulator
         private readonly IDictionary<PhysicsSimulationMode, IOrbitSimulator> orbitSimulators = new Dictionary<PhysicsSimulationMode, IOrbitSimulator>();
         private IOrbitSimulator currentOrbitSimulator;
 
-        private PhysicsObject objectOfReference;
+        private NaturalSatelliteObject objectOfReference;
 
         private readonly IList<SimulationEvent> events = new List<SimulationEvent>();
         private readonly IList<SimulationEvent> executedEvents = new List<SimulationEvent>();
@@ -263,13 +263,13 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the object of reference
         /// </summary>
-        public PhysicsObject ObjectOfReference
+        public NaturalSatelliteObject ObjectOfReference
         {
             get
             {
                 if (this.objectOfReference == null)
                 {
-                    this.objectOfReference = this.Objects.FirstOrDefault(x => x.Type == PhysicsObjectType.ObjectOfReference);
+                    this.objectOfReference = (NaturalSatelliteObject)this.Objects.FirstOrDefault(x => x.Type == PhysicsObjectType.ObjectOfReference);
                 }
 
                 return this.objectOfReference;
@@ -346,14 +346,16 @@ namespace SpaceSimulator.Simulator
         /// Adds a planet object in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
+        /// <param name="radius">The radius of the object</param>
         /// <param name="config">The configuration</param>
         /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <param name="type">The type of the object</param>
         /// <returns>The created object</returns>
-        public PhysicsObject AddPlanetInOrbit(
+        public PlanetObject AddPlanetInOrbit(
             string name,
             PhysicsObjectType type,
+            double radius,
             ObjectConfig config,
             IAtmosphericModel atmosphericModel,
             OrbitPosition orbitPosition)
@@ -368,9 +370,10 @@ namespace SpaceSimulator.Simulator
             var newObject = new PlanetObject(
                 name,
                 type,
+                radius,
                 config,
                 atmosphericModel,
-                (PhysicsObject)orbit.PrimaryBody,
+                (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit);
 
@@ -398,7 +401,7 @@ namespace SpaceSimulator.Simulator
                 name,
                 config,
                 atmosphericProperties,
-                (PhysicsObject)orbit.PrimaryBody,
+                (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit);
 
@@ -417,7 +420,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="velocity">The initial velocity</param>
         /// <returns>The created object</returns>
         public RocketObject AddRocketObject(
-            PhysicsObject primaryBody,
+            NaturalSatelliteObject primaryBody,
             string name,
             double radius,
             RocketStages rocketStages,
@@ -459,7 +462,7 @@ namespace SpaceSimulator.Simulator
             var newObject = new RocketObject(
                 name,
                 new ObjectConfig(radius, rocketStages.InitialTotalMass),
-                (PhysicsObject)orbit.PrimaryBody,
+                (NaturalSatelliteObject)orbit.PrimaryBody,
                 orbitPosition.CalculateState(ref primaryBodyState),
                 orbitPosition.Orbit,
                 rocketStages,
@@ -531,7 +534,7 @@ namespace SpaceSimulator.Simulator
                 {
                     //Change primary bodys
                     var withinSOI = false;
-                    PhysicsObject primaryBody = null;
+                    NaturalSatelliteObject primaryBody = null;
                     double? minChangeTime = null;
 
                     foreach (var object2 in this.objects.Where(x => x.Type == PhysicsObjectType.NaturalSatellite && x != object1))
@@ -542,7 +545,7 @@ namespace SpaceSimulator.Simulator
                         if (distance < soi)
                         {
                             withinSOI = true;
-                            primaryBody = object2;
+                            primaryBody = (NaturalSatelliteObject)object2;
                         }
 
                         if (object1.PrimaryBody == object2.PrimaryBody)
@@ -550,7 +553,7 @@ namespace SpaceSimulator.Simulator
                             //If a SOI change is likely, add as an event
                             if (OrbitHelpers.SOIChangeLikely(object1.ReferenceOrbit, object2.ReferenceOrbit, soi))
                             {
-                                var enterOrbit = OrbitPosition.CalculateOrbitPosition(object2, object1.State);
+                                var enterOrbit = OrbitPosition.CalculateOrbitPosition((NaturalSatelliteObject)object2, object1.State);
                                 var soiChangeTime = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(enterOrbit);
                                 if (soiChangeTime != null && soiChangeTime > 0 && (minChangeTime == null || soiChangeTime < minChangeTime))
                                 {
@@ -619,7 +622,7 @@ namespace SpaceSimulator.Simulator
             //Calculate the state at the burn
             var orbit = Orbit.CalculateOrbit(maneuver.Object);
             var stateAtBurn = this.AfterTime(
-                maneuver.Object.Configuration,
+                maneuver.Object.Config,
                 maneuver.Object.State,
                 orbit,
                 maneuver.Maneuver.ManeuverTime - this.TotalTime,

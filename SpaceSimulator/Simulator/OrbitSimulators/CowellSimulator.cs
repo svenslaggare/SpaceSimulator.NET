@@ -50,12 +50,12 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
 
             if (artificialObject.PrimaryBody is PlanetObject primaryPlanet
                 && primaryPlanet.AtmosphericModel.Inside(
-                    primaryPlanet.Configuration,
+                    primaryPlanet,
                     ref primaryBodyState,
                     ref state))
             {
                 nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
-                    primaryPlanet.Configuration,
+                    primaryPlanet,
                     ref primaryBodyState,
                     artificialObject.AtmosphericProperties,
                     ref state) / artificialObject.Mass;
@@ -122,7 +122,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             var currentState = currentObject.State;
             var nextState = this.numericIntegrator.Solve(
                 currentObject.PrimaryBody,
-                currentObject.Configuration,
+                currentObject.Config,
                 ref currentState,
                 totalTime,
                 timeStep,

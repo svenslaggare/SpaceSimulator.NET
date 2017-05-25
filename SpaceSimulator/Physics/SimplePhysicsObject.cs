@@ -16,12 +16,12 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the primary body
         /// </summary>
-        public IPhysicsObject PrimaryBody { get; }
+        public IPrimaryBodyObject PrimaryBody { get; }
 
         /// <summary>
         /// Returns the configuration of the object
         /// </summary>
-        public ObjectConfig Configuration { get; }
+        public ObjectConfig Config { get; }
 
         /// <summary>
         /// Creates a new object
@@ -29,10 +29,10 @@ namespace SpaceSimulator.Physics
         /// <param name="primaryBody">The primary body</param>
         /// <param name="configuration">The configuration</param>
         /// <param name="initialState">The initial state</param>
-        public SimplePhysicsObject(IPhysicsObject primaryBody, ObjectConfig configuration, ObjectState initialState)
+        public SimplePhysicsObject(IPrimaryBodyObject primaryBody, ObjectConfig configuration, ObjectState initialState)
         {
             this.PrimaryBody = primaryBody;
-            this.Configuration = configuration;
+            this.Config = configuration;
             this.state = initialState;
         }
 
@@ -51,7 +51,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                return this.Configuration.Mass * Constants.G;
+                return this.Config.Mass * Constants.G;
             }
         }
 

@@ -148,11 +148,11 @@ namespace SpaceSimulator.Physics
         /// <param name="latitude">The latitude (in radians)</param>
         /// <param name="longitude">The longitude (in radians)</param>
         /// <param name="elevation">The elevation, defaults to the radius of the primary body</param>
-        public static Vector3d FromCoordinates(IPhysicsObject primaryBody, double latitude, double longitude, double? elevation = null)
+        public static Vector3d FromCoordinates(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
             return primaryBody.State.Position
                    + primaryBody.GetRotationalTransform()
-                   * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Configuration.Radius);
+                   * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace SpaceSimulator.Physics
         /// <param name="latitude">The latitude (in radians)</param>
         /// <param name="longitude">The longitude (in radians)</param>
         /// <param name="elevation">The elevation</param>
-        public static Vector3d SphereNormal(IPhysicsObject primaryBody, double latitude, double longitude, double? elevation = null)
+        public static Vector3d SphereNormal(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
             var direction = FromCoordinates(primaryBody, latitude, longitude, elevation) - primaryBody.State.Position;
             direction.Normalize();
@@ -171,16 +171,16 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the surface speed due to rotation of the primary body
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="latitude">The latitude of the object</param>
-        public static double SurfaceSpeedDueToRotation(ObjectConfig primaryBodyConfig, double latitude)
+        public static double SurfaceSpeedDueToRotation(IPrimaryBodyObject primaryBody, double latitude)
         {
-            if (primaryBodyConfig.RotationalPeriod == 0)
+            if (primaryBody.Config.RotationalPeriod == 0)
             {
                 return 0;
             }
 
-            return ((2.0 * Math.PI * primaryBodyConfig.Radius) / primaryBodyConfig.RotationalPeriod) * Math.Cos(latitude);
+            return ((2.0 * Math.PI * primaryBody.Radius) / primaryBody.Config.RotationalPeriod) * Math.Cos(latitude);
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace SpaceSimulator.Simulator
         public RocketObject(
             string name,
             ObjectConfig config,
-            PhysicsObject primaryBody,
+            NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit,
             RocketStages rocketStages,
@@ -133,7 +133,7 @@ namespace SpaceSimulator.Simulator
             var deltaMass = this.rocketStages.UseFuel(time);
             if (deltaMass != null)
             {
-                this.Configuration = this.Configuration.WithMass(this.Mass - deltaMass.Value);
+                this.Config = this.Config.WithMass(this.Mass - deltaMass.Value);
             }
             else
             {
@@ -154,7 +154,7 @@ namespace SpaceSimulator.Simulator
             {
                 var spentStageObject = new SatelliteObject(
                     $"{this.Name} - {oldStage.Name}",
-                    this.Configuration.WithMass(oldStage.Mass),
+                    this.Config.WithMass(oldStage.Mass),
                     this.AtmosphericProperties,
                     this.PrimaryBody,
                     this.ReferenceState,
@@ -162,7 +162,7 @@ namespace SpaceSimulator.Simulator
                 spentStageObject.SetNextState(this.ReferenceState);
                 this.toStage.Add(spentStageObject);
 
-                this.Configuration = this.Configuration.WithMass(this.rocketStages.TotalMass);
+                this.Config = this.Config.WithMass(this.rocketStages.TotalMass);
                 this.textOutputWriter.WriteLine($"{this.Name}: staged '{oldStage.Name}'.");
                 return true;
             }

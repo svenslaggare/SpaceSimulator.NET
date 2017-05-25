@@ -32,19 +32,19 @@ namespace SpaceSimulator.Physics.Solvers
         /// <summary>
         /// Moves an impacted object following the motion of the primary body
         /// </summary>
-        /// <param name="primaryBodyConfig">The configuration of the primary body</param>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
         /// <param name="nextPrimaryBodyState">The next state of the primary body</param>
         /// <param name="state">The state</param>
         /// <param name="time">The amount of time to move</param>
         public static ObjectState MoveImpactedObject(
-            ObjectConfig primaryBodyConfig,
+            IPrimaryBodyObject primaryBody,
             ObjectState initialPrimaryBodyState,
             ObjectState nextPrimaryBodyState,
             ObjectState state,
             double time)
         {
-            if (primaryBodyConfig.RotationalPeriod == 0)
+            if (primaryBody.Config.RotationalPeriod == 0)
             {
                 state.SwapReferenceFrame(initialPrimaryBodyState, nextPrimaryBodyState);
                 state.Time += time;
@@ -54,13 +54,13 @@ namespace SpaceSimulator.Physics.Solvers
             //Calculate the new position
             var r = state.Position - initialPrimaryBodyState.Position;
             OrbitHelpers.GetSphericalCoordinates(r, out var latitude, out var longitude);
-            longitude += primaryBodyConfig.RotationalSpeed * time;
+            longitude += primaryBody.Config.RotationalSpeed * time;
             var rNext = OrbitHelpers.FromSphericalCoordinates(latitude, longitude, r.Length());
 
             //Calculate the surface velocity due to rotation of primary body
-            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(rNext), primaryBodyConfig.AxisOfRotation);
+            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(rNext), primaryBody.Config.AxisOfRotation);
             surfaceSpeedDir.Normalize();
-            var velocity = OrbitHelpers.SurfaceSpeedDueToRotation(primaryBodyConfig, Math.PI / 2.0 - latitude) * surfaceSpeedDir;
+            var velocity = OrbitHelpers.SurfaceSpeedDueToRotation(primaryBody, Math.PI / 2.0 - latitude) * surfaceSpeedDir;
 
             return new ObjectState(
                 nextPrimaryBodyState.Time + time,
@@ -99,7 +99,7 @@ namespace SpaceSimulator.Physics.Solvers
                 var primaryBodyOrbit = Orbit.CalculateOrbit(orbit.PrimaryBody);
                 primaryBodyState = AfterTime(
                     keplerProblemSolver,
-                    orbit.PrimaryBody.Configuration,
+                    orbit.PrimaryBody.Config,
                     orbit.PrimaryBody.State,
                     primaryBodyOrbit,
                     time,
