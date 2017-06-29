@@ -46,19 +46,17 @@ namespace SpaceSimulator.UI
         {
             if (this.focusObject is NaturalSatelliteObject naturalObject)
             {
-                return MathHelpers.ToDraw(naturalObject.Radius * 5.0);
+                return this.orbitCamera.ToDraw(naturalObject.Radius * 5.0);
             }
             else
             {
-                return MathHelpers.ToDraw(100.0f);
+                return this.orbitCamera.ToDraw(100.0f);
             }
         }
 
         public override void Update(TimeSpan elapsed)
         {
-            this.orbitCamera.ZoomScaleFactor = (float)Constants.DistanceScale;
-
-            focusObject = UIComponentHelpers.SelectObjectUpAndDown(
+            this.focusObject = UIComponentHelpers.SelectObjectUpAndDown(
                 this.KeyboardManager,
                 this.SimulatorEngine.Objects,
                 ref this.focusObjectIndex,
@@ -74,7 +72,7 @@ namespace SpaceSimulator.UI
 
         public override void AfterSimulationUpdate()
         {
-            this.orbitCamera.Focus = MathHelpers.ToDrawPosition(this.focusObject.Position);
+            this.orbitCamera.Focus = this.orbitCamera.ToDrawPosition(this.focusObject.Position);
         }
 
         public override void Draw(DeviceContext deviceContext)

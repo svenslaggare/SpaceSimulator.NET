@@ -329,33 +329,6 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
-        /// Converts the given scalar in world scale to draw scale
-        /// </summary>
-        /// <param name="world">The world scalar</param>
-        public static float ToDraw(double world)
-        {
-            return (float)(Constants.DistanceScale * world);
-        }
-
-        /// <summary>
-        /// Converts the given position in world position to a draw position
-        /// </summary>
-        /// <param name="worldPosition">The position in the world</param>
-        public static Vector3 ToDrawPosition(Vector3d worldPosition)
-        {
-            return ToFloat(Constants.DistanceScale * worldPosition);
-        }
-
-        /// <summary>
-        /// Converts the given position in draw position to a world position
-        /// </summary>
-        /// <param name="drawPosition">The position in the draw scace</param>
-        public static Vector3d FromDrawPosition(Vector3 drawPosition)
-        {
-            return ToDouble(drawPosition) / Constants.DistanceScale;
-        }
-
-        /// <summary>
         /// Moves the rectangle by the given amount
         /// </summary>
         /// <param name="rectangle">The rectangle</param>

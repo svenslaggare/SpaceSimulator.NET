@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
@@ -22,9 +23,10 @@ namespace SpaceSimulator.Environments
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="camera">The camera</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
         /// <returns>Simulator engine, sun rendering object, other rendering objects</returns>
-        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
+        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, BaseCamera camera, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -53,13 +55,13 @@ namespace SpaceSimulator.Environments
                     body.AxisOfRotation,
                     new NoAtmosphereModel(),
                     orbit);
-                renderingObjects.Add(new RenderingObject(graphicsDevice, color, textureName, newObject));
+                renderingObjects.Add(new RenderingObject(graphicsDevice, camera, color, textureName, newObject));
                 return newObject;
             }
 
             var baseDir = "Content/Textures/Planets/";
 
-            var sunRenderingObject = new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Sun.jpg", sun);
+            var sunRenderingObject = new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Sun.jpg", sun);
 
             AddPlanet(sun, "Mercury", Simulator.SolarSystem.Mercury, Color.Gray, baseDir + "Mercury.png");
             AddPlanet(sun, "Venus", Simulator.SolarSystem.Venus, new Color(255, 89, 0, 255), baseDir + "Venus2.jpg");
@@ -77,7 +79,7 @@ namespace SpaceSimulator.Environments
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Satellite.png", satellite1));
 
             //var satellite2 = simulatorEngine.AddObjectInOrbit(
             //    "Satellite 2",

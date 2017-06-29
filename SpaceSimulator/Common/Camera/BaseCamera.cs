@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DirectInput;
+using SpaceSimulator.Mathematics;
+using SpaceSimulator.Physics;
 
 namespace SpaceSimulator.Common.Camera
 {
@@ -251,6 +253,24 @@ namespace SpaceSimulator.Common.Camera
         public virtual void HandleMouseScroll(int delta)
         {
 
+        }
+
+        /// <summary>
+        /// Converts the given scalar in world scale to draw scale
+        /// </summary>
+        /// <param name="world">The world scalar</param>
+        public float ToDraw(double world)
+        {
+            return (float)(Constants.DistanceScale * world);
+        }
+
+        /// <summary>
+        /// Converts the given position in the world position to a draw position
+        /// </summary>
+        /// <param name="worldPosition">The position in the world</param>
+        public Vector3 ToDrawPosition(Vector3d worldPosition)
+        {
+            return MathHelpers.ToFloat(Constants.DistanceScale * worldPosition);
         }
     }
 }

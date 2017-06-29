@@ -14,6 +14,8 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// The distance scale factor
         /// </summary>
+        //public const double DistanceScale = 1.0 / (6371 * 1000);
+        //public const double DistanceScale = 1.0;
         //public const double DistanceScale = 0.5E-5;
         public const double DistanceScale = 0.5E-9;
 

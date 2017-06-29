@@ -27,10 +27,11 @@ namespace SpaceSimulator.Common.Camera
         /// </summary>
         public Vector3 Focus { get; set; }
 
-        /// <summary>
-        /// The zoom scale factor
-        /// </summary>
-        public float ZoomScaleFactor { get; set; } = 1.0f;
+        ///// <summary>
+        ///// The zoom scale factor
+        ///// </summary>
+        //public float ZoomScaleFactor { get; set; } = 1.0f;
+        private readonly float zoomScaleFactor = (float)Constants.DistanceScale;
 
         /// <summary>
         /// Creates a new orbit camera
@@ -147,7 +148,7 @@ namespace SpaceSimulator.Common.Camera
                 //Make each pixel correspond to 0.2 unit in the scene.
                 //float dx = 0.2f * (float)(position.X - this.lastMousePosition.X);
                 //float dy = 0.2f * (float)(position.Y - this.lastMousePosition.Y);
-                var mouseZoomFactor = this.ZoomScaleFactor * 100.0f * 400.0f;
+                var mouseZoomFactor = this.zoomScaleFactor * 100.0f * 400.0f;
                 float dx = mouseZoomFactor * (float)(position.X - this.lastMousePosition.X);
                 float dy = mouseZoomFactor * (float)(position.Y - this.lastMousePosition.Y);
 

@@ -22,6 +22,8 @@ namespace SpaceSimulator.Rendering
     /// </summary>
     public sealed class RenderingObject : IDisposable
     {
+        private readonly BaseCamera camera;
+
         private readonly Color orbitColor;
         private readonly PhysicsObject physicsObject;
 
@@ -46,12 +48,15 @@ namespace SpaceSimulator.Rendering
         /// Creates a new rendering object
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="camera">The camera</param>
         /// <param name="orbitColor">The color of the orbit</param>
         /// <param name="textureName">The name of the texture for the sphere model</param>
         /// <param name="physicsObject">The physics object to render</param>
         /// <param name="baseRotationY">The base rotation in the Y-axis</param>
-        public RenderingObject(Device graphicsDevice, Color orbitColor, string textureName, PhysicsObject physicsObject, float baseRotationY = 0.0f)
+        public RenderingObject(Device graphicsDevice, BaseCamera camera, Color orbitColor, string textureName, PhysicsObject physicsObject, float baseRotationY = 0.0f)
         {
+            this.camera = camera;
+
             this.orbitColor = orbitColor;
             this.physicsObject = physicsObject;
 
@@ -76,11 +81,11 @@ namespace SpaceSimulator.Rendering
 
             if (physicsObject is NaturalSatelliteObject naturalObject)
             {
-                size = MathHelpers.ToDraw(naturalObject.Radius);
+                size = this.camera.ToDraw(naturalObject.Radius);
             }
             else
             {
-                size = MathHelpers.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
+                size = this.camera.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
             }
 
             this.scalingMatrix = Matrix.Scaling(size);
@@ -93,7 +98,7 @@ namespace SpaceSimulator.Rendering
         private void CalculateOrbitPositions()
         {
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
-            this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+            this.positions = OrbitPositions.Create(this.camera, orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
         }
         
         /// <summary>
@@ -124,7 +129,7 @@ namespace SpaceSimulator.Rendering
                 transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
             }
 
-            transform *= Matrix.Translation(MathHelpers.ToDrawPosition(primaryBody.Position));
+            transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position));
             return transform;
         }
 
@@ -133,7 +138,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private Vector3 DrawPosition
         {
-            get { return MathHelpers.ToDrawPosition(this.physicsObject.Position); }
+            get { return this.camera.ToDrawPosition(this.physicsObject.Position); }
         }
 
         /// <summary>
@@ -257,7 +262,7 @@ namespace SpaceSimulator.Rendering
                     currentState.Velocity += nextManeuver.Maneuver.DeltaVelocity;
                     var nextOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object.PrimaryBody, ref currentPrimaryBodyState, ref currentState);
 
-                    var positions = OrbitPositions.Create(nextOrbit, true);
+                    var positions = OrbitPositions.Create(this.camera, nextOrbit, true);
                     this.nextManeuverRenderingOrbit.Update(positions);
 
                     this.nextManeuverRenderingOrbitUpdated = DateTime.UtcNow;
