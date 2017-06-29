@@ -14,7 +14,7 @@ using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.Simulator.Rocket;
 
-namespace SpaceSimulator.Environments
+namespace SpaceSimulator.Simulator.Environments
 {
     /// <summary>
     /// Contains an environment for the earth system
@@ -27,7 +27,7 @@ namespace SpaceSimulator.Environments
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="camera">The camera</param>
         /// <returns>Simulator engine, earth rendering object, other rendering objects</returns>
-        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, BaseCamera camera)
+        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera)
         {
             var baseDir = "Content/Textures/Planets/";
 
@@ -42,6 +42,8 @@ namespace SpaceSimulator.Environments
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
+            //camera.SetScaleFactor(earth);
+
             var earthRenderingObject = new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Earth.jpg", earth, MathUtil.DegreesToRadians(180.0f));
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });

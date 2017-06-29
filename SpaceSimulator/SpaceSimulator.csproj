@@ -118,7 +118,7 @@
     <Compile Include="Common\UI\UIHelpers.cs" />
     <Compile Include="Common\UI\UIManager.cs" />
     <Compile Include="Common\UI\UIObject.cs" />
-    <Compile Include="Environments\EarthSystem.cs" />
+    <Compile Include="Simulator\Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />
     <Compile Include="Helpers\CollisionHelpers.cs" />
     <Compile Include="Helpers\DataFormater.cs" />
@@ -165,7 +165,7 @@
     <Compile Include="Physics\Rocket\RocketStages.cs" />
     <Compile Include="Physics\SimplePhysicsObject.cs" />
     <Compile Include="Rendering\RenderingObject.cs" />
-    <Compile Include="Environments\SolarSystem.cs" />
+    <Compile Include="Simulator\Environments\SolarSystem.cs" />
     <Compile Include="Simulator\OrbitSimulators\CowellSimulator.cs" />
     <Compile Include="Simulator\OrbitSimulators\IOrbitSimulator.cs" />
     <Compile Include="Simulator\OrbitSimulators\TwoBodySimulator.cs" />

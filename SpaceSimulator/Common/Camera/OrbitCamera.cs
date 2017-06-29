@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.Common.Camera
 {
@@ -27,11 +28,10 @@ namespace SpaceSimulator.Common.Camera
         /// </summary>
         public Vector3 Focus { get; set; }
 
-        ///// <summary>
-        ///// The zoom scale factor
-        ///// </summary>
-        //public float ZoomScaleFactor { get; set; } = 1.0f;
-        private readonly float zoomScaleFactor = (float)Constants.DistanceScale;
+        /// <summary>
+        /// The zoom scale factor
+        /// </summary>
+        private float ZoomScaleFactor => (float)this.scaleFactor;
 
         /// <summary>
         /// Creates a new orbit camera
@@ -148,7 +148,7 @@ namespace SpaceSimulator.Common.Camera
                 //Make each pixel correspond to 0.2 unit in the scene.
                 //float dx = 0.2f * (float)(position.X - this.lastMousePosition.X);
                 //float dy = 0.2f * (float)(position.Y - this.lastMousePosition.Y);
-                var mouseZoomFactor = this.zoomScaleFactor * 100.0f * 400.0f;
+                var mouseZoomFactor = this.ZoomScaleFactor * 100.0f * 400.0f;
                 float dx = mouseZoomFactor * (float)(position.X - this.lastMousePosition.X);
                 float dy = mouseZoomFactor * (float)(position.Y - this.lastMousePosition.Y);
 
@@ -166,6 +166,15 @@ namespace SpaceSimulator.Common.Camera
         {
             this.radius -= delta * 0.005f * this.radius;
             this.radius = MathUtil.Clamp(this.radius, this.minRadius, this.maxRadius);
+        }
+
+        /// <summary>
+        /// Sets the scale factor
+        /// </summary>
+        /// <param name="primaryBody">The primary body to base the scale on</param>
+        public void SetScaleFactor(NaturalSatelliteObject primaryBody)
+        {
+            this.scaleFactor = 1.0 / primaryBody.Radius;
         }
     }
 }

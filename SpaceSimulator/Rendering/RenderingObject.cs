@@ -36,7 +36,7 @@ namespace SpaceSimulator.Rendering
         private readonly TimeSpan nextManeuverRenderingOrbitUpdateFrequency = TimeSpan.FromSeconds(1.0);
         private bool drawNextManeuver = false;
 
-        private readonly Matrix scalingMatrix;
+        //private readonly Matrix scalingMatrix;
 
         private readonly TimeSpan orbitUpdateTime = TimeSpan.FromMilliseconds(50.0);
         private DateTime lastOrbitUpdate = new DateTime();
@@ -77,21 +77,30 @@ namespace SpaceSimulator.Rendering
 
             this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
 
-            var size = 0.0f;
-
-            if (physicsObject is NaturalSatelliteObject naturalObject)
-            {
-                size = this.camera.ToDraw(naturalObject.Radius);
-            }
-            else
-            {
-                size = this.camera.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
-            }
-
-            this.scalingMatrix = Matrix.Scaling(size);
             this.baseRotationY = baseRotationY;
         }
         
+        /// <summary>
+        /// Returns the scaling matrix
+        /// </summary>
+        private Matrix ScalingMatrix
+        {
+            get
+            {
+                var size = 0.0f;
+                if (physicsObject is NaturalSatelliteObject naturalObject)
+                {
+                    size = this.camera.ToDraw(naturalObject.Radius);
+                }
+                else
+                {
+                    size = this.camera.ToDraw(Simulator.SolarSystem.Earth.Radius * 0.01);
+                }
+
+                return Matrix.Scaling(size);
+            }
+        }
+
         /// <summary>
         /// Calculates the orbit positions
         /// </summary>
@@ -157,7 +166,7 @@ namespace SpaceSimulator.Rendering
                 planetEffect,
                 pass,
                 camera,
-                this.scalingMatrix
+                this.ScalingMatrix
                 * Matrix.RotationY(this.baseRotationY - (float)this.physicsObject.Rotation)
                 * Matrix.Translation(this.DrawPosition));
         }

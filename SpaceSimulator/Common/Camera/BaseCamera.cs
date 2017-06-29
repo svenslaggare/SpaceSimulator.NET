@@ -31,6 +31,8 @@ namespace SpaceSimulator.Common.Camera
         protected Matrix projection;
         private Matrix viewProjection;
 
+        protected double scaleFactor = 1.0;
+
         /// <summary>
         /// Creates a new base camera
         /// </summary>
@@ -261,7 +263,7 @@ namespace SpaceSimulator.Common.Camera
         /// <param name="world">The world scalar</param>
         public float ToDraw(double world)
         {
-            return (float)(Constants.DistanceScale * world);
+            return (float)(this.scaleFactor * world);
         }
 
         /// <summary>
@@ -270,7 +272,7 @@ namespace SpaceSimulator.Common.Camera
         /// <param name="worldPosition">The position in the world</param>
         public Vector3 ToDrawPosition(Vector3d worldPosition)
         {
-            return MathHelpers.ToFloat(Constants.DistanceScale * worldPosition);
+            return MathHelpers.ToFloat(this.scaleFactor * worldPosition);
         }
     }
 }

@@ -12,7 +12,7 @@ using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 
-namespace SpaceSimulator.Environments
+namespace SpaceSimulator.Simulator.Environments
 {
     /// <summary>
     /// Contains an environment for the solar system
@@ -26,7 +26,7 @@ namespace SpaceSimulator.Environments
         /// <param name="camera">The camera</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
         /// <returns>Simulator engine, sun rendering object, other rendering objects</returns>
-        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, BaseCamera camera, bool coplanar = false)
+        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -39,6 +39,7 @@ namespace SpaceSimulator.Environments
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
+            //camera.SetScaleFactor(sun);
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();

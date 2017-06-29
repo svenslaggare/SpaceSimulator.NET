@@ -12,14 +12,6 @@ namespace SpaceSimulator.Physics
     public static class Constants
     {
         /// <summary>
-        /// The distance scale factor
-        /// </summary>
-        //public const double DistanceScale = 1.0 / (6371 * 1000);
-        //public const double DistanceScale = 1.0;
-        //public const double DistanceScale = 0.5E-5;
-        public const double DistanceScale = 0.5E-9;
-
-        /// <summary>
         /// The universal gravity constant (G) in SI units
         /// </summary>
         public const double G = 6.67408E-11;

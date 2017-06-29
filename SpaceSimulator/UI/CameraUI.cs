@@ -36,7 +36,23 @@ namespace SpaceSimulator.UI
             this.orbitCamera = orbitCamera;
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];
 
+            this.SetScaleFactorFromFocusObject();
             this.orbitCamera.Radius = this.GetStartRadius();
+        }
+
+        /// <summary>
+        /// Sets the scale factor based on the current focus object
+        /// </summary>
+        private void SetScaleFactorFromFocusObject()
+        {
+            if (this.focusObject.Type != PhysicsObjectType.ArtificialSatellite)
+            {
+                this.orbitCamera.SetScaleFactor((NaturalSatelliteObject)this.focusObject);
+            }
+            else
+            {
+                this.orbitCamera.SetScaleFactor(this.focusObject.PrimaryBody);
+            }
         }
 
         /// <summary>
@@ -66,6 +82,7 @@ namespace SpaceSimulator.UI
 
             if (changed)
             {
+                this.SetScaleFactorFromFocusObject();
                 this.orbitCamera.Radius = this.GetStartRadius();
             }
         }
