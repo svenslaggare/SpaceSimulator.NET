@@ -73,6 +73,11 @@ namespace SpaceSimulator.Rendering
         private OrbitVertex[] vertices;   
         private Buffer vertexBuffer;
 
+        /// <summary>
+        /// Indicates if the positions are relative to the focus
+        /// </summary>
+        public bool DrawRelativeToFocus { get; }
+
         private RasterizerStates rasterizerStates;
         private BlendStates blendStates;
 
@@ -116,7 +121,8 @@ namespace SpaceSimulator.Rendering
         /// <param name="positions">The positions of the points in the orbit</param>
         /// <param name="color">The color of the orbit</param>
         /// <param name="width">The width of the drawn orbit</param>
-        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, float width)
+        /// <param name="drawRelativeToFocus">Indicates if the positions are relative to the focus</param>
+        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, float width, bool drawRelativeToFocus)
         {
             this.graphicsDevice = graphicsDevice;
             this.camera = camera;
@@ -131,6 +137,7 @@ namespace SpaceSimulator.Rendering
 
             this.color = color;
             this.lineWidth = width;
+            this.DrawRelativeToFocus = drawRelativeToFocus;
 
             this.rasterizerStates = new RasterizerStates(graphicsDevice);
             this.blendStates = new BlendStates(graphicsDevice);
@@ -225,9 +232,9 @@ namespace SpaceSimulator.Rendering
                 var up = Vector3d.Cross(next - current, current);
                 up.Normalize();
 
-                vertex.Position = this.camera.ToDrawPosition(current);
-                vertex.NextPosition = this.camera.ToDrawPosition(next);
-                vertex.PrevPosition = this.camera.ToDrawPosition(prev);
+                vertex.Position = this.camera.ToDrawPosition(current, this.DrawRelativeToFocus);
+                vertex.NextPosition = this.camera.ToDrawPosition(next, this.DrawRelativeToFocus);
+                vertex.PrevPosition = this.camera.ToDrawPosition(prev, this.DrawRelativeToFocus);
                 vertex.Normal = Vector3.Cross(vertex.NextPosition - vertex.Position, vertex.Position);
                 vertex.Normal.Normalize();
                 vertex.Color = currentColor;

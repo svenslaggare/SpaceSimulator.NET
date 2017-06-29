@@ -73,7 +73,7 @@ namespace SpaceSimulator.Simulator.Environments
             AddPlanet(sun, "Saturn", Simulator.SolarSystem.Saturn, new Color(255, 167, 0, 255), baseDir + "Saturn.jpg");
             AddPlanet(sun, "Uranus", Simulator.SolarSystem.Uranus, Color.Blue, baseDir + "Uranus.jpg");
             AddPlanet(sun, "Neptune", Simulator.SolarSystem.Neptune, new Color(0, 148, 255, 255), baseDir + "Neptune.jpg");
-            AddPlanet(sun, "Pluto", Simulator.SolarSystem.Pluto, new Color(143, 115, 87, 255), baseDir + "Pluto.png");
+            var pluto = AddPlanet(sun, "Pluto", Simulator.SolarSystem.Pluto, new Color(143, 115, 87, 255), baseDir + "Pluto.png");
 
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",

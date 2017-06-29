@@ -276,8 +276,14 @@ namespace SpaceSimulator.Common.Camera
         /// Converts the given position in the world position to a draw position
         /// </summary>
         /// <param name="worldPosition">The position in the world</param>
-        public virtual Vector3 ToDrawPosition(Vector3d worldPosition)
+        /// <param name="relativeToFocus">Indicates if the position is relative to the focus</param>
+        public virtual Vector3 ToDrawPosition(Vector3d worldPosition, bool relativeToFocus = true)
         {
+            if (relativeToFocus)
+            {
+                worldPosition -= this.Focus;
+            }
+
             return MathHelpers.ToFloat(this.scaleFactor * worldPosition);
         }
     }

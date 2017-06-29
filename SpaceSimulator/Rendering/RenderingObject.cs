@@ -74,12 +74,24 @@ namespace SpaceSimulator.Rendering
             if (!physicsObject.IsObjectOfReference)
             {
                 this.CalculateOrbitPositions();
-                this.renderingOrbit = new Orbit(graphicsDevice, this.camera, this.positions, orbitColor, 6 * 0.25f);
+                this.renderingOrbit = new Orbit(
+                    graphicsDevice,
+                    this.camera,
+                    this.positions,
+                    orbitColor,
+                    6 * 0.25f,
+                    physicsObject.Type != PhysicsObjectType.ArtificialSatellite);
             }
 
             this.renderingSphere = new Sphere(graphicsDevice, 1.0f, textureName, defaultMaterial);
 
-            this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, this.camera, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
+            this.nextManeuverRenderingOrbit = new Rendering.Orbit(
+                graphicsDevice,
+                this.camera,
+                new List<Rendering.Orbit.Point>(),
+                new Color(124, 117, 6),
+                3.0f,
+                false);
 
             this.baseRotationY = baseRotationY;
         }
@@ -142,7 +154,8 @@ namespace SpaceSimulator.Rendering
                 transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
             }
 
-            transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position + this.camera.Focus));
+            transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position, relativeToFocus: !this.renderingOrbit.DrawRelativeToFocus));
+            //transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position, relativeToFocus: true));
             return transform;
         }
 

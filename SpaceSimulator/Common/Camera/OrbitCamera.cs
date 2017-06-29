@@ -173,10 +173,5 @@ namespace SpaceSimulator.Common.Camera
         {
             this.scaleFactor = 1.0 / primaryBody.Radius;
         }
-
-        public override Vector3 ToDrawPosition(Vector3d worldPosition)
-        {
-            return base.ToDrawPosition(worldPosition - this.Focus);
-        }
     }
 }

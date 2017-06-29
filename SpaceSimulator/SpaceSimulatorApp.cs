@@ -55,11 +55,11 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
-            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
-
-            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+
+            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
             this.OrbitCamera.MaxRadius = 15000.0f;

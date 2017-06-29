@@ -67,7 +67,7 @@ namespace SpaceSimulator.UI
             }
             else
             {
-                return this.orbitCamera.ToDraw(100.0f);
+                return this.orbitCamera.ToDraw(2.5E6);
             }
         }
 
@@ -83,7 +83,7 @@ namespace SpaceSimulator.UI
 
             if (changed)
             {
-                //this.SetScaleFactorFromFocusObject();
+                this.SetScaleFactorFromFocusObject();
                 this.orbitCamera.Radius = this.GetStartRadius();
             }
         }
