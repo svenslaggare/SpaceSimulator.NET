@@ -18,10 +18,9 @@ namespace SpaceSimulator.Rendering
         /// <summary>
         /// Creates orbit positions for a bound orbit
         /// </summary>
-        /// <param name="camera">The camera</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
-        private static IList<Orbit.Point> CreateForBound(BaseCamera camera, Physics.Orbit orbit, bool relative)
+        private static IList<Orbit.Point> CreateForBound(Physics.Orbit orbit, bool relative)
         {
             var orbitPositions = new List<Orbit.Point>();
 
@@ -36,8 +35,8 @@ namespace SpaceSimulator.Rendering
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;
                 var newState = orbit.CalculateState(trueAnomaly, ref primaryBodyState);
 
-                var position = camera.ToDrawPosition(newState.Position);
-                if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || float.IsInfinity(position.LengthSquared())))
+                var position = newState.Position;
+                if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || double.IsInfinity(position.LengthSquared())))
                 {
                     orbitPositions.Add(new Orbit.Point(position, trueAnomaly));
                 }
@@ -49,11 +48,10 @@ namespace SpaceSimulator.Rendering
         /// <summary>
         /// Creates orbit positions for a bound orbit
         /// </summary>
-        /// <param name="camera">The camera</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
         /// <param name="trueAnomaly">The true anomaly</param>
-        private static IList<Orbit.Point> CreateForUnbound(BaseCamera camera, Physics.Orbit orbit, bool relative, double? trueAnomaly)
+        private static IList<Orbit.Point> CreateForUnbound(Physics.Orbit orbit, bool relative, double? trueAnomaly)
         {
             var orbitPositions = new List<Orbit.Point>();
 
@@ -82,8 +80,8 @@ namespace SpaceSimulator.Rendering
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;
                 var newState = orbit.CalculateState(currentTrueAnomaly, ref primaryBodyState);
 
-                var position = camera.ToDrawPosition(newState.Position);
-                if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || float.IsInfinity(position.LengthSquared())))
+                var position = newState.Position;
+                if (!(MathHelpers.IsNaN(position) || MathHelpers.IsInfinity(position) || double.IsInfinity(position.LengthSquared())))
                 {
                     orbitPositions.Add(new Orbit.Point(position, currentTrueAnomaly));
                 }
@@ -95,19 +93,18 @@ namespace SpaceSimulator.Rendering
         /// <summary>
         /// Creates the positions for the given orbit
         /// </summary>
-        /// <param name="camera">The camera</param>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
         /// <param name="trueAnomaly">The current true anomaly. Useful for hyperbolic orbits.</param>
-        public static IList<Orbit.Point> Create(BaseCamera camera, Physics.Orbit orbit, bool relative = false, double? trueAnomaly = null)
+        public static IList<Orbit.Point> Create(Physics.Orbit orbit, bool relative = false, double? trueAnomaly = null)
         {
             if (orbit.IsBound)
             {
-                return CreateForBound(camera, orbit, relative);
+                return CreateForBound(orbit, relative);
             }
             else
             {
-                return CreateForUnbound(camera, orbit, relative, trueAnomaly);
+                return CreateForUnbound(orbit, relative, trueAnomaly);
             }
         }
     }

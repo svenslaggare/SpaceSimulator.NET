@@ -70,12 +70,12 @@ namespace SpaceSimulator.Rendering
             if (!physicsObject.IsObjectOfReference)
             {
                 this.CalculateOrbitPositions();
-                this.renderingOrbit = new Orbit(graphicsDevice, this.positions, orbitColor, 6 * 0.25f);
+                this.renderingOrbit = new Orbit(graphicsDevice, this.camera, this.positions, orbitColor, 6 * 0.25f);
             }
 
             this.renderingSphere = new Sphere(graphicsDevice, 1.0f, textureName, defaultMaterial);
 
-            this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
+            this.nextManeuverRenderingOrbit = new Rendering.Orbit(graphicsDevice, this.camera, new List<Rendering.Orbit.Point>(), new Color(124, 117, 6), 3.0f);
 
             this.baseRotationY = baseRotationY;
         }
@@ -107,7 +107,7 @@ namespace SpaceSimulator.Rendering
         private void CalculateOrbitPositions()
         {
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
-            this.positions = OrbitPositions.Create(this.camera, orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+            this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
         }
         
         /// <summary>
@@ -271,7 +271,7 @@ namespace SpaceSimulator.Rendering
                     currentState.Velocity += nextManeuver.Maneuver.DeltaVelocity;
                     var nextOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object.PrimaryBody, ref currentPrimaryBodyState, ref currentState);
 
-                    var positions = OrbitPositions.Create(this.camera, nextOrbit, true);
+                    var positions = OrbitPositions.Create(nextOrbit, true);
                     this.nextManeuverRenderingOrbit.Update(positions);
 
                     this.nextManeuverRenderingOrbitUpdated = DateTime.UtcNow;

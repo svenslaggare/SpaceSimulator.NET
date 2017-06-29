@@ -64,6 +64,7 @@ namespace SpaceSimulator.Rendering
     public sealed class Orbit : IDisposable
     {
         private readonly Device graphicsDevice;
+        private readonly BaseCamera camera;
 
         private readonly Color color;
         private readonly float lineWidth;
@@ -93,14 +94,14 @@ namespace SpaceSimulator.Rendering
             /// <summary>
             /// The position
             /// </summary>
-            public Vector3 Position { get; }
+            public Vector3d Position { get; }
 
             /// <summary>
             /// The true anomaly
             /// </summary>
             public double TrueAnomaly { get; }
 
-            public Point(Vector3 position, double trueAnomaly)
+            public Point(Vector3d position, double trueAnomaly)
             {
                 this.Position = position;
                 this.TrueAnomaly = trueAnomaly;
@@ -111,12 +112,15 @@ namespace SpaceSimulator.Rendering
         /// Creates a new orbit
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="camera">The camera</param>
         /// <param name="positions">The positions of the points in the orbit</param>
         /// <param name="color">The color of the orbit</param>
         /// <param name="width">The width of the drawn orbit</param>
-        public Orbit(Device graphicsDevice, IList<Point> positions, Color color, float width)
+        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, float width)
         {
             this.graphicsDevice = graphicsDevice;
+            this.camera = camera;
+
             this.positions = positions;
             this.UpdateVertices();
 
@@ -150,39 +154,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private void UpdateVertices()
         {
-            var vertices = new List<OrbitVertex>();
-            for (int i = 0; i < this.positions.Count; i++)
-            {
-                var nextIndex = i + 1;
-                if (nextIndex >= positions.Count)
-                {
-                    nextIndex = 0;
-                }
-
-                var prevIndex = i - 1;
-                if (prevIndex < 0)
-                {
-                    prevIndex = positions.Count - 1;
-                }
-
-                var current = positions[i].Position;
-                var next = positions[nextIndex].Position;
-                var prev = positions[prevIndex].Position;
-
-                //var up = Vector3.Up;
-                var up = Vector3.Cross(next - current, current);
-                up.Normalize();
-                vertices.Add(new OrbitVertex()
-                {
-                    Position = current,
-                    NextPosition = next,
-                    PrevPosition = prev,
-                    Normal = up,
-                    Color = color.ToVector4()
-                });
-            }
-
-            this.vertices = vertices.ToArray();
+            this.vertices = new OrbitVertex[this.positions.Count];
         }
 
         /// <summary>
@@ -195,18 +167,14 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Sets the color of the given vertex and writes to the given stream
+        /// Updates the given vertex and writes to the given stream
         /// </summary>
         /// <param name="stream">The stream</param>
         /// <param name="index">The index of the vertex</param>
-        /// <param name="color">The color</param>
-        /// <param name="nextColor">The next color</param>
-        private void SetVertexColorAndWrite(DataStream stream, int index, Vector4 color, Vector4 nextColor)
+        /// <param name="newVertex">The new vertex</param>
+        private void SetVerteAndWrite(DataStream stream, int index, OrbitVertex newVertex)
         {
-            var vertex = this.vertices[index];
-            vertex.Color = color;
-            vertex.NextColor = nextColor;
-            this.vertices[index] = vertex;
+            this.vertices[index] = newVertex;
             stream.Write(this.vertices[index]);
         }
 
@@ -225,10 +193,16 @@ namespace SpaceSimulator.Rendering
 
             for (int i = 0; i < this.positions.Count; i++)
             {
-                var j = i + 1;
-                if (j >= this.positions.Count)
+                var nextIndex = i + 1;
+                if (nextIndex >= positions.Count)
                 {
-                    j = 0;
+                    nextIndex = 0;
+                }
+
+                var prevIndex = i - 1;
+                if (prevIndex < 0)
+                {
+                    prevIndex = positions.Count - 1;
                 }
 
                 var currentColor = this.color.ToVector4();
@@ -238,18 +212,26 @@ namespace SpaceSimulator.Rendering
                 }
 
                 var nextColor = this.color.ToVector4();
-                if (this.IsPassed(j))
+                if (this.IsPassed(nextIndex))
                 {
                     nextColor = RenderingHelpers.ModifyBrightness(this.color, passedBrightness).ToVector4();
                 }
 
-                //if (i % 2 == 0)
-                //{
-                //    currentColor = Vector4.Zero;
-                //    nextColor = Vector4.Zero;
-                //}
+                var vertex = this.vertices[i];
+                var current = this.positions[i].Position;
+                var prev = this.positions[prevIndex].Position;
+                var next = this.positions[nextIndex].Position;
 
-                this.SetVertexColorAndWrite(stream, i, currentColor, nextColor);
+                var up = Vector3d.Cross(next - current, current);
+                up.Normalize();
+
+                vertex.Position = this.camera.ToDrawPosition(current);
+                vertex.NextPosition = this.camera.ToDrawPosition(next);
+                vertex.PrevPosition = this.camera.ToDrawPosition(prev);
+                vertex.Normal = this.camera.ToDrawPosition(up);
+                vertex.Color = currentColor;
+                vertex.NextColor = nextColor;
+                this.SetVerteAndWrite(stream, i, vertex);
             }
 
             deviceContext.UnmapSubresource(this.vertexBuffer, 0);
