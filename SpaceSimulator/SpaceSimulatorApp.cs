@@ -182,6 +182,17 @@ namespace SpaceSimulator
                 component.Draw(this.DeviceContext2D);
             }
 
+            //var textBuilder = new StringBuilder();
+            //foreach (var currentObject in this.renderingObjects)
+            //{
+            //    textBuilder.AppendLine($"{currentObject.PhysicsObject.Name}: {currentObject.DrawPosition}");
+            //}
+            //this.RenderingManager2D.DefaultSolidColorBrush.DrawText(
+            //    this.DeviceContext2D,
+            //    textBuilder.ToString(),
+            //    this.RenderingManager2D.DefaultTextFormat,
+            //    this.RenderingManager2D.TextPosition(new Vector2(1000, 60)));
+
             this.uiManager.Draw(this.DeviceContext2D);
             //this.plot2D.Draw(this.DeviceContext2D, new Vector2(400, 200));
             this.DeviceContext2D.EndDraw();

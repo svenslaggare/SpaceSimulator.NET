@@ -90,7 +90,7 @@ namespace SpaceSimulator.UI
 
         public override void AfterSimulationUpdate()
         {
-            this.orbitCamera.Focus = this.orbitCamera.ToDrawPosition(this.focusObject.Position);
+            this.orbitCamera.Focus = this.focusObject.Position;
         }
 
         public override void Draw(DeviceContext deviceContext)

@@ -42,16 +42,26 @@ namespace SpaceSimulator.Simulator.Environments
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
-            //camera.SetScaleFactor(earth);
 
-            var earthRenderingObject = new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Earth.jpg", earth, MathUtil.DegreesToRadians(180.0f));
+            var earthRenderingObject = new RenderingObject(
+                graphicsDevice,
+                camera,
+                Color.Yellow,
+                baseDir + "Earth.jpg",
+                earth,
+                MathUtil.DegreesToRadians(180.0f));
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>();
 
             simulatorEngine.ObjectAdded += (sender, newObject) =>
             {
-                renderingObjects.Add(new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Satellite.png", newObject));
+                renderingObjects.Add(new RenderingObject(
+                    graphicsDevice,
+                    camera,
+                    Color.Yellow,
+                    baseDir + "Satellite.png",
+                    newObject));
             };
 
             //var moon = simulatorEngine.AddPlanetInOrbit(

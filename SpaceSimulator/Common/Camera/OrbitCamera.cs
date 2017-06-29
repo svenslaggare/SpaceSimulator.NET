@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
 
@@ -22,11 +23,6 @@ namespace SpaceSimulator.Common.Camera
 		private float maxRadius = 1000;
 
         private Vector2 lastMousePosition;
-
-        /// <summary>
-        /// The focus position
-        /// </summary>
-        public Vector3 Focus { get; set; }
 
         /// <summary>
         /// The zoom scale factor
@@ -123,8 +119,9 @@ namespace SpaceSimulator.Common.Camera
 			this.look.Normalize();
 			this.right = Vector3.Cross(this.Up, this.Look);
 
-            this.position = this.position + this.Focus;
-            this.view = Matrix.LookAtLH(this.position, this.Focus, this.up);
+            var focusPosition = this.ToDrawPosition(this.Focus);
+            this.position = this.position + focusPosition;
+            this.view = Matrix.LookAtLH(this.position, focusPosition, this.up);
             this.UpdateViewProjection();
 		}
 
@@ -175,6 +172,11 @@ namespace SpaceSimulator.Common.Camera
         public void SetScaleFactor(NaturalSatelliteObject primaryBody)
         {
             this.scaleFactor = 1.0 / primaryBody.Radius;
+        }
+
+        public override Vector3 ToDrawPosition(Vector3d worldPosition)
+        {
+            return base.ToDrawPosition(worldPosition - this.Focus);
         }
     }
 }

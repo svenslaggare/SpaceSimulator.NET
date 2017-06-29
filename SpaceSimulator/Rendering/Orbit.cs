@@ -228,7 +228,8 @@ namespace SpaceSimulator.Rendering
                 vertex.Position = this.camera.ToDrawPosition(current);
                 vertex.NextPosition = this.camera.ToDrawPosition(next);
                 vertex.PrevPosition = this.camera.ToDrawPosition(prev);
-                vertex.Normal = this.camera.ToDrawPosition(up);
+                vertex.Normal = Vector3.Cross(vertex.NextPosition - vertex.Position, vertex.Position);
+                vertex.Normal.Normalize();
                 vertex.Color = currentColor;
                 vertex.NextColor = nextColor;
                 this.SetVerteAndWrite(stream, i, vertex);

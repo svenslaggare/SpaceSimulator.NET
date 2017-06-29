@@ -25,7 +25,11 @@ namespace SpaceSimulator.Rendering
         private readonly BaseCamera camera;
 
         private readonly Color orbitColor;
-        private readonly PhysicsObject physicsObject;
+
+        /// <summary>
+        /// The object being drawn
+        /// </summary>
+        public PhysicsObject PhysicsObject { get; }
 
         private IList<Orbit.Point> positions;
         private readonly Orbit renderingOrbit;
@@ -58,7 +62,7 @@ namespace SpaceSimulator.Rendering
             this.camera = camera;
 
             this.orbitColor = orbitColor;
-            this.physicsObject = physicsObject;
+            this.PhysicsObject = physicsObject;
 
             var defaultMaterial = new Material()
             {
@@ -88,7 +92,7 @@ namespace SpaceSimulator.Rendering
             get
             {
                 var size = 0.0f;
-                if (physicsObject is NaturalSatelliteObject naturalObject)
+                if (this.PhysicsObject is NaturalSatelliteObject naturalObject)
                 {
                     size = this.camera.ToDraw(naturalObject.Radius);
                 }
@@ -106,7 +110,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private void CalculateOrbitPositions()
         {
-            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
+            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.PhysicsObject);
             this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
         }
         
@@ -115,7 +119,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private void UpdatePassedPositions()
         {
-            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
+            var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.PhysicsObject);
             this.renderingOrbit.PassedTrueAnomaly = orbitPosition.TrueAnomaly;
             this.renderingOrbit.IsBound = orbitPosition.Orbit.IsBound;
         }
@@ -125,7 +129,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         private Matrix PrimaryBodyTransform()
         {
-            var primaryBody = this.physicsObject.PrimaryBody;
+            var primaryBody = this.PhysicsObject.PrimaryBody;
             if (primaryBody == null)
             {
                 return Matrix.Identity;
@@ -133,21 +137,21 @@ namespace SpaceSimulator.Rendering
 
             var transform = Matrix.Identity;
 
-            if (this.physicsObject.HasImpacted)
+            if (this.PhysicsObject.HasImpacted)
             {
                 transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
             }
 
-            transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position));
+            transform *= Matrix.Translation(this.camera.ToDrawPosition(primaryBody.Position + this.camera.Focus));
             return transform;
         }
 
         /// <summary>
         /// Returns the draw position
         /// </summary>
-        private Vector3 DrawPosition
+        public Vector3 DrawPosition
         {
-            get { return this.camera.ToDrawPosition(this.physicsObject.Position); }
+            get { return this.camera.ToDrawPosition(this.PhysicsObject.Position); }
         }
 
         /// <summary>
@@ -167,7 +171,7 @@ namespace SpaceSimulator.Rendering
                 pass,
                 camera,
                 this.ScalingMatrix
-                * Matrix.RotationY(this.baseRotationY - (float)this.physicsObject.Rotation)
+                * Matrix.RotationY(this.baseRotationY - (float)this.PhysicsObject.Rotation)
                 * Matrix.Translation(this.DrawPosition));
         }
 
@@ -181,7 +185,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="pass">The effect pass</param>
         private void DrawOrbit(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
         {
-            if (!this.physicsObject.HasImpacted)
+            if (!this.PhysicsObject.HasImpacted)
             {
                 this.renderingOrbit.Draw(
                     deviceContext,
@@ -221,7 +225,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="simulatorEngine">The simulator engine</param>
         private SimulationManeuever NextManeuver(SimulatorEngine simulatorEngine)
         {
-            return simulatorEngine.Maneuvers.FirstOrDefault(x => x.Object == this.physicsObject);
+            return simulatorEngine.Maneuvers.FirstOrDefault(x => x.Object == this.PhysicsObject);
         }
 
         /// <summary>
@@ -231,7 +235,7 @@ namespace SpaceSimulator.Rendering
         public void Update(SimulatorEngine simulatorEngine)
         {
             //Orbit
-            if (this.physicsObject.HasChangedOrbit())
+            if (this.PhysicsObject.HasChangedOrbit())
             {
                 this.updateOrbit = true;
             }
@@ -330,6 +334,7 @@ namespace SpaceSimulator.Rendering
         {
             //Draw planets
             planetEffect.SetEyePosition(camera.Position);
+            planetEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
 
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)

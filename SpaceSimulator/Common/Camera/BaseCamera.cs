@@ -34,6 +34,12 @@ namespace SpaceSimulator.Common.Camera
         protected double scaleFactor = 1.0;
 
         /// <summary>
+        /// The focus position
+        /// </summary>
+        public Vector3d Focus { get; set; }
+
+
+        /// <summary>
         /// Creates a new base camera
         /// </summary>
         public BaseCamera()
@@ -261,7 +267,7 @@ namespace SpaceSimulator.Common.Camera
         /// Converts the given scalar in world scale to draw scale
         /// </summary>
         /// <param name="world">The world scalar</param>
-        public float ToDraw(double world)
+        public virtual float ToDraw(double world)
         {
             return (float)(this.scaleFactor * world);
         }
@@ -270,7 +276,7 @@ namespace SpaceSimulator.Common.Camera
         /// Converts the given position in the world position to a draw position
         /// </summary>
         /// <param name="worldPosition">The position in the world</param>
-        public Vector3 ToDrawPosition(Vector3d worldPosition)
+        public virtual Vector3 ToDrawPosition(Vector3d worldPosition)
         {
             return MathHelpers.ToFloat(this.scaleFactor * worldPosition);
         }

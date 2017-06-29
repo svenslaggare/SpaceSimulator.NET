@@ -49,10 +49,12 @@ namespace SpaceSimulator.Common.Effects
         private readonly EffectTechnique technique;
         private readonly ShaderBytecode shaderBytecode;
 
-        private readonly EffectMatrixVariable worldViewProjVariable;
+        private readonly EffectVectorVariable eyePositionVariable;
+        private readonly EffectVectorVariable pointLightSourceVariable;
+
+        private readonly EffectMatrixVariable worldViewProjectionVariable;
         private readonly EffectMatrixVariable worldVariable;
         private readonly EffectMatrixVariable worldInverseTransposeVariable;
-        private readonly EffectVectorVariable eyePositionVariable;
         private readonly EffectMatrixVariable textureTransformVariable;
 
         private readonly EffectVectorVariable fogColor;
@@ -93,10 +95,12 @@ namespace SpaceSimulator.Common.Effects
             this.shaderBytecode = pass.Description.Signature;
 
             //Get the variables
-            this.worldViewProjVariable = this.effect.GetVariableByName("gWorldViewProj").AsMatrix();
+            this.eyePositionVariable = this.effect.GetVariableByName("gEyePosW").AsVector();
+            this.pointLightSourceVariable = this.effect.GetVariableByName("gPointLightSource").AsVector();
+
+            this.worldViewProjectionVariable = this.effect.GetVariableByName("gWorldViewProj").AsMatrix();
             this.worldVariable = this.effect.GetVariableByName("gWorld").AsMatrix();
             this.worldInverseTransposeVariable = this.effect.GetVariableByName("gWorldInvTranspose").AsMatrix();
-            this.eyePositionVariable = this.effect.GetVariableByName("gEyePosW").AsVector();
             this.textureTransformVariable = this.effect.GetVariableByName("gTexTransform").AsMatrix();
 
             this.fogColor = this.effect.GetVariableByName("gFogColor").AsVector();
@@ -148,12 +152,30 @@ namespace SpaceSimulator.Common.Effects
         }
 
         /// <summary>
+        /// Sets the eye position
+        /// </summary>
+        /// <param name="position">The eye position</param>
+        public void SetEyePosition(Vector3 position)
+        {
+            this.eyePositionVariable.Set(position);
+        }
+
+        /// <summary>
+        /// Sets the point light source
+        /// </summary>
+        /// <param name="position">The source position</param>
+        public void SetPointLightSource(Vector3 position)
+        {
+            this.pointLightSourceVariable.Set(position);
+        }
+
+        /// <summary>
         /// Sets the world-view-projection matrix
         /// </summary>
         /// <param name="worldViewProjection">The world-view-projection matrix</param>
         public void SetWorldViewProjection(Matrix worldViewProjection)
 		{
-			this.worldViewProjVariable.SetMatrix(worldViewProjection);
+			this.worldViewProjectionVariable.SetMatrix(worldViewProjection);
 		}
 
 		/// <summary>
@@ -190,15 +212,6 @@ namespace SpaceSimulator.Common.Effects
             this.SetWorldInverseTranspose(worldInverseTranspose);
             this.SetWorldViewProjection(worldViewProjection);
         }
-
-		/// <summary>
-		/// Sets the eye position
-		/// </summary>
-		/// <param name="position">The eye position</param>
-		public void SetEyePosition(Vector3 position)
-		{
-			this.eyePositionVariable.Set(position);
-		}
 
 		/// <summary>
 		/// Sets the texture transform
@@ -291,46 +304,23 @@ namespace SpaceSimulator.Common.Effects
 			this.shaderBytecode.Dispose();
 			this.technique.Dispose();
 
-			this.worldViewProjVariable.Dispose();
-			this.worldVariable.Dispose();
-			this.worldInverseTransposeVariable.Dispose();
+            this.eyePositionVariable?.Dispose();
+            this.pointLightSourceVariable?.Dispose();
 
-            if (eyePositionVariable != null)
-            {
-                this.eyePositionVariable.Dispose();
-            }
+            this.worldViewProjectionVariable?.Dispose();
+			this.worldVariable?.Dispose();
+			this.worldInverseTransposeVariable?.Dispose();
+            this.textureTransformVariable?.Dispose();
 
-            if (this.textureTransformVariable != null)
-            {
-                this.textureTransformVariable.Dispose();
-            }
+            this.fogStart?.Dispose();
+            this.fogColor?.Dispose();
+            this.fogRange?.Dispose();
 
-            if (this.fogStart != null)
-            {
-                this.fogStart.Dispose();
-                this.fogColor.Dispose();
-                this.fogRange.Dispose();
-            }
+            this.dirLightsVariable?.Dispose();
+            this.materialVariable?.Dispose();
+            this.diffuseMapVariable?.Dispose();
 
-            if (this.dirLightsVariable != null)
-            {
-                this.dirLightsVariable.Dispose();
-            }
-
-            if (this.materialVariable != null)
-            {
-                this.materialVariable.Dispose();
-            }
-
-            if (this.textureTransformVariable != null)
-            {
-                this.diffuseMapVariable.Dispose();
-            }
-
-            if (this.InputLayout != null)
-            {
-                this.InputLayout.Dispose();
-            }
+            this.InputLayout?.Dispose();
         }
 	}
 }

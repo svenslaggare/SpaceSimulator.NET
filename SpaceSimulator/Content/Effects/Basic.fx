@@ -10,6 +10,7 @@ cbuffer cbPerFrame
 {
 	DirectionalLight gDirLights[3];
 	float3 gEyePosW;
+	float3 gPointLightSource;
 
 	float  gFogStart;
 	float  gFogRange;
@@ -117,9 +118,8 @@ float4 PS(VertexOut pin, uniform int gLightCount, uniform bool gUseTexure) : SV_
 		pointLight.Ambient = float4(0.3f, 0.3f, 0.3f, 1.0f);
 		pointLight.Diffuse = float4(0.7f, 0.7f, 0.7f, 1.0f);
 		pointLight.Specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		pointLight.Position = float3(0.0f, 0.0f, 0.0f);
+		pointLight.Position = gPointLightSource;
 		pointLight.Range = 1000;
-		/*pointLight.Att = float3(0.0f, 0.0f, 0.0001f);*/
 		pointLight.Att = float3(1.0f, 0.0f, 0.0f);
 
 		float4 A, D, S;
