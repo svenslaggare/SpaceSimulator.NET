@@ -411,7 +411,7 @@ namespace SpaceSimulator.UI
         {
             var validTargets = this.SimulatorEngine.Objects
                    .Where(x =>
-                            x.Type != Simulator.PhysicsObjectType.ObjectOfReference
+                            !x.IsObjectOfReference
                             && x != selectedObject
                             && x.PrimaryBody == selectedObject.PrimaryBody)
                    .ToList();

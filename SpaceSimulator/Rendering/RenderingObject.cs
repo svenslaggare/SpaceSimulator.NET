@@ -62,7 +62,7 @@ namespace SpaceSimulator.Rendering
                 Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
             };
 
-            if (physicsObject.Type != PhysicsObjectType.ObjectOfReference)
+            if (!physicsObject.IsObjectOfReference)
             {
                 this.CalculateOrbitPositions();
                 this.renderingOrbit = new Orbit(graphicsDevice, this.positions, orbitColor, 6 * 0.25f);

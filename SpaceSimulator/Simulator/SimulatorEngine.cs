@@ -159,6 +159,7 @@ namespace SpaceSimulator.Simulator
         private readonly IList<PhysicsObject> objects = new List<PhysicsObject>();
         private readonly IList<PhysicsObject> naturalObjects = new List<PhysicsObject>();
         private readonly IList<PhysicsObject> newObjects = new List<PhysicsObject>();
+        private NaturalSatelliteObject objectOfReference;
 
         private double totalTime;
         private double timeStep = 0.02;
@@ -172,17 +173,15 @@ namespace SpaceSimulator.Simulator
         private readonly IDictionary<PhysicsSimulationMode, IOrbitSimulator> orbitSimulators = new Dictionary<PhysicsSimulationMode, IOrbitSimulator>();
         private IOrbitSimulator currentOrbitSimulator;
 
-        private NaturalSatelliteObject objectOfReference;
-
         private readonly IList<SimulationEvent> events = new List<SimulationEvent>();
         private readonly IList<SimulationEvent> executedEvents = new List<SimulationEvent>();
         private readonly IDictionary<PhysicsObject, SimulationEvent> soiChanges = new Dictionary<PhysicsObject, SimulationEvent>();
+        private bool addedEvent = false;
 
         private readonly IList<SimulationManeuever> maneuvers = new List<SimulationManeuever>();
         private readonly IList<SimulationManeuever> executedManeuvers = new List<SimulationManeuever>();
         private readonly IDictionary<PhysicsObject, double> sphereOfInfluences = new Dictionary<PhysicsObject, double>();
         private readonly double maneuverTimeEpsilon = 1E-6;
-        private bool addedEvent = false;
 
         /// <summary>
         /// The text output writer
@@ -269,7 +268,7 @@ namespace SpaceSimulator.Simulator
             {
                 if (this.objectOfReference == null)
                 {
-                    this.objectOfReference = (NaturalSatelliteObject)this.Objects.FirstOrDefault(x => x.Type == PhysicsObjectType.ObjectOfReference);
+                    this.objectOfReference = (NaturalSatelliteObject)this.Objects.FirstOrDefault(x => x.IsObjectOfReference);
                 }
 
                 return this.objectOfReference;
@@ -756,7 +755,7 @@ namespace SpaceSimulator.Simulator
         {
             foreach (var currentObject in this.objects)
             {
-                if (currentObject.Type != PhysicsObjectType.ObjectOfReference)
+                if (!currentObject.IsObjectOfReference)
                 {
                     this.currentOrbitSimulator.Update(this.totalTime, deltaTime, currentObject, this.naturalObjects, this.AddNewObject);
 
@@ -797,7 +796,7 @@ namespace SpaceSimulator.Simulator
             {
                 foreach (var currentObject in this.objects)
                 {
-                    if (currentObject.Type != PhysicsObjectType.ObjectOfReference)
+                    if (!currentObject.IsObjectOfReference)
                     {
                         currentObject.SetNextState(currentObject.NextState.Add(
                             position: currentObject.PrimaryBody.NextState.Position,
