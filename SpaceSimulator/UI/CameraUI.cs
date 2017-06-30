@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX;
 using SharpDX.Direct2D1;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
@@ -95,7 +97,11 @@ namespace SpaceSimulator.UI
 
         public override void Draw(DeviceContext deviceContext)
         {
-            
+            this.TextColorBrush.DrawText(
+                deviceContext,
+                "Focused object: " + this.focusObject.Name,
+                this.TextFormat,
+                this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 43)));
         }
     }
 }

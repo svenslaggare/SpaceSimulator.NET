@@ -86,6 +86,11 @@ namespace SpaceSimulator.Rendering
         public double PassedTrueAnomaly { get; set; }
 
         /// <summary>
+        /// Indicates if the brightness is changed for passed positions
+        /// </summary>
+        public bool ChangeBrightnessForPassed { get; set; } = true;
+
+        /// <summary>
         /// Indicates if the orbit is bound
         /// </summary>
         public bool IsBound { get; set; } = true;
@@ -210,13 +215,13 @@ namespace SpaceSimulator.Rendering
                 }
 
                 var currentColor = this.color.ToVector4();
-                if (this.IsPassed(i))
+                if (this.IsPassed(i) && this.ChangeBrightnessForPassed)
                 {
                     currentColor = RenderingHelpers.ModifyBrightness(this.color, passedBrightness).ToVector4();
                 }
 
                 var nextColor = this.color.ToVector4();
-                if (this.IsPassed(nextIndex))
+                if (this.IsPassed(nextIndex) && this.ChangeBrightnessForPassed)
                 {
                     nextColor = RenderingHelpers.ModifyBrightness(this.color, passedBrightness).ToVector4();
                 }
@@ -287,10 +292,10 @@ namespace SpaceSimulator.Rendering
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
         /// <param name="pass">The effect pass</param>
-        /// <param name="camera">The camera</param>
         /// <param name="world">The world matrix</param>
         /// <param name="currentPosition">The position of the object in the orbit</param>
-        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, BaseCamera camera, Matrix world, Vector3 currentPosition)
+        /// <param name="lineWidth">The width of the orbit line</param>
+        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, Matrix world, Vector3 currentPosition, float? lineWidth = null)
         {
             if (this.vertexBuffer == null)
             {
@@ -299,8 +304,7 @@ namespace SpaceSimulator.Rendering
 
             this.UpdatePassedPositions(deviceContext);
 
-            //effect.SetLineWidth(this.lineWidth);
-            effect.SetLineWidth(OrbitLineWidth(camera, currentPosition));
+            effect.SetLineWidth(lineWidth ?? OrbitLineWidth(camera, currentPosition));
 
             //Set draw type
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;

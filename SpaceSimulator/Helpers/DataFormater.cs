@@ -138,9 +138,9 @@ namespace SpaceSimulator.Helpers
             } },
             { DataUnit.Latitude, (value, decimals) => Format(Math.Abs(value), DataUnit.DegreesAndMinutesAndSeconds, decimals) + " " + (value > 0 ? "N" : "S") },
             { DataUnit.Longitude, (value, decimals) => Format(Math.Abs(value), DataUnit.DegreesAndMinutesAndSeconds, decimals) + " " + (value > 0 ? "E" : "W") },
-            { DataUnit.EarthRadii, (value, decimals) => Math.Round(value / SolarSystem.Earth.Radius, decimals) + " ER" },
-            { DataUnit.EarthMass, (value, decimals) => Math.Round(value / SolarSystem.Earth.Mass, decimals) + " EM" },
-            { DataUnit.SolarMass, (value, decimals) => Math.Round(value / SolarSystem.Sun.Mass, decimals) + " SM" },
+            { DataUnit.EarthRadii, (value, decimals) => Math.Round(value / SolarSystemBodies.Earth.Radius, decimals) + " ER" },
+            { DataUnit.EarthMass, (value, decimals) => Math.Round(value / SolarSystemBodies.Earth.Mass, decimals) + " EM" },
+            { DataUnit.SolarMass, (value, decimals) => Math.Round(value / SolarSystemBodies.Sun.Mass, decimals) + " SM" },
             { DataUnit.AstronomicalUnits, (value, decimals) => Math.Round(value / Constants.AstronomicalUnit, decimals) + " AU" },
             { DataUnit.TemperatureCelsius, (value, decimals) => Math.Round(value - Math.Abs(Constants.AbsoluteZero), decimals) + " °C" }
         };

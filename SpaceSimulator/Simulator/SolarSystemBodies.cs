@@ -8,9 +8,9 @@ using SpaceSimulator.Physics;
 namespace SpaceSimulator.Simulator
 {
     /// <summary>
-    /// The list of important bodies in the solar system
+    /// List of important bodies in the solar system
     /// </summary>
-    public static class SolarSystem
+    public static class SolarSystemBodies
     {
         private static readonly SolarSystemBody sun;
         private static readonly SolarSystemBody mercury;
@@ -24,7 +24,7 @@ namespace SpaceSimulator.Simulator
         private static readonly SolarSystemBody neptune;
         private static readonly SolarSystemBody pluto;
 
-        static SolarSystem()
+        static SolarSystemBodies()
         {
             sun = new SolarSystemBody(
                 695700 * 1000,

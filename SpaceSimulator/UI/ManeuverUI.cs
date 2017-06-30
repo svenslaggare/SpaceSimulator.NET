@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Common.UI;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
@@ -218,7 +219,7 @@ namespace SpaceSimulator.UI
                 BasicManeuver.ChangePeriapsis(
                     this.SimulatorEngine,
                     this.SelectedObject,
-                    newPeriapsis * SolarSystem.Earth.Radius));
+                    newPeriapsis * SolarSystemBodies.Earth.Radius));
         }
 
         /// <summary>
@@ -231,7 +232,7 @@ namespace SpaceSimulator.UI
                 BasicManeuver.ChangeApoapsis(
                     this.SimulatorEngine,
                     this.SelectedObject,
-                    newApoapsis * SolarSystem.Earth.Radius));
+                    newApoapsis * SolarSystemBodies.Earth.Radius));
         }
 
         /// <summary>
@@ -279,7 +280,7 @@ namespace SpaceSimulator.UI
                     this.SelectedObject,
                     ref state,
                     ref orbitPosition,
-                    newRadius * SolarSystem.Earth.Radius,
+                    newRadius * SolarSystemBodies.Earth.Radius,
                     OrbitalManeuverTime.Periapsis()));
         }
 

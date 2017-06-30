@@ -6,24 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
-using SharpDX.D3DCompiler;
-using SharpDX.Direct2D1;
-using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DirectInput;
 using SharpDX.DXGI;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.UI;
-using SpaceSimulator.Helpers;
-using SpaceSimulator.Mathematics;
-using SpaceSimulator.Physics;
-using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.UI;
-using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace SpaceSimulator
 {
@@ -36,7 +27,6 @@ namespace SpaceSimulator
         private BasicEffect planetEffect;
         private OrbitEffect orbitEffect;
 
-        private RenderingObject referenceRenderingObject;
         private readonly IList<RenderingObject> renderingObjects;
         private readonly SimulatorEngine simulatorEngine;
         private readonly SimulatorContainer simulatorContainer;
@@ -55,10 +45,10 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            (this.simulatorEngine, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
             this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            //(this.simulatorEngine, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
@@ -71,7 +61,7 @@ namespace SpaceSimulator
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
 
-            this.simulatorContainer = new SimulatorContainer(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects);
+            this.simulatorContainer = new SimulatorContainer(this.simulatorEngine, this.renderingObjects);
         }
 
         /// <summary>
@@ -191,11 +181,18 @@ namespace SpaceSimulator
             this.DeviceContext.ClearDepthStencilView(this.BackBufferDepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             this.DeviceContext.ClearRenderTargetView(this.BackBufferRenderView, Color.Black);
 
-            //Draw 3D
-            this.referenceRenderingObject.Draw(this.DeviceContext, this.sunEffect, this.orbitEffect, this.Camera);
-            RenderingObject.Draw(this.DeviceContext, this.planetEffect, this.orbitEffect, this.Camera, this.renderingObjects);
+            //Draw 2D before 3D
+            this.DeviceContext2D.BeginDraw();
+            foreach (var component in this.uiComponents)
+            {
+                component.DrawBefore3D(this.DeviceContext2D);
+            }
+            this.DeviceContext2D.EndDraw();
 
-            //Draw 2D
+            //Draw 3D
+            RenderingObject.Draw(this.DeviceContext, this.sunEffect, this.planetEffect, this.orbitEffect, this.renderingObjects);
+
+            //Draw 2D after 3D
             this.DeviceContext2D.BeginDraw();
 
             foreach (var component in this.uiComponents)
@@ -227,9 +224,9 @@ namespace SpaceSimulator
                 currentObject.Dispose();
             }
 
-            foreach (var uiComponent in this.uiComponents)
+            foreach (var component in this.uiComponents)
             {
-                uiComponent.Dispose();
+                component.Dispose();
             }
 
             base.Dispose();

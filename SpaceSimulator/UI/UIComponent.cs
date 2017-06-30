@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.UI
@@ -87,7 +88,16 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
-        /// Draws the component
+        /// Draws the component before the 3D
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        public virtual void DrawBefore3D(SharpDX.Direct2D1.DeviceContext deviceContext)
+        {
+
+        }
+
+        /// <summary>
+        /// Draws the component after the 3D
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         public abstract void Draw(SharpDX.Direct2D1.DeviceContext deviceContext);

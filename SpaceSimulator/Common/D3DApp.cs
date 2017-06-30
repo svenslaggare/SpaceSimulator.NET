@@ -15,6 +15,7 @@ using SharpDX.DXGI;
 using SharpDX.Windows;
 using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
@@ -77,7 +78,6 @@ namespace SpaceSimulator.Common
 			this.title = title;
             this.renderForm = new RenderForm(title)
             {
-                //ClientSize = new System.Drawing.Size(1280, 720)
                 ClientSize = new System.Drawing.Size(1440, 900)
             };
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SpaceSimulator.Common;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Common.UI;
 
 namespace SpaceSimulator.UI

@@ -8,6 +8,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectInput;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 
 namespace SpaceSimulator.Common.UI
 {
@@ -454,7 +455,7 @@ namespace SpaceSimulator.Common.UI
                     textSize = new Size2(
                         (int)Math.Round(textLayout.Metrics.Width),
                         (int)Math.Round(textLayout.Metrics.Height));
-                }        
+                }
 
                 if (this.showCaret)
                 {

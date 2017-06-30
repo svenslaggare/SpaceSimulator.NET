@@ -25,16 +25,16 @@ namespace SpaceSimulator.Simulator.Environments
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="camera">The camera</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
-        /// <returns>Simulator engine, sun rendering object, other rendering objects</returns>
-        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera, bool coplanar = false)
+        /// <returns>Simulator engine, rendering objects</returns>
+        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
                 PhysicsObjectType.ObjectOfReference,
-                Simulator.SolarSystem.Sun.Mass,
-                Simulator.SolarSystem.Sun.Radius,
-                Simulator.SolarSystem.Sun.RotationalPeriod,
-                Simulator.SolarSystem.Sun.AxisOfRotation,
+                Simulator.SolarSystemBodies.Sun.Mass,
+                Simulator.SolarSystemBodies.Sun.Radius,
+                Simulator.SolarSystemBodies.Sun.RotationalPeriod,
+                Simulator.SolarSystemBodies.Sun.AxisOfRotation,
                 new NoAtmosphereModel(),
                 null,
                 new ObjectState(),
@@ -44,7 +44,14 @@ namespace SpaceSimulator.Simulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();
 
-            PlanetObject AddPlanet(NaturalSatelliteObject primaryBody, string name, SolarSystemBody body, Color color, string textureName)
+            PlanetObject AddPlanet(
+                NaturalSatelliteObject primaryBody,
+                string name,
+                SolarSystemBody body,
+                Color color,
+                string textureName,
+                Color? ringColor = null,
+                double ringRadius = 0)
             {
                 var orbit = new OrbitPosition(body.Orbit(primaryBody), 0.0);
                 var newObject = simulatorEngine.AddPlanetInOrbit(
@@ -56,31 +63,47 @@ namespace SpaceSimulator.Simulator.Environments
                     body.AxisOfRotation,
                     new NoAtmosphereModel(),
                     orbit);
-                renderingObjects.Add(new RenderingObject(graphicsDevice, camera, color, textureName, newObject));
+                renderingObjects.Add(new RenderingObject(
+                    graphicsDevice,
+                    camera,
+                    newObject,
+                    color,
+                    textureName,
+                    ringColor: ringColor,
+                    ringRadius: ringRadius));
                 return newObject;
             }
 
             var baseDir = "Content/Textures/Planets/";
 
-            var sunRenderingObject = new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Sun.jpg", sun);
+            var sunRenderingObject = new RenderingObject(graphicsDevice, camera, sun, Color.Yellow, baseDir + "Sun.jpg");
+            renderingObjects.Add(sunRenderingObject);
 
-            AddPlanet(sun, "Mercury", Simulator.SolarSystem.Mercury, Color.Gray, baseDir + "Mercury.png");
-            AddPlanet(sun, "Venus", Simulator.SolarSystem.Venus, new Color(255, 89, 0, 255), baseDir + "Venus2.jpg");
-            var earth = AddPlanet(sun, "Earth", Simulator.SolarSystem.Earth, Color.Green, baseDir + "Earth.jpg");
-            AddPlanet(earth, "Moon", Simulator.SolarSystem.Moon, Color.Magenta, baseDir + "Moon.jpg");
-            var mars = AddPlanet(sun, "Mars", Simulator.SolarSystem.Mars, Color.Red, baseDir + "Mars4.png");
-            AddPlanet(sun, "Jupiter", Simulator.SolarSystem.Jupiter, new Color(255, 106, 0, 255), baseDir + "Jupiter.jpg");
-            AddPlanet(sun, "Saturn", Simulator.SolarSystem.Saturn, new Color(255, 167, 0, 255), baseDir + "Saturn.jpg");
-            AddPlanet(sun, "Uranus", Simulator.SolarSystem.Uranus, Color.Blue, baseDir + "Uranus.jpg");
-            AddPlanet(sun, "Neptune", Simulator.SolarSystem.Neptune, new Color(0, 148, 255, 255), baseDir + "Neptune.jpg");
-            var pluto = AddPlanet(sun, "Pluto", Simulator.SolarSystem.Pluto, new Color(143, 115, 87, 255), baseDir + "Pluto.png");
+            AddPlanet(sun, "Mercury", Simulator.SolarSystemBodies.Mercury, Color.Gray, baseDir + "Mercury.png");
+            AddPlanet(sun, "Venus", Simulator.SolarSystemBodies.Venus, new Color(255, 89, 0, 255), baseDir + "Venus2.jpg");
+            var earth = AddPlanet(sun, "Earth", Simulator.SolarSystemBodies.Earth, Color.Green, baseDir + "Earth.jpg");
+            AddPlanet(earth, "Moon", Simulator.SolarSystemBodies.Moon, Color.Magenta, baseDir + "Moon.jpg");
+            var mars = AddPlanet(sun, "Mars", Simulator.SolarSystemBodies.Mars, Color.Red, baseDir + "Mars4.png");
+            AddPlanet(sun, "Jupiter", Simulator.SolarSystemBodies.Jupiter, new Color(255, 106, 0, 255), baseDir + "Jupiter.jpg");
+            var saturn = AddPlanet(
+                sun,
+                "Saturn",
+                Simulator.SolarSystemBodies.Saturn,
+                new Color(255, 167, 0, 255),
+                baseDir + "Saturn.jpg",
+                ringColor: new Color(255, 227, 107),
+                ringRadius: 1.4 * Simulator.SolarSystemBodies.Saturn.Radius);
+
+            AddPlanet(sun, "Uranus", Simulator.SolarSystemBodies.Uranus, Color.Blue, baseDir + "Uranus.jpg");
+            AddPlanet(sun, "Neptune", Simulator.SolarSystemBodies.Neptune, new Color(0, 148, 255, 255), baseDir + "Neptune.jpg");
+            var pluto = AddPlanet(sun, "Pluto", Simulator.SolarSystemBodies.Pluto, new Color(143, 115, 87, 255), baseDir + "Pluto.png");
 
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Satellite.png", satellite1));
+                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             //var satellite2 = simulatorEngine.AddObjectInOrbit(
             //    "Satellite 2",
@@ -104,7 +127,7 @@ namespace SpaceSimulator.Simulator.Environments
             //    isRealSize: false);
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite3));
 
-            return (simulatorEngine, sunRenderingObject, renderingObjects);
+            return (simulatorEngine, renderingObjects);
         }
     }
 }

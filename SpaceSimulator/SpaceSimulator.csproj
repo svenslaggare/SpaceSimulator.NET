@@ -88,7 +88,6 @@
     <Compile Include="Common\Camera\FPSCamera.cs" />
     <Compile Include="Common\Camera\OrbitCamera.cs" />
     <Compile Include="Common\D3DApp.cs" />
-    <Compile Include="Common\Rendering2D.cs" />
     <Compile Include="Common\Effects\BasicEffect.cs" />
     <Compile Include="Common\Effects\BlendStates.cs" />
     <Compile Include="Common\Effects\DepthStencilStates.cs" />
@@ -106,6 +105,10 @@
     <Compile Include="Common\Models\GeometryGenerator.cs" />
     <Compile Include="Common\Models\ModelLoader.cs" />
     <Compile Include="Common\Input\KeyboardManager.cs" />
+    <Compile Include="Common\Rendering2D\RenderingBrushes.cs" />
+    <Compile Include="Common\Rendering2D\RenderingImage2D.cs" />
+    <Compile Include="Common\Rendering2D\RenderingManager2D.cs" />
+    <Compile Include="Common\Rendering2D\RenderingPathGeometry.cs" />
     <Compile Include="Common\RenderToTexture.cs" />
     <Compile Include="Common\TextureHelpers.cs" />
     <Compile Include="Common\UI\ButtonUIObject.cs" />
@@ -192,7 +195,7 @@
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
-    <Compile Include="Simulator\SolarSystem.cs" />
+    <Compile Include="Simulator\SolarSystemBodies.cs" />
     <Compile Include="Simulator\SolarSystemBody.cs" />
     <Compile Include="SpaceSimulatorApp.cs" />
     <Compile Include="SimulatorContainer.cs" />

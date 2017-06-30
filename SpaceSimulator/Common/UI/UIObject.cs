@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
+using SpaceSimulator.Common.Rendering2D;
 
 namespace SpaceSimulator.Common.UI
 {

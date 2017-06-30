@@ -26,18 +26,18 @@ namespace SpaceSimulator.Simulator.Environments
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="camera">The camera</param>
-        /// <returns>Simulator engine, earth rendering object, other rendering objects</returns>
-        public static (SimulatorEngine, RenderingObject, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera)
+        /// <returns>Simulator engine, rendering objects</returns>
+        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera)
         {
             var baseDir = "Content/Textures/Planets/";
 
             var earth = new PlanetObject(
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
-                Simulator.SolarSystem.Earth.Mass,
-                Simulator.SolarSystem.Earth.Radius,
-                Simulator.SolarSystem.Earth.RotationalPeriod,
-                Simulator.SolarSystem.Earth.AxisOfRotation,
+                Simulator.SolarSystemBodies.Earth.Mass,
+                Simulator.SolarSystemBodies.Earth.Radius,
+                Simulator.SolarSystemBodies.Earth.RotationalPeriod,
+                Simulator.SolarSystemBodies.Earth.AxisOfRotation,
                 new EarthAtmosphericModel(),
                 null,
                 new ObjectState(),
@@ -46,22 +46,22 @@ namespace SpaceSimulator.Simulator.Environments
             var earthRenderingObject = new RenderingObject(
                 graphicsDevice,
                 camera,
+                earth,
                 Color.Yellow,
                 baseDir + "Earth.jpg",
-                earth,
                 MathUtil.DegreesToRadians(180.0f));
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
-            var renderingObjects = new List<RenderingObject>();
+            var renderingObjects = new List<RenderingObject>() { earthRenderingObject };
 
             simulatorEngine.ObjectAdded += (sender, newObject) =>
             {
                 renderingObjects.Add(new RenderingObject(
                     graphicsDevice,
                     camera,
+                    newObject,
                     Color.Yellow,
-                    baseDir + "Satellite.png",
-                    newObject));
+                    baseDir + "Satellite.png"));
             };
 
             //var moon = simulatorEngine.AddPlanetInOrbit(
@@ -84,7 +84,7 @@ namespace SpaceSimulator.Simulator.Environments
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
                 Vector3d.Zero);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Satellite.png", falcon9Object));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
             //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
             //    simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
@@ -93,7 +93,13 @@ namespace SpaceSimulator.Simulator.Environments
             //    falcon9TargetOrbit);
             var bestPitchStart = 2E3;
             var bestPitchEnd = 12.8625E3;
-            falcon9Object.SetControlProgram(new AscentControlProgram(falcon9Object, falcon9TargetOrbit, bestPitchStart, bestPitchEnd, simulatorEngine.TextOutputWriter));
+            falcon9Object.SetControlProgram(new AscentControlProgram(
+                falcon9Object,
+                falcon9TargetOrbit,
+                bestPitchStart,
+                bestPitchEnd,
+                simulatorEngine.TextOutputWriter));
+
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartEngine();
 
@@ -104,7 +110,7 @@ namespace SpaceSimulator.Simulator.Environments
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
 
             var orbitPosition2 = new OrbitPosition(
-                Physics.Orbit.New(earth, parameter: 3.0 * Simulator.SolarSystem.Earth.Radius, eccentricity: 0.0),
+                Physics.Orbit.New(earth, parameter: 3.0 * Simulator.SolarSystemBodies.Earth.Radius, eccentricity: 0.0),
                 87.2 * MathUtild.Deg2Rad);
 
             var object2 = simulatorEngine.AddSatelliteInOrbit(
@@ -112,7 +118,7 @@ namespace SpaceSimulator.Simulator.Environments
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 orbitPosition2);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, Color.Yellow, baseDir + "Satellite.png", object2));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, object2, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddObject(
             //    PhysicsObjectType.ArtificialSatellite,
@@ -138,7 +144,7 @@ namespace SpaceSimulator.Simulator.Environments
             //Console.WriteLine($"Computed in {(DateTime.UtcNow - startTime).TotalSeconds} seconds.");
             //simulatorEngine.ScheduleManeuver(rocketObject, maneuvers);
 
-            return (simulatorEngine, earthRenderingObject, renderingObjects);
+            return (simulatorEngine, renderingObjects);
         }
     }
 }

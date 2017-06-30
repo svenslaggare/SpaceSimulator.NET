@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using SpaceSimulator.Common.Rendering2D;
 
 namespace SpaceSimulator.Common
 {
@@ -37,9 +38,7 @@ namespace SpaceSimulator.Common
             this.graphicsDevice = graphicsDevice;
 
             var textureDescription = backBufferDescription;
-            //textureDescription.SampleDescription = new SampleDescription(1, 0);
             textureDescription.BindFlags = BindFlags.RenderTarget;
-
             this.texture = new Texture2D(this.graphicsDevice, textureDescription);
             this.textureRenderTargetView = new RenderTargetView(this.graphicsDevice, this.texture);
 

@@ -8,6 +8,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using SharpDX.Mathematics.Interop;
 using SpaceSimulator.Common;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;
 
 namespace SpaceSimulator.Rendering

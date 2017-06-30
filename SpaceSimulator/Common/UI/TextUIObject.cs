@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
+using SpaceSimulator.Common.Rendering2D;
 
 namespace SpaceSimulator.Common.UI
 {

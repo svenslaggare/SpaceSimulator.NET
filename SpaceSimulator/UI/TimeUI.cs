@@ -8,6 +8,7 @@ using SharpDX.DirectInput;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Simulator;
 

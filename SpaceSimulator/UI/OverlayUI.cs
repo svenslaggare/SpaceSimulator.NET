@@ -12,6 +12,7 @@ using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Models;
+using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
@@ -54,6 +55,21 @@ namespace SpaceSimulator.UI
             /// The thumbnail
             /// </summary>
             public RenderingImage2D Thumbnail { get; set; }
+
+            /// <summary>
+            /// The scale which the thumbnail is being drawn with
+            /// </summary>
+            public float ThumbnailScale { get; } = 1.0f / 32.0f;
+
+            /// <summary>
+            /// The size of the drawn thumbnail
+            /// </summary>
+            public Vector2 ThumbnailSize => this.ThumbnailScale * new Vector2(this.Thumbnail.Size.Width, this.Thumbnail.Size.Height);
+
+            /// <summary>
+            /// Indicates if the text is being drawn
+            /// </summary>
+            public bool DrawText { get; set; }
 
             /// <summary>
             /// Indicates if the thumbnail is being drawn
@@ -154,7 +170,6 @@ namespace SpaceSimulator.UI
                         renderingObject.DrawSphere(
                             deviceContext,
                             this.thumbnailEffect,
-                            this.camera,
                             pass,
                             position: Vector3.Zero);
                     }
@@ -199,7 +214,7 @@ namespace SpaceSimulator.UI
                     {
                         if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
                         {
-                            this.GetRenderedMinAndMax(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
+                            this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
                             selected = screenMouseDistance <= renderedRadius;
                         }
                     }
@@ -214,13 +229,13 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
-        /// Returns the rendered min and max positions
+        /// Returns the rendered size of the given position
         /// </summary>
         /// <param name="physicsObject">The physics object</param>
         /// <param name="minPosition">The min position</param>
         /// <param name="maxPosition">The max position</param>
         /// <param name="renderedRadius">The rendered radius</param>
-        private void GetRenderedMinAndMax(NaturalSatelliteObject physicsObject, out Vector2 minPosition, out Vector2 maxPosition, out float renderedRadius)
+        private void GetRenderedSize(NaturalSatelliteObject physicsObject, out Vector2 minPosition, out Vector2 maxPosition, out float renderedRadius)
         {
             var spherePositions = this.spherePoints.Select(x => physicsObject.Position + physicsObject.Radius * x);
 
@@ -244,52 +259,46 @@ namespace SpaceSimulator.UI
             }
         }
 
+        /// <summary>
+        /// Determines the visibility of the given overlay object
+        /// </summary>
+        /// <param name="overlayObject">The overlay object</param>
+        private void DetermineOverlayVisiblity(OverlayObject overlayObject)
+        {
+            overlayObject.DrawText = true;
+            overlayObject.DrawThumbnail = true;
+
+            if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
+            {
+                this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
+                var screenWidth = maxPosition.X - minPosition.X;
+                var screenHeight = maxPosition.Y - minPosition.Y;
+
+                overlayObject.DrawText = screenWidth * screenWidth <= 100.0f;
+                var drawnSize = overlayObject.ThumbnailSize;
+                overlayObject.DrawThumbnail = screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
+            }
+        }
+
         public override void BeforeFirstDraw(DeviceContext deviceContext)
         {
             this.CreateThumbnails();
         }
 
-        public override void Draw(DeviceContext deviceContext)
+        /// <summary>
+        /// Draws the overlay
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        private void DrawOverlay(DeviceContext deviceContext)
         {
             foreach (var overlayObject in this.overlayObjects)
             {
                 var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
-                var drawText = true;
-                var drawThumbnail = true;
-
-                var scaling = 1.0f / 32.0f;
-                //var scaling = 1.0f;
-                var originalWidth = overlayObject.Thumbnail.Size.Width;
-                var originalHeight = overlayObject.Thumbnail.Size.Height;
-                var width = originalWidth * scaling;
-                var height = originalHeight * scaling;
-
-                //var center = screenPosition;
-                //var radius = 12.0f;
-
-                if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
-                {
-                    this.GetRenderedMinAndMax(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
-                    var screenWidth = maxPosition.X - minPosition.X;
-                    var screenHeight = maxPosition.Y - minPosition.Y;
-
-                    drawText = screenWidth * screenWidth <= 100.0f;
-                    drawThumbnail = screenWidth < width && screenHeight < height;
-
-                    //radius = (maxPosition - minPosition).Length() * 0.36f;
-                    //radius = renderedRadius;
-                }
-
-                //this.RenderingManager2D.DefaultSolidColorBrush.Color = new Color(255, 0, 0, 128);
-                //this.RenderingManager2D.DefaultSolidColorBrush.ApplyResource(brush =>
-                //{
-                //    deviceContext.FillEllipse(
-                //        new Ellipse(center, radius, radius),
-                //        brush);
-                //});
+                this.DetermineOverlayVisiblity(overlayObject);
 
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
-                if (drawThumbnail 
+                if (overlayObject.DrawThumbnail
+                    && physicsObject.Type != PhysicsObjectType.ArtificialSatellite
                     && (physicsObject.PrimaryBody == this.SimulatorEngine.ObjectOfReference || physicsObject.IsObjectOfReference))
                 {
                     overlayObject.Thumbnail.ApplyResource(bitmap =>
@@ -298,14 +307,15 @@ namespace SpaceSimulator.UI
                             bitmap,
                             1.0f,
                             SharpDX.Direct2D1.InterpolationMode.MultiSampleLinear,
-                            new RectangleF(0, 0, originalWidth, originalHeight),
-                            Matrix.Scaling(scaling) * Matrix.Translation(screenPosition.X - width / 2.0f, screenPosition.Y - height / 2.0f, 0));
+                            new RectangleF(0, 0, overlayObject.Thumbnail.Size.Width, overlayObject.Thumbnail.Size.Height),
+                            Matrix.Scaling(overlayObject.ThumbnailScale)
+                            * Matrix.Translation(
+                                screenPosition.X - overlayObject.ThumbnailSize.X / 2.0f,
+                                screenPosition.Y - overlayObject.ThumbnailSize.Y / 2.0f, 0));
                     });
                 }
 
-                overlayObject.DrawThumbnail = drawThumbnail;
-
-                if (drawText)
+                if (overlayObject.DrawText)
                 {
                     this.RenderingManager2D.DefaultSolidColorBrush.DrawText(
                         deviceContext,
@@ -314,9 +324,19 @@ namespace SpaceSimulator.UI
                         this.RenderingManager2D.TextPosition(
                             screenPosition - new Vector2(
                                 overlayObject.TextSize.Width / 2.0f,
-                                overlayObject.TextSize.Height + height / 2.0f)));
+                                overlayObject.TextSize.Height + overlayObject.ThumbnailSize.Y / 2.0f)));
                 }
             }
+        }
+
+        public override void DrawBefore3D(DeviceContext deviceContext)
+        {
+            //this.DrawOverlay(deviceContext);
+        }
+
+        public override void Draw(DeviceContext deviceContext)
+        {
+            this.DrawOverlay(deviceContext);
         }
 
         public override void Dispose()
