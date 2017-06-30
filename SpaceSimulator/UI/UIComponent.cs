@@ -13,7 +13,7 @@ namespace SpaceSimulator.UI
     /// <summary>
     /// Represents an UI component
     /// </summary>
-    public abstract class UIComponent
+    public abstract class UIComponent : IDisposable
     {
         protected RenderingManager2D RenderingManager2D { get; }
         protected KeyboardManager KeyboardManager { get; }
@@ -67,9 +67,23 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Called before the first frame is drawn
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        public virtual void BeforeFirstDraw(SharpDX.Direct2D1.DeviceContext deviceContext)
+        {
+
+        }
+
+        /// <summary>
         /// Draws the component
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         public abstract void Draw(SharpDX.Direct2D1.DeviceContext deviceContext);
+
+        public virtual void Dispose()
+        {
+           
+        }
     }
 }

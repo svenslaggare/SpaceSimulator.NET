@@ -45,17 +45,18 @@ namespace SpaceSimulator.Common
 
         private bool resized = true;
 
-
         private Texture2D backBuffer;
-		private RenderTargetView renderView;
+		private RenderTargetView backBufferRenderView;
 		private Texture2D depthBuffer;
-		private DepthStencilView depthView;
+		private DepthStencilView backBufferDepthView;
 
         private SharpDX.Direct2D1.DeviceContext deviceContext2D;
         private RenderingManager2D renderingManager2D;
     
         private BaseCamera camera;
         private KeyboardManager keyboardManager;
+
+        private RenderToTexture renderToTexture;
 
         private int frameCount;
 		private float elapsed;
@@ -98,10 +99,10 @@ namespace SpaceSimulator.Common
 			get { return this.graphicsDevice; }
 		}
 
-		/// <summary>
-		/// Returns the swap chain
-		/// </summary>
-		protected SwapChain SwapChain
+        /// <summary>
+        /// Returns the swap chain
+        /// </summary>
+        public SwapChain SwapChain
 		{
 			get { return this.swapChain; }
 		}
@@ -117,18 +118,28 @@ namespace SpaceSimulator.Common
 		/// <summary>
 		/// Returns the render view
 		/// </summary>
-		protected RenderTargetView RenderView
+		public RenderTargetView BackBufferRenderView
 		{
-			get { return this.renderView; }
+			get { return this.backBufferRenderView; }
 		}
 
-		/// <summary>
-		/// Returns the depth view
-		/// </summary>
-		protected DepthStencilView DepthView
+        /// <summary>
+        /// Returns the depth view
+        /// </summary>
+        public DepthStencilView BackBufferDepthView
 		{
-			get { return this.depthView; }
+			get { return this.backBufferDepthView; }
 		}
+
+        /// <summary>
+        /// Returns the description for the back buffer
+        /// </summary>
+        public Texture2DDescription BackBufferDescription => this.backBuffer.Description;
+
+        /// <summary>
+        /// Returns the description for the depth back buffer
+        /// </summary>
+        public Texture2DDescription BackBufferDepthDescription => this.depthBuffer.Description;
 
         /// <summary>
         /// Returns the D2D context
@@ -141,7 +152,7 @@ namespace SpaceSimulator.Common
         /// <summary>
         /// Returns the rendering 2D manager
         /// </summary>
-        protected RenderingManager2D RenderingManager2D
+        public RenderingManager2D RenderingManager2D
         {
             get { return this.renderingManager2D; }
         }
@@ -149,7 +160,7 @@ namespace SpaceSimulator.Common
         /// <summary>
         /// Returns the camera
         /// </summary>
-        protected BaseCamera Camera
+        public BaseCamera Camera
         {
             get { return this.camera; }
         }
@@ -157,7 +168,7 @@ namespace SpaceSimulator.Common
         /// <summary>
         /// Returns the keyboard manager
         /// </summary>
-        protected KeyboardManager KeyboardManager
+        public KeyboardManager KeyboardManager
 		{
 			get { return this.keyboardManager; }
 		}
@@ -170,10 +181,35 @@ namespace SpaceSimulator.Common
 			get { return this.totalTimeWatch.Elapsed; }
 		}
 
-		/// <summary>
-		/// Creates the device
-		/// </summary>
-		private void CreateDevice()
+        /// <summary>
+        /// Renders to texture
+        /// </summary>
+        /// <param name="backgroundColor">The background color</param>
+        /// <param name="render">The render function</param>
+        public RenderingImage2D RenderToTexture(Color backgroundColor, Action<SharpDX.Direct3D11.DeviceContext> render)
+        {
+            if (this.renderToTexture == null)
+            {
+                this.renderToTexture = new RenderToTexture(
+                    this.GraphicsDevice,
+                    this.BackBufferDescription,
+                    this.BackBufferDepthDescription);
+            }
+
+            var image = this.renderToTexture.Render(
+                this.deviceContext,
+                this.BackBufferRenderView,
+                this.backBufferDepthView,
+                backgroundColor,
+                render);
+            this.RenderingManager2D.AddResource(image);
+            return image;
+        }
+
+        /// <summary>
+        /// Creates the device
+        /// </summary>
+        private void CreateDevice()
 		{
             this.sampleDescription = new SampleDescription(4, 0);
             //this.sampleDescription = new SampleDescription(1, 0);
@@ -196,8 +232,8 @@ namespace SpaceSimulator.Common
 
             Device.CreateWithSwapChain(
 				DriverType.Hardware,
-                //DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug,
-                DeviceCreationFlags.BgraSupport,
+                DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug,
+                //DeviceCreationFlags.BgraSupport,
                 swapChainDescription,
 				out this.graphicsDevice,
 				out this.swapChain);
@@ -214,13 +250,14 @@ namespace SpaceSimulator.Common
         /// <summary>
         /// Resizes the render buffers
         /// </summary>
-        private void ResizeRenderBuffers()
+        /// <param name="isFirstTime">Indicates if this is the first time the buffers are resized</param>
+        private void ResizeRenderBuffers(bool isFirstTime = false)
 		{
 			//Dispose all previous allocated resources
 			Utilities.Dispose(ref this.backBuffer);
-			Utilities.Dispose(ref this.renderView);
+			Utilities.Dispose(ref this.backBufferRenderView);
 			Utilities.Dispose(ref this.depthBuffer);
-			Utilities.Dispose(ref this.depthView);
+			Utilities.Dispose(ref this.backBufferDepthView);
 
             Utilities.Dispose(ref this.deviceContext2D);
 
@@ -236,7 +273,7 @@ namespace SpaceSimulator.Common
 			this.backBuffer = Texture2D.FromSwapChain<Texture2D>(this.swapChain, 0);
 
 			//Renderview on the backbuffer
-			this.renderView = new RenderTargetView(this.graphicsDevice, this.backBuffer);
+			this.backBufferRenderView = new RenderTargetView(this.graphicsDevice, this.backBuffer);
 
 			//Create the depth buffer
 			this.depthBuffer = new Texture2D(this.graphicsDevice, new Texture2DDescription()
@@ -254,7 +291,7 @@ namespace SpaceSimulator.Common
             });
 
             //Create the depth buffer view
-            this.depthView = new DepthStencilView(this.graphicsDevice, this.depthBuffer);
+            this.backBufferDepthView = new DepthStencilView(this.graphicsDevice, this.depthBuffer);
             
             //Setup targets and viewport for rendering
             this.deviceContext.Rasterizer.SetViewport(new Viewport(
@@ -265,7 +302,7 @@ namespace SpaceSimulator.Common
                 0.0f,
                 1.0f));
 
-            this.deviceContext.OutputMerger.SetTargets(depthView, renderView);
+            this.deviceContext.OutputMerger.SetTargets(backBufferDepthView, backBufferRenderView);
 
             this.renderForm.Resize += (sender, e) =>
             {
@@ -276,12 +313,15 @@ namespace SpaceSimulator.Common
                 }
             };
 
-            using (var backBuffer = swapChain.GetBackBuffer<Surface>(0))
+            using (var backBuffer = this.swapChain.GetBackBuffer<Surface>(0))
             {
                 this.deviceContext2D = new SharpDX.Direct2D1.DeviceContext(backBuffer);
             }
 
-            this.renderingManager2D.Update(this.deviceContext2D);
+            if (!isFirstTime)
+            {
+                this.renderingManager2D.Update(this.deviceContext2D);
+            }
         }
 
         /// <summary>
@@ -291,7 +331,8 @@ namespace SpaceSimulator.Common
 		{
             this.camera.SetLens(
                 0.25f * MathUtil.Pi,
-                this.RenderForm.ClientSize.Width / (float)this.RenderForm.ClientSize.Height,
+                this.RenderForm.ClientSize.Width,
+                this.RenderForm.ClientSize.Height,
                 0.001f,
                 100000.0f);
 		}
@@ -370,6 +411,14 @@ namespace SpaceSimulator.Common
             this.camera.UpdateViewMatrix();
         }
 
+        /// <summary>
+        /// Called before the first frame is drawn
+        /// </summary>
+        public virtual void BeforeFirstDraw()
+        {
+
+        }
+
 		/// <summary>
 		/// Draws the application
 		/// </summary>
@@ -389,12 +438,13 @@ namespace SpaceSimulator.Common
 			this.totalTimeWatch = new Stopwatch();
 			this.totalTimeWatch.Start();
             var hasLoaded = false;
+            var firstFrame = true;
 
 			RenderLoop.Run(this.renderForm, () =>
 			{
 				if (this.resized)
 				{
-                    this.ResizeRenderBuffers();
+                    this.ResizeRenderBuffers(!hasLoaded);
                     this.OnResized();
 					this.resized = false;
 
@@ -403,7 +453,7 @@ namespace SpaceSimulator.Common
                         this.LoadContent();
                         hasLoaded = true;
                     }
-				}
+                }
 
 				this.elapsed += (float)elapsed.TotalMilliseconds;
 
@@ -420,6 +470,14 @@ namespace SpaceSimulator.Common
 
 				this.renderForm.Text = this.title + " FPS: " + this.fps;
 				this.Update(elapsed);
+
+                if (firstFrame)
+                {
+                    this.BeforeFirstDraw();
+                    this.renderingManager2D.Update(this.deviceContext2D);
+                    firstFrame = false;
+                }
+
                 this.Draw(elapsed);
 
                 elapsed = clock.Elapsed;
@@ -433,8 +491,8 @@ namespace SpaceSimulator.Common
 		public virtual void Dispose()
 		{
 			this.depthBuffer.Dispose();
-			this.depthView.Dispose();
-			this.renderView.Dispose();
+			this.backBufferDepthView.Dispose();
+			this.backBufferRenderView.Dispose();
 			this.backBuffer.Dispose();
 
 			this.deviceContext.ClearState();

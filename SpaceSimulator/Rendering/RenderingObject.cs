@@ -79,7 +79,6 @@ namespace SpaceSimulator.Rendering
                     this.camera,
                     this.positions,
                     orbitColor,
-                    6 * 0.25f,
                     physicsObject.Type != PhysicsObjectType.ArtificialSatellite);
             }
 
@@ -90,7 +89,6 @@ namespace SpaceSimulator.Rendering
                 this.camera,
                 new List<Rendering.Orbit.Point>(),
                 new Color(124, 117, 6),
-                3.0f,
                 false);
 
             this.baseRotationY = baseRotationY;
@@ -173,10 +171,10 @@ namespace SpaceSimulator.Rendering
         /// <param name="deviceContext">The device context</param>
         /// <param name="sunEffect">The sun effect</param>
         /// <param name="planetEffect">The planet effect</param>
-        /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="pass">The effect pass</param>
-        private void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
+        /// <param name="position">The position to draw at.</param>
+        public void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, BaseCamera camera, EffectPass pass, Vector3? position = null)
         {
             this.renderingSphere.Draw(
                 deviceContext,
@@ -185,18 +183,17 @@ namespace SpaceSimulator.Rendering
                 camera,
                 this.ScalingMatrix
                 * Matrix.RotationY(this.baseRotationY - (float)this.PhysicsObject.Rotation)
-                * Matrix.Translation(this.DrawPosition));
+                * Matrix.Translation(position ?? this.DrawPosition));
         }
 
         /// <summary>
         /// Draws the orbit
         /// </summary>
         /// <param name="deviceContext">The device context</param>
-        /// <param name="planetEffect">The planet effect</param>
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="pass">The effect pass</param>
-        private void DrawOrbit(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
+        public void DrawOrbit(DeviceContext deviceContext, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
         {
             if (!this.PhysicsObject.HasImpacted)
             {
@@ -214,11 +211,10 @@ namespace SpaceSimulator.Rendering
         /// Draws the next maneuver
         /// </summary>
         /// <param name="deviceContext">The device context</param>
-        /// <param name="planetEffect">The planet effect</param>
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="pass">The effect pass</param>
-        private void DrawNextManeuver(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
+        private void DrawNextManeuver(DeviceContext deviceContext, OrbitEffect orbitEffect, BaseCamera camera, EffectPass pass)
         {
             if (this.drawNextManeuver)
             {
@@ -315,11 +311,12 @@ namespace SpaceSimulator.Rendering
         {
             //Draw planet
             planetEffect.SetEyePosition(camera.Position);
+            planetEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
 
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)
             {
-                this.DrawSphere(deviceContext, planetEffect, orbitEffect, camera, pass);
+                this.DrawSphere(deviceContext, planetEffect, camera, pass);
             }
 
             //Draw orbit
@@ -329,7 +326,7 @@ namespace SpaceSimulator.Rendering
                 if (this.renderingOrbit != null)
                 {
                     this.UpdatePassedPositions();
-                    this.DrawOrbit(deviceContext, planetEffect, orbitEffect, camera, pass);
+                    this.DrawOrbit(deviceContext, orbitEffect, camera, pass);
                 }
             }
         }
@@ -354,7 +351,7 @@ namespace SpaceSimulator.Rendering
             {
                 foreach (var currentObject in objects)
                 {
-                    currentObject.DrawSphere(deviceContext, planetEffect, orbitEffect, camera, pass);
+                    currentObject.DrawSphere(deviceContext, planetEffect, camera, pass);
                 }
             }
 
@@ -365,8 +362,8 @@ namespace SpaceSimulator.Rendering
                 foreach (var currentObject in objects)
                 {
                     currentObject.UpdatePassedPositions();
-                    currentObject.DrawOrbit(deviceContext, planetEffect, orbitEffect, camera, pass);
-                    currentObject.DrawNextManeuver(deviceContext, planetEffect, orbitEffect, camera, pass);
+                    currentObject.DrawOrbit(deviceContext, orbitEffect, camera, pass);
+                    currentObject.DrawNextManeuver(deviceContext, orbitEffect, camera, pass);
                 }
             }
         }

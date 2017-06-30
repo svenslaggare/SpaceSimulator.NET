@@ -55,11 +55,11 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
-            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
-
-            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            (this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera);
             this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+
+            //(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
             this.OrbitCamera.MaxRadius = 15000.0f;
@@ -71,11 +71,7 @@ namespace SpaceSimulator
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
 
-            this.simulatorContainer = new SimulatorContainer(this.simulatorEngine);
-            this.uiComponents.Add(new TimeUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
-            this.uiComponents.Add(new SelectedObjectUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
-            this.uiComponents.Add(new CameraUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.OrbitCamera));
-            this.uiComponents.Add(new ManeuverUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.uiManager, this.uiStyle));
+            this.simulatorContainer = new SimulatorContainer(this.simulatorEngine, this.referenceRenderingObject, this.renderingObjects);
         }
 
         /// <summary>
@@ -107,6 +103,18 @@ namespace SpaceSimulator
         {
             base.Initialize();
             this.CreateEffect();
+
+            this.uiComponents.Add(new TimeUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
+            this.uiComponents.Add(new SelectedObjectUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
+            this.uiComponents.Add(new CameraUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.OrbitCamera));
+            this.uiComponents.Add(new ManeuverUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.uiManager, this.uiStyle));
+            this.uiComponents.Add(new OverlayUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.simulatorContainer,
+                this.OrbitCamera,
+                this.sunEffect,
+                this));
 
             //var values = new List<Vector2>();
             //var earthAtmosphericModel = new EarthAtmosphericModel();
@@ -160,6 +168,14 @@ namespace SpaceSimulator
             base.Update(elapsed);
         }
 
+        public override void BeforeFirstDraw()
+        {
+            foreach (var component in this.uiComponents)
+            {
+                component.BeforeFirstDraw(this.DeviceContext2D);
+            }
+        }
+
         /// <summary>
         /// Draws the application
         /// </summary>
@@ -167,8 +183,8 @@ namespace SpaceSimulator
         public override void Draw(TimeSpan elapsed)
         {
             //Clear views
-            this.DeviceContext.ClearDepthStencilView(this.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            this.DeviceContext.ClearRenderTargetView(this.RenderView, Color.Black);
+            this.DeviceContext.ClearDepthStencilView(this.BackBufferDepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
+            this.DeviceContext.ClearRenderTargetView(this.BackBufferRenderView, Color.Black);
 
             //Draw 3D
             this.referenceRenderingObject.Draw(this.DeviceContext, this.sunEffect, this.orbitEffect, this.Camera);
@@ -181,17 +197,6 @@ namespace SpaceSimulator
             {
                 component.Draw(this.DeviceContext2D);
             }
-
-            //var textBuilder = new StringBuilder();
-            //foreach (var currentObject in this.renderingObjects)
-            //{
-            //    textBuilder.AppendLine($"{currentObject.PhysicsObject.Name}: {currentObject.DrawPosition}");
-            //}
-            //this.RenderingManager2D.DefaultSolidColorBrush.DrawText(
-            //    this.DeviceContext2D,
-            //    textBuilder.ToString(),
-            //    this.RenderingManager2D.DefaultTextFormat,
-            //    this.RenderingManager2D.TextPosition(new Vector2(1000, 60)));
 
             this.uiManager.Draw(this.DeviceContext2D);
             //this.plot2D.Draw(this.DeviceContext2D, new Vector2(400, 200));
@@ -215,6 +220,11 @@ namespace SpaceSimulator
             foreach (var currentObject in this.renderingObjects)
             {
                 currentObject.Dispose();
+            }
+
+            foreach (var uiComponent in this.uiComponents)
+            {
+                uiComponent.Dispose();
             }
 
             base.Dispose();

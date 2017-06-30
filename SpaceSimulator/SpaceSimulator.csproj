@@ -106,6 +106,7 @@
     <Compile Include="Common\Models\GeometryGenerator.cs" />
     <Compile Include="Common\Models\ModelLoader.cs" />
     <Compile Include="Common\Input\KeyboardManager.cs" />
+    <Compile Include="Common\RenderToTexture.cs" />
     <Compile Include="Common\TextureHelpers.cs" />
     <Compile Include="Common\UI\ButtonUIObject.cs" />
     <Compile Include="Common\UI\ImageUIObject.cs" />
@@ -198,6 +199,7 @@
     <Compile Include="UI\CameraUI.cs" />
     <Compile Include="UI\ManeuverUI.cs" />
     <Compile Include="UI\SelectedObjectUI.cs" />
+    <Compile Include="UI\OverlayUI.cs" />
     <Compile Include="UI\TimeUI.cs" />
     <Compile Include="UI\UIComponent.cs" />
     <Compile Include="UI\UIComponentHelpers.cs" />

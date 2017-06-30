@@ -18,7 +18,7 @@ namespace SpaceSimulator.UI
     /// </summary>
     public class TimeUI : UIComponent
     {
-        private readonly int[] simulationSpeeds = new int[] { 1, 10, 100, 1000, 10000, 100000, 1000000 };
+        private readonly int[] simulationSpeeds = new int[] { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
         private int simulationSpeedIndex = 0;
 
         /// <summary>

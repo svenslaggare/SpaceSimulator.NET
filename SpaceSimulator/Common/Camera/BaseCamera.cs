@@ -22,7 +22,8 @@ namespace SpaceSimulator.Common.Camera
 
         private float nearZ;
         private float farZ;
-        private float aspectRatio;
+        protected float viewportWidth;
+        protected float viewportHeight;
         private float fovY;
         private float nearWindowHeight;
         private float farWindowHeight;
@@ -100,10 +101,7 @@ namespace SpaceSimulator.Common.Camera
         /// <summary>
         /// Returns the aspect ratio
         /// </summary>
-        public float AspectRatio
-        {
-            get { return this.aspectRatio; }
-        }
+        public float AspectRatio => this.viewportWidth / this.viewportHeight;
 
         /// <summary>
         /// Returns the field of view
@@ -177,20 +175,22 @@ namespace SpaceSimulator.Common.Camera
         /// Sets the frustum
         /// </summary>
         /// <param name="fovY">The field of view in the y-direction</param>
-        /// <param name="aspectRatio">The aspect ratio</param>
+        /// <param name="viewportWidth">The width of the viewport</param>
+        /// <param name="viewportHeight">The height of the viewport</param>
         /// <param name="nearPlane">The near plane</param>
         /// <param name="farPlane">The far plane</param>
-        public virtual void SetLens(float fovY, float aspectRatio, float nearPlane, float farPlane)
+        public virtual void SetLens(float fovY, float viewportWidth, float viewportHeight, float nearPlane, float farPlane)
         {
             this.fovY = fovY;
-            this.aspectRatio = aspectRatio;
+            this.viewportWidth = viewportWidth;
+            this.viewportHeight = viewportHeight;
             this.nearZ = nearPlane;
             this.farZ = farPlane;
 
             this.nearWindowHeight = 2.0f * this.nearZ * (float)Math.Tan(0.5f * this.fovY);
             this.farWindowHeight = 2.0f * this.farZ * (float)Math.Tan(0.5f * this.fovY);
 
-            this.projection = Matrix.PerspectiveFovLH(this.fovY, this.aspectRatio, this.nearZ, this.farZ);
+            this.projection = Matrix.PerspectiveFovLH(this.fovY, this.AspectRatio, this.nearZ, this.farZ);
             this.UpdateViewProjection();
         }
 
@@ -261,6 +261,21 @@ namespace SpaceSimulator.Common.Camera
         public virtual void HandleMouseScroll(int delta)
         {
 
+        }
+
+        /// <summary>
+        /// Projects the given position in world space to screen space
+        /// </summary>
+        /// <param name="position">The position in world space</param>
+        /// <returns>The position in screen space</returns>
+        public Vector2 Project(Vector3 position)
+        {
+            var screenPosition = Vector3.TransformCoordinate(position, this.ViewProjection);
+            screenPosition /= screenPosition.Z;
+
+            screenPosition.X = this.viewportWidth * (screenPosition.X + 1.0f) / 2.0f;
+            screenPosition.Y = this.viewportHeight * (1.0f - ((screenPosition.Y + 1.0f) / 2.0f));
+            return new Vector2(screenPosition.X, screenPosition.Y);
         }
 
         /// <summary>

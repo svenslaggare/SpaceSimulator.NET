@@ -31,16 +31,16 @@ namespace SpaceSimulator.Common
     /// </summary>
     public class RenderingImage2D : IRenderingResource2D
     {
-        private readonly DataStream dataStream;
-        private Bitmap currentBitmap;
-
         private readonly int stride;
         private readonly BitmapProperties bitmapProperties;
+        private readonly DataStream dataStream;
+
+        private Bitmap currentBitmap;
 
         /// <summary>
         /// Returns the size of the image
         /// </summary>
-        public Size2 Size { get; private set; }
+        public Size2 Size { get; }
 
         /// <summary>
         /// Creates a new image from the given file
@@ -80,6 +80,20 @@ namespace SpaceSimulator.Common
 
                 bitmap.UnlockBits(bitmapData);
             }
+        }
+
+        /// <summary>
+        /// Creates a new image from the given memory pointer
+        /// </summary>
+        /// <param name="bitmapProperties">The properties for the image</param>
+        /// <param name="size">The size of the image</param>
+        /// <param name="dataStream">A pointer to the memory</param>
+        public RenderingImage2D(BitmapProperties bitmapProperties, Size2 size, DataStream dataStream)
+        {
+            this.stride = sizeof(int) * size.Width;
+            this.bitmapProperties = bitmapProperties;
+            this.Size = size;
+            this.dataStream = dataStream;
         }
 
         /// <summary>
@@ -512,6 +526,16 @@ namespace SpaceSimulator.Common
         }
 
         /// <summary>
+        /// Adds the given resource to list of resources managed by this class
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        /// <remarks>This resource is managed by this class, and is disposed when the class is disposed.</remarks>
+        public void AddResource(IRenderingResource2D resource)
+        {
+            this.resources.Add(resource);
+        }
+
+        /// <summary>
         /// Loads the given image
         /// </summary>
         /// <param name="fileName">The name of the file to load</param>
@@ -580,17 +604,17 @@ namespace SpaceSimulator.Common
         /// <param name="deviceContext">The device context</param>
         public void Update(DeviceContext deviceContext)
         {
-            foreach (var image in this.resources)
+            foreach (var resource in this.resources)
             {
-                image.Update(deviceContext);
+                resource.Update(deviceContext);
             }
         }
 
         public void Dispose()
         {
-            foreach (var image in this.resources)
+            foreach (var resource in this.resources)
             {
-                image.Dispose();
+                resource.Dispose();
             }
 
             this.FontFactory.Dispose();

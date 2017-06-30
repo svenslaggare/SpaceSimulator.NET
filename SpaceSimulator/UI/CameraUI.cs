@@ -83,7 +83,7 @@ namespace SpaceSimulator.UI
 
             if (changed)
             {
-                this.SetScaleFactorFromFocusObject();
+                //this.SetScaleFactorFromFocusObject();
                 this.orbitCamera.Radius = this.GetStartRadius();
             }
         }

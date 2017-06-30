@@ -67,7 +67,6 @@ namespace SpaceSimulator.Rendering
         private readonly BaseCamera camera;
 
         private readonly Color color;
-        private readonly float lineWidth;
         private IList<Point> positions;
 
         private OrbitVertex[] vertices;   
@@ -120,9 +119,8 @@ namespace SpaceSimulator.Rendering
         /// <param name="camera">The camera</param>
         /// <param name="positions">The positions of the points in the orbit</param>
         /// <param name="color">The color of the orbit</param>
-        /// <param name="width">The width of the drawn orbit</param>
         /// <param name="drawRelativeToFocus">Indicates if the positions are relative to the focus</param>
-        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, float width, bool drawRelativeToFocus)
+        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, bool drawRelativeToFocus)
         {
             this.graphicsDevice = graphicsDevice;
             this.camera = camera;
@@ -136,7 +134,6 @@ namespace SpaceSimulator.Rendering
             }
 
             this.color = color;
-            this.lineWidth = width;
             this.DrawRelativeToFocus = drawRelativeToFocus;
 
             this.rasterizerStates = new RasterizerStates(graphicsDevice);
@@ -253,8 +250,7 @@ namespace SpaceSimulator.Rendering
         public static float OrbitLineWidth(BaseCamera camera, Vector3 position)
         {
             var width = Vector3.Distance(position, camera.Position) / 200.0f;
-            //var width = (float)Vector3d.Distance(MathConversionsHelpers.FromDrawPosition(position), MathConversionsHelpers.FromDrawPosition(camera.Position)) / 0.4E8f;
-            return MathUtil.Clamp(width, 0.0001f, 10.0f);
+            return MathUtil.Clamp(width, 0.0001f, 100.0f);
         }
 
         /// <summary>
