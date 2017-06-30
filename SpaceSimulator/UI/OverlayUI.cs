@@ -331,12 +331,12 @@ namespace SpaceSimulator.UI
 
         public override void DrawBefore3D(DeviceContext deviceContext)
         {
-            //this.DrawOverlay(deviceContext);
+            this.DrawOverlay(deviceContext);
         }
 
         public override void Draw(DeviceContext deviceContext)
         {
-            this.DrawOverlay(deviceContext);
+            //this.DrawOverlay(deviceContext);
         }
 
         public override void Dispose()

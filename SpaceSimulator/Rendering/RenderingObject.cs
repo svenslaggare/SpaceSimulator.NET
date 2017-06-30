@@ -379,14 +379,13 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Draws the given rendering objects
+        /// Draws spheres for the given rendering objects
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="sunEffect">The sun effect</param>
         /// <param name="planetEffect">The planet effect</param>
-        /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="objects">The objects</param>
-        public static void Draw(DeviceContext deviceContext, BasicEffect sunEffect, BasicEffect planetEffect, OrbitEffect orbitEffect, IList<RenderingObject> objects)
+        public static void DrawSpheres(DeviceContext deviceContext, BasicEffect sunEffect, BasicEffect planetEffect, IList<RenderingObject> objects)
         {
             var camera = objects[0].camera;
 
@@ -412,6 +411,17 @@ namespace SpaceSimulator.Rendering
                     currentObject.DrawSphere(deviceContext, planetEffect, pass);
                 }
             }
+        }
+
+        /// <summary>
+        /// Draws orbits for the given given rendering
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="orbitEffect">The orbit effect</param>
+        /// <param name="objects">The objects</param>
+        public static void DrawOrbits(DeviceContext deviceContext, OrbitEffect orbitEffect, IList<RenderingObject> objects)
+        {
+            var camera = objects[0].camera;
 
             //Draw orbits
             deviceContext.InputAssembler.InputLayout = orbitEffect.InputLayout;

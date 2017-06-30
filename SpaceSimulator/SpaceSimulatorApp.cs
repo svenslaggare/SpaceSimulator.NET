@@ -181,6 +181,8 @@ namespace SpaceSimulator
             this.DeviceContext.ClearDepthStencilView(this.BackBufferDepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             this.DeviceContext.ClearRenderTargetView(this.BackBufferRenderView, Color.Black);
 
+            RenderingObject.DrawOrbits(this.DeviceContext, this.orbitEffect, this.renderingObjects);
+
             //Draw 2D before 3D
             this.DeviceContext2D.BeginDraw();
             foreach (var component in this.uiComponents)
@@ -190,7 +192,7 @@ namespace SpaceSimulator
             this.DeviceContext2D.EndDraw();
 
             //Draw 3D
-            RenderingObject.Draw(this.DeviceContext, this.sunEffect, this.planetEffect, this.orbitEffect, this.renderingObjects);
+            RenderingObject.DrawSpheres(this.DeviceContext, this.sunEffect, this.planetEffect, this.renderingObjects);
 
             //Draw 2D after 3D
             this.DeviceContext2D.BeginDraw();
