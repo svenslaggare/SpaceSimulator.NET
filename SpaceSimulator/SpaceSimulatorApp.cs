@@ -129,6 +129,11 @@ namespace SpaceSimulator
         {
             base.OnMouseButtonDown(mousePosition, button);
             this.uiManager.OnMouseButtonDown(mousePosition, button);
+
+            foreach (var component in this.uiComponents)
+            {
+                component.OnMouseButtonDown(mousePosition, button);
+            }
         }
 
         protected override void OnResized()

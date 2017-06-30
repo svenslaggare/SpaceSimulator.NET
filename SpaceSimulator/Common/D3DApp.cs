@@ -56,6 +56,11 @@ namespace SpaceSimulator.Common
         private BaseCamera camera;
         private KeyboardManager keyboardManager;
 
+        /// <summary>
+        /// The position of the mouse
+        /// </summary>
+        public Vector2 MousePosition { get; private set; }
+
         private RenderToTexture renderToTexture;
 
         private int frameCount;
@@ -378,6 +383,7 @@ namespace SpaceSimulator.Common
 		/// <param name="button">The state of the buttons</param>
 		protected virtual void OnMouseMove(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
 		{
+            this.MousePosition = mousePosition;
             this.camera.HandleMouseMove(mousePosition, button);
 		}
 

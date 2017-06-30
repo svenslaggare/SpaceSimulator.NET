@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
@@ -174,6 +175,22 @@ namespace SpaceSimulator.UI
         public override void Update(TimeSpan elapsed)
         {
 
+        }
+
+        public override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)
+        {
+            if (button == MouseButtons.Left)
+            {
+                foreach (var overlayObject in this.overlayObjects)
+                {
+                    var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
+                    if (Vector2.Distance(screenPosition, this.d3dApplication.MousePosition) <= 12.5)
+                    {
+                        this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
+                        break;
+                    }
+                }
+            }
         }
 
         /// <summary>

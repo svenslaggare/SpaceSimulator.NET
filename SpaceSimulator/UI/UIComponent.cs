@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Input;
@@ -51,6 +52,16 @@ namespace SpaceSimulator.UI
         /// Returns the selected object
         /// </summary>
         protected PhysicsObject SelectedObject => this.SimulatorContainer.SelectedObject;
+
+        /// <summary>
+        /// Handles when a mouse button is pressed
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        /// <param name="button">Which button that is being pressed</param>
+        public virtual void OnMouseButtonDown(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
+        {
+
+        }
 
         /// <summary>
         /// Updates the component

@@ -43,6 +43,24 @@ namespace SpaceSimulator.UI
 
                 this.SimulatorContainer.SelectedObject = this.SimulatorEngine.Objects[this.selectedObjectIndex];
             }
+
+            this.SimulatorContainer.SelectedObjectChanged += SelectedObjectChanged;
+        }
+
+        /// <summary>
+        /// Handles when the selected object is changed
+        /// </summary>
+        /// <param name="newObject">The new selected object</param>
+        private void SelectedObjectChanged(object sender, PhysicsObject newObject)
+        {
+            for (int i = 0; i < this.SimulatorEngine.Objects.Count; i++)
+            {
+                if (this.SimulatorEngine.Objects[i] == newObject)
+                {
+                    this.selectedObjectIndex = i;
+                    break;
+                }
+            }
         }
 
         /// <summary>
