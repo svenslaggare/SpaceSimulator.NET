@@ -53,8 +53,12 @@ namespace SpaceSimulator.UI
             /// <summary>
             /// The thumbnail
             /// </summary>
-            //public Bitmap Thumbnail { get; set; }
             public RenderingImage2D Thumbnail { get; set; }
+
+            /// <summary>
+            /// Indicates if the thumbnail is being drawn
+            /// </summary>
+            public bool DrawThumbnail { get; set; }
 
             /// <summary>
             /// Creates a new overlay object
@@ -183,8 +187,24 @@ namespace SpaceSimulator.UI
             {
                 foreach (var overlayObject in this.overlayObjects)
                 {
+                    var selected = false;
                     var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
-                    if (Vector2.Distance(screenPosition, this.d3dApplication.MousePosition) <= 12.5)
+                    var screenMouseDistance = Vector2.Distance(screenPosition, this.d3dApplication.MousePosition);
+
+                    if (overlayObject.DrawThumbnail)
+                    {
+                        selected = screenMouseDistance <= 12.5;
+                    }
+                    else
+                    {
+                        if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
+                        {
+                            this.GetRenderedMinAndMax(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
+                            selected = screenMouseDistance <= renderedRadius;
+                        }
+                    }
+
+                    if (selected)
                     {
                         this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
                         break;
@@ -199,19 +219,28 @@ namespace SpaceSimulator.UI
         /// <param name="physicsObject">The physics object</param>
         /// <param name="minPosition">The min position</param>
         /// <param name="maxPosition">The max position</param>
-        private void GetRenderedMinAndMax(NaturalSatelliteObject physicsObject, out Vector2 minPosition, out Vector2 maxPosition)
+        /// <param name="renderedRadius">The rendered radius</param>
+        private void GetRenderedMinAndMax(NaturalSatelliteObject physicsObject, out Vector2 minPosition, out Vector2 maxPosition, out float renderedRadius)
         {
-            var center = physicsObject.Position;
-            var radius = physicsObject.Radius;
-            var points = this.spherePoints.Select(x => center + radius * x);
+            var spherePositions = this.spherePoints.Select(x => physicsObject.Position + physicsObject.Radius * x);
 
-            var screenPoints = points.Select(x => this.camera.Project(this.camera.ToDrawPosition(x))).ToList();
+            var screenPositions = spherePositions.Select(x => this.camera.Project(this.camera.ToDrawPosition(x))).ToList();
             minPosition = new Vector2(float.MaxValue);
             maxPosition = new Vector2(float.MinValue);
-            foreach (var position in screenPoints)
+
+            var center = Vector2.Zero;
+            foreach (var position in screenPositions)
             {
                 minPosition = Vector2.Min(minPosition, position);
                 maxPosition = Vector2.Max(maxPosition, position);
+                center += position;
+            }
+
+            center /= screenPositions.Count;
+            renderedRadius = 0.0f;
+            foreach (var position in screenPositions)
+            {
+                renderedRadius = Math.Max(renderedRadius, (center - position).Length());
             }
         }
 
@@ -235,15 +264,29 @@ namespace SpaceSimulator.UI
                 var width = originalWidth * scaling;
                 var height = originalHeight * scaling;
 
+                //var center = screenPosition;
+                //var radius = 12.0f;
+
                 if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
                 {
-                    GetRenderedMinAndMax(naturalSatelliteObject, out var minPosition, out var maxPosition);
+                    this.GetRenderedMinAndMax(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
                     var screenWidth = maxPosition.X - minPosition.X;
                     var screenHeight = maxPosition.Y - minPosition.Y;
 
                     drawText = screenWidth * screenWidth <= 100.0f;
                     drawThumbnail = screenWidth < width && screenHeight < height;
+
+                    //radius = (maxPosition - minPosition).Length() * 0.36f;
+                    //radius = renderedRadius;
                 }
+
+                //this.RenderingManager2D.DefaultSolidColorBrush.Color = new Color(255, 0, 0, 128);
+                //this.RenderingManager2D.DefaultSolidColorBrush.ApplyResource(brush =>
+                //{
+                //    deviceContext.FillEllipse(
+                //        new Ellipse(center, radius, radius),
+                //        brush);
+                //});
 
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
                 if (drawThumbnail 
@@ -259,6 +302,8 @@ namespace SpaceSimulator.UI
                             Matrix.Scaling(scaling) * Matrix.Translation(screenPosition.X - width / 2.0f, screenPosition.Y - height / 2.0f, 0));
                     });
                 }
+
+                overlayObject.DrawThumbnail = drawThumbnail;
 
                 if (drawText)
                 {
