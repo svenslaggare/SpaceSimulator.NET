@@ -137,6 +137,7 @@ namespace SpaceSimulator.Rendering
 
                 values.Add(new PlotHeatmap.HeatmapValue(
                     new Vector2d(possibleLaunch.Duration, possibleLaunch.StartTime),
+                    //new Vector2d(possibleLaunch.ArrivalTime, possibleLaunch.StartTime),
                     deltaV));
 
                 minValue = Math.Min(minValue, deltaV);

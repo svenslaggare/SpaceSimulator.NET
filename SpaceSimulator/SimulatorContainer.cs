@@ -18,10 +18,8 @@ namespace SpaceSimulator
         /// </summary>
         public SimulatorEngine SimulatorEngine { get; }
 
-        /// <summary>
-        /// Indicates if the simulator is paused
-        /// </summary>
-        public bool Paused { get; set; }
+        private bool isFrozen = false;
+        private bool isPaused = false;
 
         private PhysicsObject selectedObject;
 
@@ -47,6 +45,26 @@ namespace SpaceSimulator
         }
 
         /// <summary>
+        /// Indicates if the simulator is paused
+        /// </summary>
+        public bool IsPaused
+        {
+            get
+            {
+                return this.isPaused || this.isFrozen;
+            }
+            set
+            {
+                this.isPaused = value;
+            }
+        }
+
+        /// <summary>
+        /// Indicates if the simulator is frozen
+        /// </summary>
+        public bool IsFrozen => this.isFrozen;
+
+        /// <summary>
         /// The selected object
         /// </summary>
         public PhysicsObject SelectedObject
@@ -57,6 +75,22 @@ namespace SpaceSimulator
                 this.selectedObject = value;
                 this.SelectedObjectChanged?.Invoke(this, value);
             }
+        }
+
+        /// <summary>
+        /// Freezes the simulation
+        /// </summary>
+        public void Freeze()
+        {
+            this.isFrozen = true;
+        }
+
+        /// <summary>
+        /// Unfreezes the simulation
+        /// </summary>
+        public void Unfreeze()
+        {
+            this.isFrozen = false;
         }
     }
 }

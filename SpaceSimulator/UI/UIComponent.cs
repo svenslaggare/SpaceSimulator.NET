@@ -21,6 +21,8 @@ namespace SpaceSimulator.UI
         protected KeyboardManager KeyboardManager { get; }
         protected SimulatorContainer SimulatorContainer { get; }
 
+        private readonly Queue<Action> mainThreadQueue = new Queue<Action>();
+
         /// <summary>
         /// Creates a new base UI component
         /// </summary>
@@ -53,6 +55,33 @@ namespace SpaceSimulator.UI
         /// Returns the selected object
         /// </summary>
         protected PhysicsObject SelectedObject => this.SimulatorContainer.SelectedObject;
+
+        /// <summary>
+        /// Runs the given task on the main thread
+        /// </summary>
+        /// <param name="action">The action</param>
+        protected void ScheduleMain(Action action)
+        {
+            lock (this.mainThreadQueue)
+            {
+                this.mainThreadQueue.Enqueue(action);
+            }
+        }
+
+        /// <summary>
+        /// Runs the scheduled tasks
+        /// </summary>
+        protected void RunScheduledTasks()
+        {
+            lock (this.mainThreadQueue)
+            {
+                while (this.mainThreadQueue.Count > 0)
+                {
+                    var task = this.mainThreadQueue.Dequeue();
+                    task();
+                }
+            }
+        }
 
         /// <summary>
         /// Handles when a mouse button is pressed

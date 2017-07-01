@@ -96,7 +96,10 @@ namespace SpaceSimulator.UI
                 {
                     try
                     {
-                        leftMouseClick();
+                        if (!this.SimulatorContainer.IsFrozen)
+                        {
+                            leftMouseClick();
+                        }
                     }
                     catch (Exception exception)
                     {
@@ -398,16 +401,40 @@ namespace SpaceSimulator.UI
 
             if (targetObject != null)
             {
-                var maneuver = InterplanetaryManeuver.PlanetaryTransfer(
-                    this.SimulatorEngine,
-                    this.SelectedObject,
-                    targetObject,
-                    out var possibleDepartureBurns);
-                this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, maneuver);
-                this.SelectedObject.Target = targetObject;
+                //var maneuver = InterplanetaryManeuver.PlanetaryTransfer(
+                //    this.SimulatorEngine,
+                //    this.SelectedObject,
+                //    targetObject,
+                //    out var possibleDepartureBurns);
 
-                this.showDeltaVChart = true;
-                this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
+                //this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, maneuver);
+                //this.SelectedObject.Target = targetObject;
+
+                //this.showDeltaVChart = true;
+                //this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
+
+                this.SimulatorContainer.Freeze();
+                var task = new Task(state =>
+                {
+                    var stateTuple = ((PhysicsObject, PhysicsObject))state;
+                    var maneuver = InterplanetaryManeuver.PlanetaryTransfer(
+                        this.SimulatorEngine,
+                        stateTuple.Item1,
+                        stateTuple.Item2,
+                        out var possibleDepartureBurns);
+
+                    this.ScheduleMain(() =>
+                    {
+                        this.SimulatorEngine.ScheduleManeuver(stateTuple.Item1, maneuver);
+                        this.SelectedObject.Target = stateTuple.Item2;
+
+                        this.showDeltaVChart = true;
+                        this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
+
+                        this.SimulatorContainer.Unfreeze();
+                    });
+                }, (this.SelectedObject, targetObject));
+                task.Start();
             }
         }
 
@@ -465,7 +492,7 @@ namespace SpaceSimulator.UI
 
         public override void Update(TimeSpan elapsed)
         {
-
+            this.RunScheduledTasks();
         }
 
         /// <summary>

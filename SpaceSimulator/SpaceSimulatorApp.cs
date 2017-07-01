@@ -181,7 +181,7 @@ namespace SpaceSimulator
 
             this.uiManager.Update(elapsed);
 
-            if (!this.simulatorContainer.Paused)
+            if (!this.simulatorContainer.IsPaused)
             {
                 this.simulatorEngine.Update();
             }

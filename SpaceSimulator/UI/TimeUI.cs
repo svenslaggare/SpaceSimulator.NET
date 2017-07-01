@@ -53,7 +53,7 @@ namespace SpaceSimulator.UI
 
             if (this.KeyboardManager.IsKeyPressed(Key.Pause))
             {
-                this.SimulatorContainer.Paused = !this.SimulatorContainer.Paused;
+                this.SimulatorContainer.IsPaused = !this.SimulatorContainer.IsPaused;
             }
 
             this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
@@ -68,7 +68,7 @@ namespace SpaceSimulator.UI
         {
             this.TextColorBrush.DrawText(
                 deviceContext,
-                $"Simulation speed: {this.SimulatorEngine.SimulationSpeed}x" + (this.SimulatorContainer.Paused ? " (paused)" : ""),
+                $"Simulation speed: {this.SimulatorEngine.SimulationSpeed}x" + (this.SimulatorContainer.IsPaused ? " (paused)" : ""),
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 5)));
 
