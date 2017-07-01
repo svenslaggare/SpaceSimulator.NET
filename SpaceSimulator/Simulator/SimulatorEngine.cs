@@ -388,6 +388,38 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Adds the given satellite object
+        /// </summary>
+        /// <param name="primaryBody">The object to orbit around</param>
+        /// <param name="name">The name of the object</param>
+        /// <param name="mass">The mass of the satellite</param>
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
+        /// <param name="position">The initial position</param>
+        /// <param name="velocity">The initial velocity</param>
+        /// <returns>The created object</returns>
+        public SatelliteObject AddSatellite(
+            NaturalSatelliteObject primaryBody,
+            string name,
+            double mass,
+            AtmosphericProperties atmosphericProperties,
+            Vector3d position,
+            Vector3d velocity)
+        {
+            var initialState = new ObjectState(this.totalTime, position, velocity, Vector3d.Zero);
+
+            var newObject = new SatelliteObject(
+                name,
+                mass,
+                atmosphericProperties,
+                primaryBody,
+                initialState,
+                Orbit.CalculateOrbit(primaryBody, ref initialState));
+
+            this.AddObject(newObject);
+            return newObject;
+        }
+
+        /// <summary>
         /// Adds a satellite in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
@@ -420,15 +452,13 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="primaryBody">The object to orbit around</param>
         /// <param name="name">The name of the object</param>
-        /// <param name="radius">The radius of the object</param>
         /// <param name="rocketStages">The rocket stages</param>
         /// <param name="position">The initial position</param>
         /// <param name="velocity">The initial velocity</param>
         /// <returns>The created object</returns>
-        public RocketObject AddRocketObject(
+        public RocketObject AddRocket(
             NaturalSatelliteObject primaryBody,
             string name,
-            double radius,
             RocketStages rocketStages,
             Vector3d position,
             Vector3d velocity)
@@ -452,13 +482,11 @@ namespace SpaceSimulator.Simulator
         /// Adds a rocket object in given orbit around the given object
         /// </summary>
         /// <param name="name">The name of the object</param>
-        /// <param name="radius">The radius of the object</param>
         /// <param name="rocketStages">The rocket stages</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <returns>The created object</returns>
-        public RocketObject AddRocketObjectInOrbit(
+        public RocketObject AddRocketInOrbit(
             string name,
-            double radius,
             AtmosphericProperties atmosphericProperties,
             RocketStages rocketStages,
             OrbitPosition orbitPosition)

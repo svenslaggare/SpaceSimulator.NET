@@ -288,8 +288,9 @@ namespace SpaceSimulator.UI
         {
             overlayObject.DrawText = true;
             overlayObject.DrawThumbnail = true;
+            var physicsObject = overlayObject.RenderingObject.PhysicsObject;
 
-            if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
+            if (physicsObject is NaturalSatelliteObject naturalSatelliteObject)
             {
                 this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
                 var screenWidth = maxPosition.X - minPosition.X;
@@ -299,6 +300,23 @@ namespace SpaceSimulator.UI
                 var drawnSize = overlayObject.ThumbnailSize;
                 overlayObject.DrawThumbnail = screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
                 overlayObject.RenderingObject.ShowSphere = !overlayObject.DrawThumbnail;
+            }
+
+            if (!physicsObject.IsObjectOfReference)
+            {
+                var periapsis = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, 0.0);
+                var apoapsis = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, MathUtild.Pi);
+
+                var periapsisScreenPosition = this.camera.Project(this.camera.ToDrawPosition(periapsis.CalculateState().Position));
+                var apoapsisScreenPosition = this.camera.Project(this.camera.ToDrawPosition(apoapsis.CalculateState().Position));
+                var renderedDistance = Vector2.Distance(periapsisScreenPosition, apoapsisScreenPosition);
+
+                overlayObject.DrawText = renderedDistance >= 24.0f;
+
+                if (overlayObject.DrawThumbnail)
+                {
+                    overlayObject.DrawThumbnail = overlayObject.DrawText;
+                }
             }
         }
 
@@ -321,7 +339,8 @@ namespace SpaceSimulator.UI
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
                 if (overlayObject.DrawThumbnail
                     && physicsObject.Type != PhysicsObjectType.ArtificialSatellite
-                    && (physicsObject.PrimaryBody == this.SimulatorEngine.ObjectOfReference || physicsObject.IsObjectOfReference))
+                    )
+                    //&& (physicsObject.PrimaryBody == this.SimulatorEngine.ObjectOfReference || physicsObject.IsObjectOfReference))
                 {
                     overlayObject.Thumbnail.ApplyResource(bitmap =>
                     {

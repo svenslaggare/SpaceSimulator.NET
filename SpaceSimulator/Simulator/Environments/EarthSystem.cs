@@ -76,10 +76,9 @@ namespace SpaceSimulator.Simulator.Environments
             //var falcon9TargetAltitude = 1000E3;
 
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
-            var falcon9Object = simulatorEngine.AddRocketObject(
+            var falcon9Object = simulatorEngine.AddRocket(
                 earth,
                 "Falcon 9",
-                10,
                 Rockets.CreateFalcon9(4000.0),
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),

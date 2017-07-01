@@ -66,7 +66,7 @@ namespace SpaceSimulator.Simulator
                 6378.1370 * 1000,
                 6371 * 1000,
                 5.9722E24,
-                Constants.SiderealDay * 0.0,
+                Constants.SiderealDay * 1.0,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 149598023E3,

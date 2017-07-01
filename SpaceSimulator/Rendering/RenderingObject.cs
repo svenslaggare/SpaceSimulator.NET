@@ -87,6 +87,11 @@ namespace SpaceSimulator.Rendering
             };
 
             var drawRelativeToFocus = physicsObject.Type != PhysicsObjectType.ArtificialSatellite;
+            drawRelativeToFocus = false;
+            if (physicsObject.PrimaryBody != null && physicsObject.PrimaryBody.IsObjectOfReference)
+            {
+                drawRelativeToFocus = true;
+            }
 
             if (!physicsObject.IsObjectOfReference)
             {
