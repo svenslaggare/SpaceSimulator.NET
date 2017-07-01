@@ -26,6 +26,10 @@ namespace SpaceSimulator.Simulator
 
         static SolarSystemBodies()
         {
+            var allowRotation = 1.0;
+            var oneDay = 24.0 * 60.0 * 60.0;
+            var oneHour = 60.0 * 60.0;
+
             sun = new SolarSystemBody(
                 695700 * 1000,
                 695700 * 1000,
@@ -38,7 +42,7 @@ namespace SpaceSimulator.Simulator
                 2439.7 * 1000,
                 2439.7 * 1000,
                 3.3011E23,
-                0,
+                58.6462 * oneDay * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 57909050E3,
@@ -52,7 +56,7 @@ namespace SpaceSimulator.Simulator
                 6051.8 * 1000,
                 6051.8 * 1000,
                 4.8675E24,
-                0,
+                -243.0185 * oneDay * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 108208000E3,
@@ -66,7 +70,7 @@ namespace SpaceSimulator.Simulator
                 6378.1370 * 1000,
                 6371 * 1000,
                 5.9722E24,
-                Constants.SiderealDay * 1.0,
+                Constants.SiderealDay * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 149598023E3,
@@ -80,7 +84,7 @@ namespace SpaceSimulator.Simulator
                 1738.1 * 1000,
                 1737.1 * 1000,
                 7.342E22,
-                27.321661 * 24.0 * 60.0 * 60.0,
+                27.321661 * oneDay * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                     semiMajorAxis: 384399E3,
@@ -92,7 +96,7 @@ namespace SpaceSimulator.Simulator
                 3396.2 * 1000,
                 3389.5 * 1000,
                 6.4171E23,
-                0,
+                24.622962 * oneHour * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 227.9392E9,
@@ -106,7 +110,7 @@ namespace SpaceSimulator.Simulator
                 71492 * 1000,
                 69911 * 1000,
                 1.8986E27,
-                0,
+                (9.0 * oneHour + 55.0 * 60.0 + 29.685) * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 778.299E9,
@@ -120,7 +124,7 @@ namespace SpaceSimulator.Simulator
                 60268 * 1000,
                 58232 * 1000,
                 5.6836E26,
-                0,
+                (10.0 * oneHour + 39.0 * 60.0 + 22.4) * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 1429.39E9,
@@ -134,7 +138,7 @@ namespace SpaceSimulator.Simulator
                 25559 * 1000,
                 25362 * 1000,
                 8.6810E25,
-                0,
+                17.24 * oneHour * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 2875.04E9,
@@ -148,7 +152,7 @@ namespace SpaceSimulator.Simulator
                 24764 * 1000,
                 24622 * 1000,
                 1.0243E26,
-                0,
+                16.11 * oneHour * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 4504.45E9,
@@ -162,7 +166,7 @@ namespace SpaceSimulator.Simulator
                 1187 * 1000,
                 1187 * 1000,
                 1.303E22,
-                0,
+                6.387230 * oneDay * allowRotation,
                 Vector3d.Up,
                 Orbit.New(
                    semiMajorAxis: 5915E9,

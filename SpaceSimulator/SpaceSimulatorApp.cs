@@ -41,9 +41,6 @@ namespace SpaceSimulator
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
 
-        //private Plot2D plot2D;
-        //private PlotHeatmap deltaVChart;
-
         /// <summary>
         /// Creates a new space simulator application
         /// </summary>
@@ -60,7 +57,8 @@ namespace SpaceSimulator
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
-            this.OrbitCamera.MaxRadius = 15000.0f;
+            //this.OrbitCamera.MaxRadius = 15000.0f;
+            this.OrbitCamera.MaxRadius = 10000.0f;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -240,8 +238,31 @@ namespace SpaceSimulator
                 }
 
                 this.uiManager.Draw(deviceContext2D);
-                //this.deltaVChart.Draw(deviceContext2D, new Vector2(400, 400));
+                //this.DrawDebug();
             });
+        }
+
+        /// <summary>
+        /// Draws debug information
+        /// </summary>
+        private void DrawDebug()
+        {
+            var textBuilder = new StringBuilder();
+
+            foreach (var renderingObject in this.renderingObjects)
+            {
+                textBuilder.AppendLine(
+                    $"{renderingObject.PhysicsObject.Name} - " +
+                    $"Position: {renderingObject.DrawPosition}, " +
+                    $"ShowSphere: {renderingObject.ShowSphere}, " +
+                    $"ShowOrbit: {renderingObject.ShowOrbit}");
+            }
+
+            this.RenderingManager2D.DefaultSolidColorBrush.DrawText(
+                this.DeviceContext2D,
+                textBuilder.ToString(),
+                this.RenderingManager2D.DefaultTextFormat,
+                this.RenderingManager2D.TextPosition(new Vector2(700, 50)));
         }
 
         /// <summary>

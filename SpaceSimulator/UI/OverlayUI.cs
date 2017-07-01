@@ -14,6 +14,7 @@ using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Models;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Common.UI;
+using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
@@ -45,7 +46,7 @@ namespace SpaceSimulator.UI
         /// <summary>
         /// Object being overlayed
         /// </summary>
-        private class OverlayObject : IDisposable
+        private class OverlayObject : IDisposable, IComparable<OverlayObject>
         {
             /// <summary>
             /// The rendering object
@@ -88,6 +89,11 @@ namespace SpaceSimulator.UI
             public bool DrawThumbnail { get; set; }
 
             /// <summary>
+            /// The draw depth
+            /// </summary>
+            public double DrawDepth { get; set; }
+
+            /// <summary>
             /// Creates a new overlay object
             /// </summary>
             /// <param name="renderingManager2D">The rendering manager 2D</param>
@@ -112,6 +118,16 @@ namespace SpaceSimulator.UI
             public void Dispose()
             {
                 this.Thumbnail?.Dispose();
+            }
+
+            public int CompareTo(OverlayObject other)
+            {
+                return other.DrawDepth.CompareTo(this.DrawDepth);
+            }
+
+            public override string ToString()
+            {
+                return $"{this.RenderingObject.PhysicsObject.Name}: {this.DrawDepth}";
             }
         }
 
@@ -167,6 +183,7 @@ namespace SpaceSimulator.UI
                     if (renderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
                     {
                         radius = naturalSatelliteObject.Radius;
+                        this.camera.SetScaleFactor(naturalSatelliteObject);
                     }
 
                     this.thumbnailEffect.SetEyePosition(this.camera.Position);
@@ -189,6 +206,7 @@ namespace SpaceSimulator.UI
                             position: Vector3.Zero);
                     }
 
+                    this.camera.SetScaleFactor(this.SimulatorEngine.ObjectOfReference);
                     this.camera.Radius = originalRadius;
                     this.camera.Phi = originalPhi;
                     this.camera.UpdateViewMatrix();
@@ -304,14 +322,29 @@ namespace SpaceSimulator.UI
 
             if (!physicsObject.IsObjectOfReference)
             {
-                var periapsis = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, 0.0);
-                var apoapsis = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, MathUtild.Pi);
+                var orbitScreenPositions = new List<Vector2>();
+                void AddOrbitScreenPosition(double trueAnomaly)
+                {
+                    var orbitPosition = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, trueAnomaly).CalculateState().Position;
+                    orbitScreenPositions.Add(this.camera.Project(this.camera.ToDrawPosition(orbitPosition)));
+                }
 
-                var periapsisScreenPosition = this.camera.Project(this.camera.ToDrawPosition(periapsis.CalculateState().Position));
-                var apoapsisScreenPosition = this.camera.Project(this.camera.ToDrawPosition(apoapsis.CalculateState().Position));
-                var renderedDistance = Vector2.Distance(periapsisScreenPosition, apoapsisScreenPosition);
+                AddOrbitScreenPosition(0.0);
+                AddOrbitScreenPosition(MathUtild.Deg2Rad * 90.0);
+                AddOrbitScreenPosition(MathUtild.Deg2Rad * 180.0);
+                AddOrbitScreenPosition(MathUtild.Deg2Rad * 270.0);
+
+                var renderedDistance = 0.0;
+                foreach (var point1 in orbitScreenPositions)
+                {
+                    foreach (var point2 in orbitScreenPositions)
+                    {
+                        renderedDistance = Math.Max(renderedDistance, Vector2.Distance(point1, point2));
+                    }
+                }
 
                 overlayObject.DrawText = renderedDistance >= 24.0f;
+                overlayObject.RenderingObject.ShowOrbit = overlayObject.DrawText;
 
                 if (overlayObject.DrawThumbnail)
                 {
@@ -333,14 +366,19 @@ namespace SpaceSimulator.UI
         {
             foreach (var overlayObject in this.overlayObjects)
             {
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition, out var depth);
+                overlayObject.DrawDepth = depth;
+            }
+
+            this.overlayObjects.Sort();
+
+            foreach (var overlayObject in this.overlayObjects)
+            {
                 var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
                 this.DetermineOverlayVisiblity(overlayObject);
 
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
-                if (overlayObject.DrawThumbnail
-                    && physicsObject.Type != PhysicsObjectType.ArtificialSatellite
-                    )
-                    //&& (physicsObject.PrimaryBody == this.SimulatorEngine.ObjectOfReference || physicsObject.IsObjectOfReference))
+                if (overlayObject.DrawThumbnail && physicsObject.Type != PhysicsObjectType.ArtificialSatellite)
                 {
                     overlayObject.Thumbnail.ApplyResource(bitmap =>
                     {

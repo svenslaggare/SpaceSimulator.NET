@@ -75,7 +75,7 @@ namespace SpaceSimulator.Common
             Action<SharpDX.Direct3D11.DeviceContext> render)
         {
             //Render to texture
-            //deviceContext.ClearRenderTargetView(this.textureRenderTargetView, backgroundColor);
+            deviceContext.ClearRenderTargetView(this.textureRenderTargetView, backgroundColor);
             deviceContext.ClearDepthStencilView(this.depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
             deviceContext.OutputMerger.SetRenderTargets(this.depthStencilView, this.textureRenderTargetView);
             deviceContext.OutputMerger.SetRenderTargets(this.textureRenderTargetView);
@@ -98,6 +98,7 @@ namespace SpaceSimulator.Common
                 this.texture.Description.Width * this.texture.Description.Height * sizeof(int),
                 true,
                 true);
+
             dataStream.CopyTo(copyDataStream);
             dataStream.Seek(0, System.IO.SeekOrigin.Begin);
             deviceContext.UnmapSubresource(copyTexture, 0);

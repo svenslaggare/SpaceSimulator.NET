@@ -54,6 +54,11 @@ namespace SpaceSimulator.Rendering
         public bool ShowSphere { get; set; } = true;
 
         /// <summary>
+        /// Indicates if the orbit should be drawn
+        /// </summary>
+        public bool ShowOrbit { get; set; } = true;
+
+        /// <summary>
         /// Creates a new rendering object
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
@@ -131,7 +136,8 @@ namespace SpaceSimulator.Rendering
                     false)
                 {
                     IsBound = true,
-                    ChangeBrightnessForPassed = false
+                    ChangeBrightnessForPassed = false,
+                    RotateToFaceCamera = false
                 };
             }
         }
@@ -281,7 +287,8 @@ namespace SpaceSimulator.Rendering
                     pass,
                     this.PrimaryBodyTransform(this.ringRenderingOrbit, (NaturalSatelliteObject)this.PhysicsObject),
                     this.DrawPosition,
-                    lineWidth: 0.03f);
+                    lineWidth: this.camera.ToDraw(2E7));
+                    //lineWidth: 0.03f);
             }
         }
 
@@ -430,7 +437,7 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = ringEffect.InputLayout;
             foreach (var pass in ringEffect.Passes)
             {
-                foreach (var currentObject in objects)
+                foreach (var currentObject in objects.Where(x => x.ShowSphere))
                 {
                     if (currentObject.renderingOrbit != null)
                     {
@@ -454,7 +461,7 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = orbitEffect.InputLayout;
             foreach (var pass in orbitEffect.Passes)
             {
-                foreach (var currentObject in objects)
+                foreach (var currentObject in objects.Where(x => x.ShowOrbit))
                 {
                     if (currentObject.renderingOrbit != null)
                     {

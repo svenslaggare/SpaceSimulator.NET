@@ -96,6 +96,11 @@ namespace SpaceSimulator.Rendering
         public bool IsBound { get; set; } = true;
 
         /// <summary>
+        /// Indicates if the orbit is rotated to face the camera
+        /// </summary>
+        public bool RotateToFaceCamera { get; set; } = true;
+
+        /// <summary>
         /// Represents a point in the orbit
         /// </summary>
         public struct Point
@@ -237,9 +242,17 @@ namespace SpaceSimulator.Rendering
                 vertex.Position = this.camera.ToDrawPosition(current, this.DrawRelativeToFocus);
                 vertex.NextPosition = this.camera.ToDrawPosition(next, this.DrawRelativeToFocus);
                 vertex.PrevPosition = this.camera.ToDrawPosition(prev, this.DrawRelativeToFocus);
-                //vertex.Normal = Vector3.Cross(vertex.NextPosition - vertex.Position, vertex.Position);
-                vertex.Normal = this.camera.Look;
-                vertex.Normal.Normalize();
+
+                if (this.RotateToFaceCamera)
+                {
+                    vertex.Normal = this.camera.Look;
+                }
+                else
+                {
+                    vertex.Normal = Vector3.Cross(vertex.NextPosition - vertex.Position, vertex.Position);
+                    vertex.Normal.Normalize();
+                }
+
                 vertex.Color = currentColor;
                 vertex.NextColor = nextColor;
                 this.SetVerteAndWrite(stream, i, vertex);
@@ -305,7 +318,7 @@ namespace SpaceSimulator.Rendering
 
             this.UpdatePassedPositions(deviceContext);
 
-            effect.SetLineWidth(lineWidth ?? OrbitLineWidth(camera, currentPosition));
+            effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, currentPosition)));
 
             //Set draw type
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;

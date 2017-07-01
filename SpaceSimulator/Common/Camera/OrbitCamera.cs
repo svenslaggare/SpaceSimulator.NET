@@ -171,7 +171,7 @@ namespace SpaceSimulator.Common.Camera
         /// <param name="primaryBody">The primary body to base the scale on</param>
         public void SetScaleFactor(NaturalSatelliteObject primaryBody)
         {
-            this.scaleFactor = 1.0 / primaryBody.Radius;
+            this.scaleFactor = 1.0 / (5.0 * primaryBody.Radius);
         }
     }
 }

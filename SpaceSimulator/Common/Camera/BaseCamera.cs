@@ -270,7 +270,19 @@ namespace SpaceSimulator.Common.Camera
         /// <returns>The position in screen space</returns>
         public Vector2 Project(Vector3 position)
         {
+            return this.Project(position, out var depth);
+        }
+
+        /// <summary>
+        /// Projects the given position in world space to screen space
+        /// </summary>
+        /// <param name="position">The position in world space</param>
+        /// <param name="depth">The depth of the position</param>
+        /// <returns>The position in screen space</returns>
+        public Vector2 Project(Vector3 position, out double depth)
+        {
             var screenPosition = Vector3.TransformCoordinate(position, this.ViewProjection);
+            depth = screenPosition.Z;
             screenPosition /= screenPosition.Z;
 
             screenPosition.X = this.viewportWidth * (screenPosition.X + 1.0f) / 2.0f;
