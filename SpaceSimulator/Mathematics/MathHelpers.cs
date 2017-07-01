@@ -121,6 +121,15 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Squares the given value
+        /// </summary>
+        /// <param name="x">The value</param>
+        public static double Square(double x)
+        {
+            return x * x;
+        }
+
+        /// <summary>
         /// Computes the C function
         /// </summary>
         /// <param name="z">The value</param>

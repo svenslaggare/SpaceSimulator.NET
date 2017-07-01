@@ -33,7 +33,7 @@ namespace SpaceSimulator.Helpers
         }
 
         /// <summary>
-        /// Normalizes the given value into the range [0, 1] such that the min value becomes 0 and max value, 1.
+        /// Normalizes the given value into the range [0, 1] such that the min value becomes 0 and the max value 1
         /// </summary>
         /// <param name="min">The minimum value</param>
         /// <param name="max">The maximum value</param>

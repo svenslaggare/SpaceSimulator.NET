@@ -16,6 +16,11 @@ namespace SpaceSimulator.Common.Rendering2D
     public interface IRenderingResource2D : IDisposable
     {
         /// <summary>
+        /// Indicates if the internal resources has been bound to a device context
+        /// </summary>
+        bool HasBoundResources { get; }
+
+        /// <summary>
         /// Updates the internal resource using the given device context
         /// </summary>
         /// <param name="deviceContext">The device context</param>

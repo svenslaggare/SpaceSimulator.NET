@@ -13,6 +13,7 @@ using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Models;
 using SpaceSimulator.Common.Rendering2D;
+using SpaceSimulator.Common.UI;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
@@ -24,12 +25,22 @@ namespace SpaceSimulator.UI
     /// </summary>
     public class OverlayUI : UIComponent
     {
+        private readonly UIManager uiManager;
+
         private readonly OrbitCamera camera;
         private readonly BasicEffect thumbnailEffect;
-        private readonly D3DApp d3dApplication;
+
+        private readonly RenderToTexture renderToTexture;
 
         private readonly IList<Vector3d> spherePoints = new List<Vector3d>();
         private readonly IList<OverlayObject> overlayObjects = new List<OverlayObject>();
+
+        /// <summary>
+        /// Renders to texture
+        /// </summary>
+        /// <param name="backgroundColor">The background color</param>
+        /// <param name="render">The render function</param>
+        public delegate RenderingImage2D RenderToTexture(Color backgroundColor, Action<SharpDX.Direct3D11.DeviceContext> render);
 
         /// <summary>
         /// Object being overlayed
@@ -109,22 +120,26 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="uiManager">The UI manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
         /// <param name="camera">The camera</param>
         /// <param name="thumbnailEffect">The thumbnail effect</param>
-        /// <param name="d3dApplication">The D3D application</param>
+        /// <param name="renderToTexture">Renders to texture</param>
         public OverlayUI(
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
+            UIManager uiManager,
             SimulatorContainer simulatorContainer,
             OrbitCamera camera,
             BasicEffect thumbnailEffect,
-            D3DApp d3dApplication)
+            RenderToTexture renderToTexture)
             : base(renderingManager2D, keyboardManager, simulatorContainer)
         {
+            this.uiManager = uiManager;
+
             this.camera = camera;
             this.thumbnailEffect = thumbnailEffect;
-            this.d3dApplication = d3dApplication;
+            this.renderToTexture = renderToTexture;
 
             GeometryGenerator.CreateSphere(1.0f, 12, 10, out var vertices, out var indices);
             foreach (var vertex in vertices)
@@ -144,7 +159,7 @@ namespace SpaceSimulator.UI
         /// <param name="renderingObject">The rendering object</param>
         private RenderingImage2D CreateThumbnailImage(RenderingObject renderingObject)
         {
-            return this.d3dApplication.RenderToTexture(
+            return this.renderToTexture(
                 Color.Transparent,
                 render: deviceContext =>
                 {
@@ -200,11 +215,17 @@ namespace SpaceSimulator.UI
         {
             if (button == MouseButtons.Left)
             {
+                var selectedUIElement = this.uiManager.SelectElement(mousePosition);
+                if (selectedUIElement != null)
+                {
+                    return;
+                }
+
                 foreach (var overlayObject in this.overlayObjects)
                 {
                     var selected = false;
                     var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
-                    var screenMouseDistance = Vector2.Distance(screenPosition, this.d3dApplication.MousePosition);
+                    var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
 
                     if (overlayObject.DrawThumbnail)
                     {
@@ -277,6 +298,7 @@ namespace SpaceSimulator.UI
                 overlayObject.DrawText = screenWidth * screenWidth <= 100.0f;
                 var drawnSize = overlayObject.ThumbnailSize;
                 overlayObject.DrawThumbnail = screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
+                overlayObject.RenderingObject.ShowSphere = !overlayObject.DrawThumbnail;
             }
         }
 
@@ -329,14 +351,9 @@ namespace SpaceSimulator.UI
             }
         }
 
-        public override void DrawBefore3D(DeviceContext deviceContext)
-        {
-            this.DrawOverlay(deviceContext);
-        }
-
         public override void Draw(DeviceContext deviceContext)
         {
-            //this.DrawOverlay(deviceContext);
+            this.DrawOverlay(deviceContext);
         }
 
         public override void Dispose()

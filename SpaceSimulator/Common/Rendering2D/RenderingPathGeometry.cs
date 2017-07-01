@@ -86,6 +86,11 @@ namespace SpaceSimulator.Common.Rendering2D
         }
 
         /// <summary>
+        /// Indicates if the internal resources has been bound to a device context
+        /// </summary>
+        public bool HasBoundResources => this.pathGeometry != null;
+
+        /// <summary>
         /// Updates the internal color brush to the given device context
         /// </summary>
         /// <param name="deviceContext">The device context</param>

@@ -149,11 +149,13 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// </summary>
         /// <param name="simulatorEngine">The simulator engine</param>
         /// <param name="physicsObject">The object to apply for</param>
-        /// <param name="targetOrbit">The planet to rendevouz with</param>
+        /// <param name="target">The object to rendevouz with</param>
+        /// <param name="possibleDepartureBurns">The possible depature burns</param>
         public static OrbitalManeuvers PlanetaryTransfer(
             ISimulatorEngine simulatorEngine,
             IPhysicsObject physicsObject,
-            IPhysicsObject target)
+            IPhysicsObject target,
+            out IList<InterceptManeuver.PossibleLaunch> possibleDepartureBurns)
         {
             if (!target.PrimaryBody.IsObjectOfReference)
             {
@@ -187,7 +189,7 @@ namespace SpaceSimulator.Physics.Maneuvers
 
             var synodicPeriod = OrbitFormulas.SynodicPeriod(currentPlanetOrbit.Period, targetOrbit.Period);
             var testStartTime = DateTime.UtcNow;
-            var possibleLaunches = InterceptManeuver.Intercept(
+            possibleDepartureBurns = InterceptManeuver.Intercept(
                 simulatorEngine,
                 sun,
                 currentPlanet,
@@ -205,7 +207,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 day,
                 true);
             //ChartHelpers.ShowPossibleLaunchesChart(possibleLaunches, false);
-            Console.WriteLine((DateTime.UtcNow - testStartTime));
+            Console.WriteLine($"Calculated helicentric transfer orbit in {(DateTime.UtcNow - testStartTime)}.");
             var heliocentricTransferBurn = heliocentricTransferBurnVector.Length();
 
             //Uses a hohmann transfer orbit
@@ -238,7 +240,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 v0,
                 injectionDeltaV,
                 heliocentricTransferBurn);
-            Console.WriteLine((DateTime.UtcNow - testStartTime));
+            Console.WriteLine($"Calculated maneuver time in {(DateTime.UtcNow - testStartTime)}.");
 
             var injectionState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
@@ -301,7 +303,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 day * 0.5,
                 false,
                 allowedDeltaV: 150);
-            Console.WriteLine((DateTime.UtcNow - testStartTime));
+            Console.WriteLine($"Calculated mid-course correction burn in {(DateTime.UtcNow - testStartTime)}");
 
             testStartTime = DateTime.UtcNow;
             var minDistance = OrbitCalculators.ClosestApproach(
@@ -311,14 +313,15 @@ namespace SpaceSimulator.Physics.Maneuvers
                 target,
                 targetOrbitAtSOILeave,
                 deltaTime: 12.0 * 60 * 60.0).Distance;
-            Console.WriteLine((DateTime.UtcNow - testStartTime));
+            Console.WriteLine($"Calculated closest approach in {(DateTime.UtcNow - testStartTime)}");
 
             //Console.WriteLine(bestInjectionBurn.Length());
             Console.WriteLine(bestInjectionOrbitPosition);
             Console.WriteLine(bestHeliocentricOrbitPosition);
             //Console.WriteLine(DataFormatter.Format(minDistance, DataUnit.Distance));
 
-            Console.WriteLine("Computed trajectory in: " + (DateTime.UtcNow - startTime));
+            var totalDeltaV = DataFormatter.Format(bestInjectionBurn.Length() + midcourseBurnDeltaV.Length(), DataUnit.Velocity);
+            Console.WriteLine($"Computed trajectory in {(DateTime.UtcNow - startTime)}, Δv: {totalDeltaV}");
 
             var injectionBurn = new OrbitalManeuver(simulatorEngine.TotalTime + t, bestInjectionBurn);
             var midcourseBurn = new OrbitalManeuver(simulatorEngine.TotalTime + timeToLeaveSOI + t + midcourseBurnTime, midcourseBurnDeltaV);

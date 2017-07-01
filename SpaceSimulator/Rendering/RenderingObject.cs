@@ -49,6 +49,11 @@ namespace SpaceSimulator.Rendering
         private readonly float baseRotationY;
 
         /// <summary>
+        /// Indicates if the sphere should be drawn
+        /// </summary>
+        public bool ShowSphere { get; set; } = true;
+
+        /// <summary>
         /// Creates a new rendering object
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
@@ -384,19 +389,23 @@ namespace SpaceSimulator.Rendering
         /// <param name="deviceContext">The device context</param>
         /// <param name="sunEffect">The sun effect</param>
         /// <param name="planetEffect">The planet effect</param>
+        /// <param name="ringEffect">The ring effect</param>
         /// <param name="objects">The objects</param>
-        public static void DrawSpheres(DeviceContext deviceContext, BasicEffect sunEffect, BasicEffect planetEffect, IList<RenderingObject> objects)
+        public static void DrawSpheres(DeviceContext deviceContext, BasicEffect sunEffect, BasicEffect planetEffect, OrbitEffect ringEffect, IList<RenderingObject> objects)
         {
             var camera = objects[0].camera;
 
             //Draw the sun
-            sunEffect.SetEyePosition(camera.Position);
-            sunEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
-
-            deviceContext.InputAssembler.InputLayout = sunEffect.InputLayout;
-            foreach (var pass in sunEffect.Passes)
+            if (objects[0].ShowSphere)
             {
-                objects[0].DrawSphere(deviceContext, sunEffect, pass);
+                sunEffect.SetEyePosition(camera.Position);
+                sunEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
+
+                deviceContext.InputAssembler.InputLayout = sunEffect.InputLayout;
+                foreach (var pass in sunEffect.Passes)
+                {
+                    objects[0].DrawSphere(deviceContext, sunEffect, pass);
+                }
             }
 
             //Draw planets
@@ -406,9 +415,22 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)
             {
-                foreach (var currentObject in objects.Where(x => !x.PhysicsObject.IsObjectOfReference))
+                foreach (var currentObject in objects.Where(x => !x.PhysicsObject.IsObjectOfReference && x.ShowSphere))
                 {
                     currentObject.DrawSphere(deviceContext, planetEffect, pass);
+                }
+            }
+
+            //Draw planetary rings
+            deviceContext.InputAssembler.InputLayout = ringEffect.InputLayout;
+            foreach (var pass in ringEffect.Passes)
+            {
+                foreach (var currentObject in objects)
+                {
+                    if (currentObject.renderingOrbit != null)
+                    {
+                        currentObject.DrawRings(deviceContext, ringEffect, pass);
+                    }
                 }
             }
         }
@@ -434,7 +456,6 @@ namespace SpaceSimulator.Rendering
                         currentObject.UpdatePassedPositions();
                         currentObject.DrawOrbit(deviceContext, orbitEffect, pass);
                         currentObject.DrawNextManeuver(deviceContext, orbitEffect, pass);
-                        currentObject.DrawRings(deviceContext, orbitEffect, pass);
                     }
                 }
             }

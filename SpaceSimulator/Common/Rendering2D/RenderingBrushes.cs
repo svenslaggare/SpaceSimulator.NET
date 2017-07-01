@@ -62,6 +62,11 @@ namespace SpaceSimulator.Common.Rendering2D
         }
 
         /// <summary>
+        /// Indicates if the internal resources has been bound to a device context
+        /// </summary>
+        public bool HasBoundResources => this.solidColorBrush != null;
+
+        /// <summary>
         /// Applies the internal resource to the given function.
         /// </summary>
         /// <remarks>It is possible that the resource is null.</remarks>
@@ -143,6 +148,11 @@ namespace SpaceSimulator.Common.Rendering2D
             this.stop = stop;
             this.gradientStops = gradientStops.ToArray();
         }
+
+        /// <summary>
+        /// Indicates if the internal resources has been bound to a device context
+        /// </summary>
+        public bool HasBoundResources => this.linearGradientBrush != null;
 
         /// <summary>
         /// Applies the internal resource to the given function.

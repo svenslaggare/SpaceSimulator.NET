@@ -88,15 +88,6 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
-        /// Draws the component before the 3D
-        /// </summary>
-        /// <param name="deviceContext">The device context</param>
-        public virtual void DrawBefore3D(SharpDX.Direct2D1.DeviceContext deviceContext)
-        {
-
-        }
-
-        /// <summary>
         /// Draws the component after the 3D
         /// </summary>
         /// <param name="deviceContext">The device context</param>

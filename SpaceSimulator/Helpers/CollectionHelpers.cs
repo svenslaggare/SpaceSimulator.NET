@@ -52,5 +52,31 @@ namespace SpaceSimulator.Helpers
         {
             Sort(list, (x, y) => x.CompareTo(y));
         }
+
+        /// <summary>
+        /// Splits a sequence based on the given predicate
+        /// </summary>
+        /// <typeparam name="T">The type of the sequence</typeparam>
+        /// <param name="sequence">The sequence</param>
+        /// <param name="predicate">The predicate</param>
+        public static (IList<T>, IList<T>) Split<T>(this IEnumerable<T> sequence, Predicate<T> predicate)
+        {
+            var first = new List<T>();
+            var second = new List<T>();
+
+            foreach (var element in sequence)
+            {
+                if (predicate(element))
+                {
+                    first.Add(element);
+                }
+                else
+                {
+                    second.Add(element);
+                }
+            }
+
+            return (first, second);
+        }
     }
 }

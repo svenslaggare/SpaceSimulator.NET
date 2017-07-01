@@ -109,6 +109,7 @@
     <Compile Include="Common\Rendering2D\RenderingImage2D.cs" />
     <Compile Include="Common\Rendering2D\RenderingManager2D.cs" />
     <Compile Include="Common\Rendering2D\RenderingPathGeometry.cs" />
+    <Compile Include="Common\RenderingPasses.cs" />
     <Compile Include="Common\RenderToTexture.cs" />
     <Compile Include="Common\TextureHelpers.cs" />
     <Compile Include="Common\UI\ButtonUIObject.cs" />
@@ -122,6 +123,9 @@
     <Compile Include="Common\UI\UIHelpers.cs" />
     <Compile Include="Common\UI\UIManager.cs" />
     <Compile Include="Common\UI\UIObject.cs" />
+    <Compile Include="Mathematics\StatisticsHelpers.cs" />
+    <Compile Include="Mathematics\Vector2d.cs" />
+    <Compile Include="Rendering\PlotHeatmap.cs" />
     <Compile Include="Simulator\Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />
     <Compile Include="Helpers\CollisionHelpers.cs" />

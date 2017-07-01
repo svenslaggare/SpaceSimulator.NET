@@ -54,6 +54,12 @@ namespace SpaceSimulator.Simulator.Environments
                 double ringRadius = 0)
             {
                 var orbit = new OrbitPosition(body.Orbit(primaryBody), 0.0);
+
+                if (coplanar)
+                {
+                    orbit = orbit.Set(inclination: 0, longitudeOfAscendingNode: 0, argumentOfPeriapsis: 0);
+                }
+
                 var newObject = simulatorEngine.AddPlanetInOrbit(
                     name,
                     PhysicsObjectType.NaturalSatellite,

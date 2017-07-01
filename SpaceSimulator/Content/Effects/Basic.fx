@@ -15,6 +15,9 @@ cbuffer cbPerFrame
 	float  gFogStart;
 	float  gFogRange;
 	float4 gFogColor;
+
+	float gBlurSizeX;
+	float gBlurSizeY;
 };
 
 cbuffer cbPerObject
@@ -138,6 +141,86 @@ float4 PS(VertexOut pin, uniform int gLightCount, uniform bool gUseTexure) : SV_
 	return litColor;
 }
 
+float4 SunPS_Horizontal(VertexOut pin, uniform bool gUseTexure) : SV_Target
+{
+	// Interpolating normal can unnormalize it, so normalize it.
+	pin.NormalW = normalize(pin.NormalW);
+
+	// The toEye vector is used in lighting.
+	float3 toEye = gEyePosW - pin.PosW;
+
+	// Cache the distance to the eye from this surface point.
+	float distToEye = length(toEye);
+
+	// Normalize.
+	toEye /= distToEye;
+
+	// Default to multiplicative identity.
+	float4 texColor = float4(1, 1, 1, 1);
+	if (gUseTexure)
+	{
+		// Sample texture.
+		texColor = gDiffuseMap.Sample(samAnisotropic, pin.Tex);
+	}
+
+	float4 litColor = texColor;
+
+	// Common to take alpha from diffuse material and texture.
+	litColor.a = gMaterial.Diffuse.a * texColor.a;
+
+	// Blur
+	//float blurSizeX = gBlurSizeX;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x - 3.0*blurSizeX, pin.Tex.y)) * 0.09f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x - 2.0*blurSizeX, pin.Tex.y)) * 0.11f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x - blurSizeX, pin.Tex.y)) * 0.18f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, pin.Tex) * 0.24f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x + blurSizeX, pin.Tex.y)) * 0.18f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x + 2.0*blurSizeX, pin.Tex.y)) * 0.11f;
+	//litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x + 3.0*blurSizeX, pin.Tex.y)) * 0.09f;
+
+	return litColor;
+}
+
+float4 SunPS_Vertical(VertexOut pin, uniform bool gUseTexure) : SV_Target
+{
+	// Interpolating normal can unnormalize it, so normalize it.
+	pin.NormalW = normalize(pin.NormalW);
+
+	// The toEye vector is used in lighting.
+	float3 toEye = gEyePosW - pin.PosW;
+
+	// Cache the distance to the eye from this surface point.
+	float distToEye = length(toEye);
+
+	// Normalize.
+	toEye /= distToEye;
+
+	// Default to multiplicative identity.
+	float4 texColor = float4(1, 1, 1, 1);
+	if (gUseTexure)
+	{
+		// Sample texture.
+		texColor = gDiffuseMap.Sample(samAnisotropic, pin.Tex);
+	}
+
+	float4 litColor = texColor;
+
+	// Common to take alpha from diffuse material and texture.
+	litColor.a = gMaterial.Diffuse.a * texColor.a;
+
+	// Blur
+	float blurSizeY = gBlurSizeY;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y - 3.0*blurSizeY)) * 0.09f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y - 2.0*blurSizeY)) * 0.11f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y - blurSizeY)) * 0.18f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, pin.Tex) * 0.24f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y + blurSizeY)) * 0.18f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y + 2.0*blurSizeY)) * 0.11f;
+	litColor += gDiffuseMap.Sample(samAnisotropic, float2(pin.Tex.x, pin.Tex.y + 3.0*blurSizeY)) * 0.09f;
+
+	return litColor;
+}
+
 technique11 Light1
 {
 	pass P0
@@ -215,5 +298,15 @@ technique11 Light3Tex
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS(3, true)));
+	}
+}
+
+technique11 SunTex
+{
+	pass P0
+	{
+		SetVertexShader(CompileShader(vs_5_0, VS()));
+		SetGeometryShader(NULL);
+		SetPixelShader(CompileShader(ps_5_0, SunPS_Horizontal(true)));
 	}
 }

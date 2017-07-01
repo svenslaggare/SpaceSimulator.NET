@@ -38,6 +38,9 @@ namespace SpaceSimulator.UI
         private readonly ListBoxUIObject rendevouzTargetList;
         private readonly ListBoxUIObject planetaryRendevouzTargetList;
 
+        private PlotHeatmap deltaVChart;
+        private bool showDeltaVChart = false;
+
         /// <summary>
         /// Creates a new maneuver UI component
         /// </summary>
@@ -398,9 +401,13 @@ namespace SpaceSimulator.UI
                 var maneuver = InterplanetaryManeuver.PlanetaryTransfer(
                     this.SimulatorEngine,
                     this.SelectedObject,
-                    targetObject);
+                    targetObject,
+                    out var possibleDepartureBurns);
                 this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, maneuver);
                 this.SelectedObject.Target = targetObject;
+
+                this.showDeltaVChart = true;
+                this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
             }
         }
 
@@ -511,6 +518,11 @@ namespace SpaceSimulator.UI
         public override void Draw(DeviceContext deviceContext)
         {
             this.DrawManeuverTexts(deviceContext);
+
+            if (this.showDeltaVChart)
+            {
+                this.deltaVChart.Draw(deviceContext, new Vector2(400, 50));
+            }
         }
     }
 }

@@ -65,6 +65,9 @@ namespace SpaceSimulator.Common.Effects
         private readonly EffectVariable materialVariable;
         private readonly EffectShaderResourceVariable diffuseMapVariable;
 
+        private readonly EffectScalarVariable blurSizeXVariable;
+        private readonly EffectScalarVariable blurSizeYVariable;
+
         /// <summary>
         /// The input layout
         /// </summary>
@@ -110,6 +113,9 @@ namespace SpaceSimulator.Common.Effects
             this.dirLightsVariable = this.effect.GetVariableByName("gDirLights");
             this.materialVariable = this.effect.GetVariableByName("gMaterial");
             this.diffuseMapVariable = this.effect.GetVariableByName("gDiffuseMap").AsShaderResource();
+
+            this.blurSizeXVariable = this.effect.GetVariableByName("gBlurSizeX").AsScalar();
+            this.blurSizeYVariable = this.effect.GetVariableByName("gBlurSizeY").AsScalar();
         }
 
         /// <summary>
@@ -276,11 +282,29 @@ namespace SpaceSimulator.Common.Effects
 			this.diffuseMapVariable.SetResource(diffuseMap);
 		}
 
-		/// <summary>
-		/// Returns the given technique
-		/// </summary>
-		/// <param name="name">The name of the technique</param>
-		public EffectTechnique GetTechnique(string name)
+        /// <summary>
+        /// Sets the blur size x
+        /// </summary>
+        /// <param name="amount">The amount</param>
+        public void SetBlurSizeX(float amount)
+        {
+            this.blurSizeXVariable.Set(amount);
+        }
+
+        /// <summary>
+        /// Sets the blur size y
+        /// </summary>
+        /// <param name="amount">The amount</param>
+        public void SetBlurSizeY(float amount)
+        {
+            this.blurSizeYVariable.Set(amount);
+        }
+
+        /// <summary>
+        /// Returns the given technique
+        /// </summary>
+        /// <param name="name">The name of the technique</param>
+        public EffectTechnique GetTechnique(string name)
 		{
 			return this.effect.GetTechniqueByName(name);
 		}
@@ -319,6 +343,9 @@ namespace SpaceSimulator.Common.Effects
             this.dirLightsVariable?.Dispose();
             this.materialVariable?.Dispose();
             this.diffuseMapVariable?.Dispose();
+
+            this.blurSizeXVariable?.Dispose();
+            this.blurSizeYVariable?.Dispose();
 
             this.InputLayout?.Dispose();
         }

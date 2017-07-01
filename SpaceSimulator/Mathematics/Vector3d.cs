@@ -155,6 +155,18 @@ namespace SpaceSimulator.Mathematics
         /// <summary>
         /// Initializes a new instance of the <see cref="Vector3d"/> struct.
         /// </summary>
+        /// <param name="value">A vector containing the values with which to initialize the X and Y components.</param>
+        /// <param name="z">Initial value for the Z component of the vector.</param>
+        public Vector3d(Vector2d value, double z)
+        {
+            X = value.X;
+            Y = value.Y;
+            Z = z;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vector3d"/> struct.
+        /// </summary>
         /// <param name="x">Initial value for the X component of the vector.</param>
         /// <param name="y">Initial value for the Y component of the vector.</param>
         /// <param name="z">Initial value for the Z component of the vector.</param>

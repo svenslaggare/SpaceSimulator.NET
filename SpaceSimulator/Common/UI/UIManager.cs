@@ -112,17 +112,17 @@ namespace SpaceSimulator.Common.UI
         }
 
         /// <summary>
-        /// Handles when a mouse button is pressed
+        /// Selects an element at the given position
         /// </summary>
-        /// <param name="mousePosition">The position of the mouse</param>
-        /// <param name="button">Which button that is being pressed</param>
-        public void OnMouseButtonDown(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
+        /// <param name="position">The position</param>
+        /// <returns>The element or null</returns>
+        public UIElement SelectElement(Vector2 position)
         {
             UIElement topElement = null;
 
             foreach (var element in this.elements)
             {
-                if (element.BoundingRectangle.Contains(mousePosition.X, mousePosition.Y))
+                if (element.BoundingRectangle.Contains(position.X, position.Y))
                 {
                     if (topElement == null || element.ZOrder >= topElement.ZOrder)
                     {
@@ -130,6 +130,18 @@ namespace SpaceSimulator.Common.UI
                     }
                 }
             }
+
+            return topElement;
+        }
+
+        /// <summary>
+        /// Handles when a mouse button is pressed
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        /// <param name="button">Which button that is being pressed</param>
+        public void OnMouseButtonDown(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
+        {
+            var topElement = this.SelectElement(mousePosition);
 
             if (topElement != null)
             {

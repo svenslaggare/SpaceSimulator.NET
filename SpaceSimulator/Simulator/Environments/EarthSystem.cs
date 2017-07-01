@@ -103,14 +103,19 @@ namespace SpaceSimulator.Simulator.Environments
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartEngine();
 
-            //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
-            //    "Satellite 1",
-            //    new ObjectConfig(1000),
-            //    new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystem.Earth.Radius + 300E3), 0.0));
-            //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite1));
+            var satellite1 = simulatorEngine.AddSatelliteInOrbit(
+                "Satellite 1",
+                1000,
+                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
+                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             var orbitPosition2 = new OrbitPosition(
-                Physics.Orbit.New(earth, parameter: 3.0 * Simulator.SolarSystemBodies.Earth.Radius, eccentricity: 0.0),
+                Physics.Orbit.New(
+                    earth,
+                    parameter: 3.0 * Simulator.SolarSystemBodies.Earth.Radius,
+                    eccentricity: 0.2,
+                    inclination: 0 * MathUtild.Deg2Rad),
                 87.2 * MathUtild.Deg2Rad);
 
             var object2 = simulatorEngine.AddSatelliteInOrbit(
