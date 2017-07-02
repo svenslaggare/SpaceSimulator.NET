@@ -114,19 +114,19 @@ namespace SpaceSimulator.Simulator.Environments
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
-            var rocketObject = simulatorEngine.AddSatellite(
-                earth,
-                "Rocket 1",
-                1000,
-                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
-                //OrbitHelpers.FromCoordinates(earth, 0 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
-                Vector3d.Zero);
-            rocketObject.CheckImpacted(0);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, rocketObject, Color.Yellow, baseDir + "Satellite.png"));
+            //var rocketObject = simulatorEngine.AddSatellite(
+            //    earth,
+            //    "Rocket 1",
+            //    1000,
+            //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
+            //    OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
+            //    //OrbitHelpers.FromCoordinates(earth, 0 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
+            //    Vector3d.Zero);
+            //rocketObject.CheckImpacted(0);
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, camera, rocketObject, Color.Yellow, baseDir + "Satellite.png"));
 
             //var falcon9TargetAltitude = 250E3;
-            var falcon9TargetAltitude = 300E3;
+            //var falcon9TargetAltitude = 300E3;
             //var falcon9TargetAltitude = 1000E3;
 
             //var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);

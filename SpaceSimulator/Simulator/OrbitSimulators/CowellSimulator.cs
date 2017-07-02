@@ -79,16 +79,17 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             //{
             //    if (physicsObject != object2 && object2.Type != PhysicsObjectType.ArtificialSatellite)
             //    {
-            //        totalAcceleration += Formulas.GravityAcceleration(
+            //        totalAcceleration += OrbitFormulas.GravityAcceleration(
             //            object2.StandardGravitationalParameter,
             //            state.Position - object2.Position);
             //    }
             //}
             //return totalAcceleration;
 
-            //return Formulas.GravityAcceleration(
+            //return OrbitFormulas.GravityAcceleration(
             //    physicsObject.PrimaryBody.StandardGravitationalParameter,
             //    state.Position - physicsObject.PrimaryBody.Position);
+
             if (physicsObject.PrimaryBody == null)
             {
                 return Vector3d.Zero;

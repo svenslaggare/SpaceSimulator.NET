@@ -773,7 +773,7 @@ namespace SpaceSimulator.Simulator
         /// Calculates the next states
         /// </summary>
         /// <param name="deltaTime">The delta time</param>
-        private void CalculateNextState(double deltaTime)
+        private void CalculateNextStates(double deltaTime)
         {
             foreach (var currentObject in this.objects)
             {
@@ -863,7 +863,7 @@ namespace SpaceSimulator.Simulator
                 }
 
                 //Calculate the next states
-                this.CalculateNextState(deltaTime);
+                this.CalculateNextStates(deltaTime);
 
                 //Update state
                 foreach (var currentObject in this.objects)
