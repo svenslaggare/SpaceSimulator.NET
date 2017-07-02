@@ -88,10 +88,10 @@ namespace SpaceSimulator.Physics.Solvers
                     deltaTime);
             }
 
-            var k0 = Evaluate(primaryBody, ref state, totalTime, 0, ref zero, calculateAcceleration);
-            var k1 = Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
-            var k2 = Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
-            var k3 = Evaluate(primaryBody, ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
+            var k0 = this.Evaluate(primaryBody, ref state, totalTime, 0, ref zero, calculateAcceleration);
+            var k1 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
+            var k2 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
+            var k3 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
 
             var velocity = (1.0 / 6.0) * (k0.Velocity + 2 * (k1.Velocity + k2.Velocity) + k3.Velocity);
             var acceleration = (1.0 / 6.0) * (k0.Acceleration + 2 * (k1.Acceleration + k2.Acceleration) + k3.Acceleration);

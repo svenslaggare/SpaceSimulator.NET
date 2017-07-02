@@ -36,8 +36,8 @@ namespace SpaceSimulator.Physics.Solvers
 
             for (int i = 0; i < this.maxNumIterations; i++)
             {
-                var S = MathHelpers.S(zn);
-                var C = MathHelpers.C(zn);
+                var S = MathHelpers.StumpffS(zn);
+                var C = MathHelpers.StumpffC(zn);
                 var y = CalculateY(r1Length, r2Length, zn, S, C, A);
 
                 //If we get a negative z value, choose a new one
@@ -139,7 +139,7 @@ namespace SpaceSimulator.Physics.Solvers
             //Solve for y
             var A = Math.Sign(Math.PI - deltaTrueAnomaly) * Math.Sqrt(r1Length * r2Length * (1 + Math.Cos(deltaTrueAnomaly)));
             var z = this.SolveForZ(deltaTrueAnomaly, time, sqrtMu, r1Length, r2Length, A);
-            var y = CalculateY(r1Length, r2Length, z, MathHelpers.S(z), MathHelpers.C(z), A);
+            var y = CalculateY(r1Length, r2Length, z, MathHelpers.StumpffS(z), MathHelpers.StumpffC(z), A);
 
             //Calculate the velocity vectors at the two positions
             var f = 1 - y / r1Length;

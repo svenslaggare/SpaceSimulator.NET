@@ -85,8 +85,8 @@ namespace SpaceSimulator.Physics.Solvers
             {
                 var xnSquared = xn * xn;
                 var z = xnSquared * alpha;
-                var Cz = MathHelpers.C(z);
-                var Sz = MathHelpers.S(z);
+                var Cz = MathHelpers.StumpffC(z);
+                var Sz = MathHelpers.StumpffS(z);
                 var tn = (r0v0dotBySqrtMu * xnSquared * Cz
                           + (1 - r0Length * alpha) * xnSquared * xn * Sz + r0Length * xn)
                           / sqrtMu;
@@ -154,8 +154,8 @@ namespace SpaceSimulator.Physics.Solvers
             //Solve for x
             var x = SolveForUniversalVariable(initialOrbit, ref r0, ref v0, ref time, ref sqrtMu, ref alpha);
             var z = (x * x) * alpha;
-            var Sz = MathHelpers.S(z);
-            var Cz = MathHelpers.C(z);
+            var Sz = MathHelpers.StumpffS(z);
+            var Cz = MathHelpers.StumpffC(z);
 
             //Compute the radius vector
             var f = 1 - ((x * x) / r0Length) * Cz;

@@ -15,6 +15,7 @@ using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Physics.Solvers;
 using SpaceSimulator.Rendering;
+using SpaceSimulator.Rendering.Plot;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.UI
@@ -38,7 +39,7 @@ namespace SpaceSimulator.UI
         private readonly ListBoxUIObject rendevouzTargetList;
         private readonly ListBoxUIObject planetaryRendevouzTargetList;
 
-        private PlotHeatmap deltaVChart;
+        private Heatmap deltaVChart;
         private bool showDeltaVChart = false;
 
         /// <summary>
@@ -429,7 +430,7 @@ namespace SpaceSimulator.UI
                         this.SelectedObject.Target = stateTuple.Item2;
 
                         this.showDeltaVChart = true;
-                        this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
+                        this.deltaVChart = Heatmap.CreateDeltaVChart(this.RenderingManager2D, possibleDepartureBurns);
 
                         this.SimulatorContainer.Unfreeze();
                     });

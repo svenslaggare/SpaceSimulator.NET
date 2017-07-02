@@ -55,16 +55,16 @@ namespace SpaceSimulator.Physics.Solvers
             var r = state.Position - initialPrimaryBodyState.Position;
             OrbitHelpers.GetSphericalCoordinates(r, out var latitude, out var longitude);
             longitude += primaryBody.RotationalSpeed() * time;
-            var rNext = OrbitHelpers.FromSphericalCoordinates(latitude, longitude, r.Length());
+            var nextPosition = OrbitHelpers.FromSphericalCoordinates(latitude, longitude, r.Length());
 
             //Calculate the surface velocity due to rotation of primary body
-            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(rNext), primaryBody.AxisOfRotation);
+            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(nextPosition), primaryBody.AxisOfRotation);
             surfaceSpeedDir.Normalize();
             var velocity = OrbitHelpers.SurfaceSpeedDueToRotation(primaryBody, Math.PI / 2.0 - latitude) * surfaceSpeedDir;
 
             return new ObjectState(
                 nextPrimaryBodyState.Time + time,
-                nextPrimaryBodyState.Position + rNext,
+                nextPrimaryBodyState.Position + nextPosition,
                 nextPrimaryBodyState.Velocity + velocity,
                 state.Acceleration,
                 rotation: state.Rotation,

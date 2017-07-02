@@ -269,7 +269,7 @@ namespace SpaceSimulator.Rendering
         public static float OrbitLineWidth(BaseCamera camera, Vector3 position)
         {
             var width = Vector3.Distance(position, camera.Position) / 200.0f;
-            return MathUtil.Clamp(width, 0.0001f, 100.0f);
+            return MathUtil.Clamp(width, 0.0001f, 100.0f) / 1.5f;
         }
 
         /// <summary>

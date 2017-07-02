@@ -74,8 +74,8 @@ namespace SpaceSimulator.UI
                 this.KeyboardManager,
                 this.SimulatorEngine.Objects,
                 ref this.selectedObjectIndex,
-                SharpDX.DirectInput.Key.PageUp,
                 SharpDX.DirectInput.Key.PageDown,
+                SharpDX.DirectInput.Key.PageUp,
                 out var changed);
 
             if (changed)

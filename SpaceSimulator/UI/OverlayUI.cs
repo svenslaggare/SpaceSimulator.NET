@@ -406,6 +406,17 @@ namespace SpaceSimulator.UI
                                 overlayObject.TextSize.Height + overlayObject.ThumbnailSize.Y / 2.0f)));
                 }
             }
+
+            //var tmpOverlayObject = this.overlayObjects.FirstOrDefault(x => x.RenderingObject.PhysicsObject.Name == "Earth");
+            //tmpOverlayObject.Thumbnail.ApplyResource(bitmap =>
+            //{
+            //    deviceContext.DrawBitmap(
+            //        bitmap,
+            //        1.0f,
+            //        SharpDX.Direct2D1.InterpolationMode.MultiSampleLinear,
+            //        new RectangleF(0, 0, tmpOverlayObject.Thumbnail.Size.Width, tmpOverlayObject.Thumbnail.Size.Height),
+            //        Matrix.Scaling(0.25f));
+            //});
         }
 
         public override void Draw(DeviceContext deviceContext)

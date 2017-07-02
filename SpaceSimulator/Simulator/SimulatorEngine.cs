@@ -342,21 +342,18 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Adds a planet object in given orbit around the given object
+        /// Adds a planet object in the given orbit
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="mass">The mass of the object</param>
         /// <param name="radius">The radius of the object</param>
         /// <param name="rotationalPeriod">The rotational period</param>
         /// <param name="axisOfRotation">The axis-of-rotation</param>
-        /// <param name="config">The configuration</param>
         /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="orbitPosition">The position in the orbit</param>
-        /// <param name="type">The type of the object</param>
         /// <returns>The created object</returns>
         public PlanetObject AddPlanetInOrbit(
             string name,
-            PhysicsObjectType type,
             double mass,
             double radius,
             double rotationalPeriod,
@@ -364,16 +361,11 @@ namespace SpaceSimulator.Simulator
             IAtmosphericModel atmosphericModel,
             OrbitPosition orbitPosition)
         {
-            if (type == PhysicsObjectType.ArtificialSatellite)
-            {
-                throw new ArgumentException("Invalid type.");
-            }
-
             var orbit = orbitPosition.Orbit;
             var primaryBodyState = orbit.PrimaryBody.State;
             var newObject = new PlanetObject(
                 name,
-                type,
+                PhysicsObjectType.NaturalSatellite,
                 mass,
                 radius,
                 rotationalPeriod,
@@ -420,7 +412,7 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Adds a satellite in given orbit around the given object
+        /// Adds a satellite in given orbit
         /// </summary>
         /// <param name="name">The name of the object</param>
         /// <param name="mass">The mass of the object</param>
@@ -479,9 +471,10 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Adds a rocket object in given orbit around the given object
+        /// Adds a rocket object in given orbit
         /// </summary>
         /// <param name="name">The name of the object</param>
+        /// <param name="atmosphericProperties">The atmospheric properties</param>
         /// <param name="rocketStages">The rocket stages</param>
         /// <param name="orbitPosition">The position in the orbit</param>
         /// <returns>The created object</returns>
@@ -564,6 +557,7 @@ namespace SpaceSimulator.Simulator
         {
             foreach (var object1 in this.objects)
             {
+                //if (object1.Type == PhysicsObjectType.ArtificialSatellite && !object1.HasImpacted)
                 if (object1.Type == PhysicsObjectType.ArtificialSatellite)
                 {
                     //Change primary bodys

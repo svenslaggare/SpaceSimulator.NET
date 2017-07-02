@@ -9,12 +9,12 @@ using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 
-namespace SpaceSimulator.Rendering
+namespace SpaceSimulator.Rendering.Plot
 {
     /// <summary>
     /// Plots a heatmap
     /// </summary>
-    public sealed class PlotHeatmap
+    public sealed class Heatmap
     {
         private readonly RenderingManager2D renderingManager2D;
         private readonly IList<ColorRange> colorScheme;
@@ -105,7 +105,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="values">The values</param>
         /// <param name="showMinimumValue">Indicates if the minimum value is shown as a cross</param>
         /// <param name="minimumValueCrossSize">The size of the minimum value cross</param>
-        public PlotHeatmap(RenderingManager2D renderingManager2D, IList<ColorRange> colorScheme, IList<HeatmapValue> values, bool showMinimumValue, int minimumValueCrossSize = 5)
+        public Heatmap(RenderingManager2D renderingManager2D, IList<ColorRange> colorScheme, IList<HeatmapValue> values, bool showMinimumValue, int minimumValueCrossSize = 5)
         {
             this.renderingManager2D = renderingManager2D;
             this.colorScheme = colorScheme;
@@ -124,18 +124,18 @@ namespace SpaceSimulator.Rendering
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="possibleLaunches">The possible launches</param>
         /// <param name="deltaVLimit">The maximum allowed delta V</param>
-        public static PlotHeatmap CreateDeltaVChart(RenderingManager2D renderingManager2D, IList<Physics.Maneuvers.InterceptManeuver.PossibleLaunch> possibleLaunches, double deltaVLimit = 30E3)
+        public static Heatmap CreateDeltaVChart(RenderingManager2D renderingManager2D, IList<Physics.Maneuvers.InterceptManeuver.PossibleLaunch> possibleLaunches, double deltaVLimit = 30E3)
         {
             var minValue = double.MaxValue;
             var maxValue = double.MinValue;
-            var values = new List<PlotHeatmap.HeatmapValue>();
+            var values = new List<Heatmap.HeatmapValue>();
 
             foreach (var possibleLaunch in possibleLaunches)
             {
                 var deltaV = possibleLaunch.DeltaVelocity.Length();
                 deltaV = Math.Min(deltaV, deltaVLimit);
 
-                values.Add(new PlotHeatmap.HeatmapValue(
+                values.Add(new Heatmap.HeatmapValue(
                     new Vector2d(possibleLaunch.Duration, possibleLaunch.StartTime),
                     //new Vector2d(possibleLaunch.ArrivalTime, possibleLaunch.StartTime),
                     deltaV));
@@ -144,10 +144,10 @@ namespace SpaceSimulator.Rendering
                 maxValue = Math.Max(maxValue, deltaV);
             }
 
-            return new PlotHeatmap(
+            return new Heatmap(
                 renderingManager2D,
-                PlotHeatmap.DeltaVColorScheme(minValue, maxValue),
-                new List<PlotHeatmap.HeatmapValue>(values),
+                Heatmap.DeltaVColorScheme(minValue, maxValue),
+                new List<Heatmap.HeatmapValue>(values),
                 true);
         }
 

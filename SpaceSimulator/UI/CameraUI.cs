@@ -79,8 +79,8 @@ namespace SpaceSimulator.UI
                 this.KeyboardManager,
                 this.SimulatorEngine.Objects,
                 ref this.focusObjectIndex,
-                SharpDX.DirectInput.Key.Home,
                 SharpDX.DirectInput.Key.End,
+                SharpDX.DirectInput.Key.Home,
                 out var changed);
 
             if (changed)

@@ -125,7 +125,7 @@
     <Compile Include="Common\UI\UIObject.cs" />
     <Compile Include="Mathematics\StatisticsHelpers.cs" />
     <Compile Include="Mathematics\Vector2d.cs" />
-    <Compile Include="Rendering\PlotHeatmap.cs" />
+    <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Simulator\Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />
     <Compile Include="Helpers\CollisionHelpers.cs" />
@@ -164,7 +164,7 @@
     <Compile Include="Physics\Rocket\RocketEngine.cs" />
     <Compile Include="Physics\Rocket\RocketFormulas.cs" />
     <Compile Include="Physics\Rocket\RocketStage.cs" />
-    <Compile Include="Rendering\Plot2D.cs" />
+    <Compile Include="Rendering\Plot\Function2D.cs" />
     <Compile Include="Simulator\ITextOutputWriter.cs" />
     <Compile Include="Simulator\NaturalSatelliteObject.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />

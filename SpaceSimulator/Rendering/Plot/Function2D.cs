@@ -11,12 +11,12 @@ using SpaceSimulator.Common;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;
 
-namespace SpaceSimulator.Rendering
+namespace SpaceSimulator.Rendering.Plot
 {
     /// <summary>
     /// Represents a rendering of 2D function
     /// </summary>
-    public sealed class Plot2D : IDisposable
+    public sealed class Function2D : IDisposable
     {
         private readonly RenderingManager2D renderingManager2D;
 
@@ -45,7 +45,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="height">The height of the plot</param>
         /// <param name="labelAxisX">The label for the x-axis</param>
         /// <param name="labelAxisY">The label for the y-axis</param>
-        public Plot2D(RenderingManager2D renderingManager2D, IList<Vector2> values, Color color, int width, int height, string labelAxisX = "", string labelAxisY = "")
+        public Function2D(RenderingManager2D renderingManager2D, IList<Vector2> values, Color color, int width, int height, string labelAxisX = "", string labelAxisY = "")
         {
             this.width = width;
             this.height = height;

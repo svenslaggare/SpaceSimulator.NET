@@ -153,6 +153,7 @@ namespace SpaceSimulator.Rendering
                 if (this.PhysicsObject is NaturalSatelliteObject naturalObject)
                 {
                     size = this.camera.ToDraw(naturalObject.Radius);
+                    //size = Math.Max(0.01f * (this.DrawPosition - this.camera.Position).Length(), size);
                 }
                 else
                 {

@@ -130,10 +130,10 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
-        /// Computes the C function
+        /// Computes the Stumpff C function
         /// </summary>
         /// <param name="z">The value</param>
-        public static double C(double z)
+        public static double StumpffC(double z)
         {
             if (Math.Abs(z) < stumpffFunctionZeroLimit)
             {
@@ -154,10 +154,10 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
-        /// Computes the S function
+        /// Computes the Stumpff S function
         /// </summary>
         /// <param name="z">The value</param>
-        public static double S(double z)
+        public static double StumpffS(double z)
         {
             if (Math.Abs(z) < stumpffFunctionZeroLimit)
             {
