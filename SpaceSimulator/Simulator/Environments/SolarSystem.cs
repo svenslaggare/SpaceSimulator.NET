@@ -27,7 +27,7 @@ namespace SpaceSimulator.Simulator.Environments
         /// <param name="camera">The camera</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
         /// <returns>Simulator engine, rendering objects</returns>
-        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, OrbitCamera camera, bool coplanar = false)
+        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, SpaceCamera camera, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -68,7 +68,7 @@ namespace SpaceSimulator.Simulator.Environments
                     body.Radius,
                     body.RotationalPeriod,
                     body.AxisOfRotation,
-                    new NoAtmosphereModel(),
+                    body.AtmosphericModel,
                     orbit);
 
                 renderingObjects.Add(new RenderingObject(
@@ -125,31 +125,29 @@ namespace SpaceSimulator.Simulator.Environments
             //rocketObject.CheckImpacted(0);
             //renderingObjects.Add(new RenderingObject(graphicsDevice, camera, rocketObject, Color.Yellow, baseDir + "Satellite.png"));
 
-            //var falcon9TargetAltitude = 250E3;
-            //var falcon9TargetAltitude = 300E3;
-            //var falcon9TargetAltitude = 1000E3;
+            var falcon9TargetAltitude = 300E3;
 
-            //var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
-            //var falcon9Object = simulatorEngine.AddRocket(
-            //    earth,
-            //    "Falcon 9",
-            //    Rockets.CreateFalcon9(4000.0),
-            //    OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
-            //    //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
-            //    Vector3d.Zero);
-            //renderingObjects.Add(new RenderingObject(graphicsDevice, camera, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
+            var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
+            var falcon9Object = simulatorEngine.AddRocket(
+                earth,
+                "Falcon 9",
+                Rockets.CreateFalcon9(4000.0),
+                OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
+                //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
+                Vector3d.Zero);
+            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
-            //var bestPitchStart = 2E3;
-            //var bestPitchEnd = 12.8625E3;
-            //falcon9Object.SetControlProgram(new AscentControlProgram(
-            //    falcon9Object,
-            //    falcon9TargetOrbit,
-            //    bestPitchStart,
-            //    bestPitchEnd,
-            //    simulatorEngine.TextOutputWriter));
+            var bestPitchStart = 2E3;
+            var bestPitchEnd = 12.8625E3;
+            falcon9Object.SetControlProgram(new AscentControlProgram(
+                falcon9Object,
+                falcon9TargetOrbit,
+                bestPitchStart,
+                bestPitchEnd,
+                simulatorEngine.TextOutputWriter));
 
-            //falcon9Object.CheckImpacted(0);
-            //falcon9Object.StartEngine();
+            falcon9Object.CheckImpacted(0);
+            falcon9Object.StartEngine();
 
             //var satellite2 = simulatorEngine.AddObjectInOrbit(
             //    "Satellite 2",

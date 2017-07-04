@@ -779,15 +779,12 @@ namespace SpaceSimulator.Simulator
             {
                 if (!currentObject.IsObjectOfReference)
                 {
-                    this.currentOrbitSimulator.Update(this.totalTime, deltaTime, currentObject, this.naturalObjects, this.AddNewObject);
+                    this.currentOrbitSimulator.Update(this.totalTime, deltaTime, currentObject, this.AddNewObject);
 
-                    if (this.SimulationMode == PhysicsSimulationMode.KeplerProblemUniversalVariable)
-                    {
-                        //Set state to relative to handle update of the state of the primary body
-                        currentObject.SetNextState(currentObject.NextState.Add(
-                            position: -currentObject.PrimaryBody.Position,
-                            velocity: -currentObject.PrimaryBody.Velocity));
-                    }
+                    //Set state to relative to handle update of the state of the primary body
+                    var nextState = currentObject.NextState;
+                    nextState.MakeRelative(currentObject.PrimaryBody.State);
+                    currentObject.SetNextState(nextState);
                 }
                 else
                 {
@@ -814,16 +811,13 @@ namespace SpaceSimulator.Simulator
             }
 
             //Set the absolute state for all objects
-            if (this.SimulationMode == PhysicsSimulationMode.KeplerProblemUniversalVariable)
+            foreach (var currentObject in this.objects)
             {
-                foreach (var currentObject in this.objects)
+                if (!currentObject.IsObjectOfReference)
                 {
-                    if (!currentObject.IsObjectOfReference)
-                    {
-                        currentObject.SetNextState(currentObject.NextState.Add(
-                            position: currentObject.PrimaryBody.NextState.Position,
-                            velocity: currentObject.PrimaryBody.NextState.Velocity));
-                    }
+                    var nextState = currentObject.NextState;
+                    nextState.MakeAbsolute(currentObject.PrimaryBody.NextState);
+                    currentObject.SetNextState(nextState);     
                 }
             }
         }

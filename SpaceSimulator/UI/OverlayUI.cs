@@ -231,40 +231,40 @@ namespace SpaceSimulator.UI
 
         public override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)
         {
-            if (button == MouseButtons.Left)
-            {
-                var selectedUIElement = this.uiManager.SelectElement(mousePosition);
-                if (selectedUIElement != null)
-                {
-                    return;
-                }
+            //if (button == MouseButtons.Left)
+            //{
+            //    var selectedUIElement = this.uiManager.SelectElement(mousePosition);
+            //    if (selectedUIElement != null)
+            //    {
+            //        return;
+            //    }
 
-                foreach (var overlayObject in this.overlayObjects)
-                {
-                    var selected = false;
-                    var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
-                    var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
+            //    foreach (var overlayObject in this.overlayObjects)
+            //    {
+            //        var selected = false;
+            //        var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
+            //        var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
 
-                    if (overlayObject.DrawThumbnail)
-                    {
-                        selected = screenMouseDistance <= 12.5;
-                    }
-                    else
-                    {
-                        if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
-                        {
-                            this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
-                            selected = screenMouseDistance <= renderedRadius;
-                        }
-                    }
+            //        if (overlayObject.DrawThumbnail)
+            //        {
+            //            selected = screenMouseDistance <= 12.5;
+            //        }
+            //        else
+            //        {
+            //            if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
+            //            {
+            //                this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
+            //                selected = screenMouseDistance <= renderedRadius;
+            //            }
+            //        }
 
-                    if (selected)
-                    {
-                        this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
-                        break;
-                    }
-                }
-            }
+            //        if (selected)
+            //        {
+            //            this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
+            //            break;
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>

@@ -126,6 +126,7 @@ namespace SpaceSimulator.Simulator
             this.RotationalPeriod = rotationalPeriod;
             this.AxisOfRotation = axisOfRotation;
             this.state = initialState;
+            this.nextState = state;
             this.PrimaryBody = primaryBody;
             this.ReferenceOrbit = initialOrbit;
             this.ReferenceState = initialState;
@@ -364,7 +365,7 @@ namespace SpaceSimulator.Simulator
                 var impacted = CollisionHelpers.SphereIntersection(
                     this.state.Position,
                     radius,
-                    this.PrimaryBody.NextState.Position,
+                    this.PrimaryBody.nextState.Position,
                     this.PrimaryBody.Radius);
 
                 //If impacted, move to the edge of the primary body

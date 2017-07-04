@@ -29,9 +29,9 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <param name="totalTime">The total simulated time</param>
         /// <param name="timeStep">The time step</param>
         /// <param name="currentObject">The current object</param>
-        /// <param name="objects">The objects</param>
         /// <param name="addObject">A function to add a new object</param>
-        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, IList<PhysicsObject> objects, Action<PhysicsObject> addObject)
+        /// 
+        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, Action<PhysicsObject> addObject)
         {
             var initialPrimaryState = currentObject.ReferencePrimaryBodyState;
             var initialState = currentObject.ReferenceState;

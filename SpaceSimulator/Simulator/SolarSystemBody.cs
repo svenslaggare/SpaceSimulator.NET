@@ -38,6 +38,11 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public Vector3d AxisOfRotation { get; }
 
+        /// <summary>
+        /// The atmospheric model
+        /// </summary>
+        public IAtmosphericModel AtmosphericModel { get; }
+
         private readonly Orbit referenceOrbit;
 
         /// <summary>
@@ -48,14 +53,23 @@ namespace SpaceSimulator.Simulator
         /// <param name="mass">The mass of the body</param>
         /// <param name="rotationalPeriod">The rotational period</param>
         /// <param name="axisOfRotation">The axis-of-rotation</param>
+        /// <param name="atmosphericModel">The atmospheric model</param>
         /// <param name="orbit">The orbit around the primary body</param>
-        public SolarSystemBody(double equatorialRadius, double meanRadius, double mass, double rotationalPeriod, Vector3d axisOfRotation, Orbit orbit)
+        public SolarSystemBody(
+            double equatorialRadius,
+            double meanRadius,
+            double mass,
+            double rotationalPeriod,
+            Vector3d axisOfRotation,
+            IAtmosphericModel atmosphericModel,
+            Orbit orbit)
         {
             this.EquatorialRadius = equatorialRadius;
             this.MeanRadius = meanRadius;
             this.Mass = mass;
             this.RotationalPeriod = rotationalPeriod;
             this.AxisOfRotation = axisOfRotation;
+            this.AtmosphericModel = atmosphericModel;
             this.referenceOrbit = orbit;
         }
 
@@ -98,7 +112,7 @@ namespace SpaceSimulator.Simulator
                 this.Radius,
                 this.RotationalPeriod,
                 this.AxisOfRotation,
-                new NoAtmosphereModel(),
+                this.AtmosphericModel,
                 primaryBody,
                 initialOrbit.CalculateState(initialTrueAnomaly, primaryBody.State),
                 initialOrbit);

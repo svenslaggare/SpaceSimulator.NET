@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Simulator
 {
@@ -36,6 +37,7 @@ namespace SpaceSimulator.Simulator
                 1.98855E30,
                 0,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 new Orbit());
 
             mercury = new SolarSystemBody(
@@ -44,6 +46,7 @@ namespace SpaceSimulator.Simulator
                 3.3011E23,
                 58.6462 * oneDay * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 57909050E3,
                    eccentricity: 0.20563,
@@ -58,6 +61,7 @@ namespace SpaceSimulator.Simulator
                 4.8675E24,
                 -243.0185 * oneDay * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 108208000E3,
                    eccentricity: 0.006772,
@@ -72,6 +76,7 @@ namespace SpaceSimulator.Simulator
                 5.9722E24,
                 Constants.SiderealDay * allowRotation,
                 Vector3d.Up,
+                new EarthAtmosphericModel(),
                 Orbit.New(
                    semiMajorAxis: 149598023E3,
                    eccentricity: 0.0167086,
@@ -86,6 +91,7 @@ namespace SpaceSimulator.Simulator
                 7.342E22,
                 27.321661 * oneDay * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                     semiMajorAxis: 384399E3,
                     eccentricity: 0.0549,
@@ -98,6 +104,7 @@ namespace SpaceSimulator.Simulator
                 6.4171E23,
                 24.622962 * oneHour * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 227.9392E9,
                    eccentricity: 0.0934,
@@ -112,6 +119,7 @@ namespace SpaceSimulator.Simulator
                 1.8986E27,
                 (9.0 * oneHour + 55.0 * 60.0 + 29.685) * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 778.299E9,
                    eccentricity: 0.048498,
@@ -126,6 +134,7 @@ namespace SpaceSimulator.Simulator
                 5.6836E26,
                 (10.0 * oneHour + 39.0 * 60.0 + 22.4) * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 1429.39E9,
                    eccentricity: 0.05555,
@@ -140,6 +149,7 @@ namespace SpaceSimulator.Simulator
                 8.6810E25,
                 17.24 * oneHour * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 2875.04E9,
                    eccentricity: 0.046381,
@@ -154,6 +164,7 @@ namespace SpaceSimulator.Simulator
                 1.0243E26,
                 16.11 * oneHour * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 4504.45E9,
                    eccentricity: 0.009456,
@@ -168,6 +179,7 @@ namespace SpaceSimulator.Simulator
                 1.303E22,
                 6.387230 * oneDay * allowRotation,
                 Vector3d.Up,
+                new NoAtmosphereModel(),
                 Orbit.New(
                    semiMajorAxis: 5915E9,
                    eccentricity: 0.24905,

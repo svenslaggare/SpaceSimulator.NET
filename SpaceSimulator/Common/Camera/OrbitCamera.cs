@@ -14,8 +14,8 @@ namespace SpaceSimulator.Common.Camera
 	/// <summary>
 	/// Represents an orbit camera
 	/// </summary>
-	public class OrbitCamera : BaseCamera
-	{
+	public class OrbitCamera : SpaceCamera
+    {
 		private float theta;
 		private float phi;
 		private float radius;
@@ -33,7 +33,6 @@ namespace SpaceSimulator.Common.Camera
         /// Creates a new orbit camera
         /// </summary>
         public OrbitCamera()
-			: base()
 		{
             this.theta = 1.5f * MathUtil.Pi;
             this.phi = 0.1f * MathUtil.Pi;
@@ -163,15 +162,6 @@ namespace SpaceSimulator.Common.Camera
         {
             this.radius -= delta * 0.005f * this.radius;
             this.radius = MathUtil.Clamp(this.radius, this.minRadius, this.maxRadius);
-        }
-
-        /// <summary>
-        /// Sets the scale factor
-        /// </summary>
-        /// <param name="primaryBody">The primary body to base the scale on</param>
-        public void SetScaleFactor(NaturalSatelliteObject primaryBody)
-        {
-            this.scaleFactor = 1.0 / (5.0 * primaryBody.Radius);
         }
     }
 }

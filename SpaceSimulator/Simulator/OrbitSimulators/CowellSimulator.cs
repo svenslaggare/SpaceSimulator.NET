@@ -28,22 +28,25 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <summary>
         /// Calculates the non-gravity based acceleration of the given object
         /// </summary>
-        /// <param name="artificialObject">The artificial physics object</param>
+        /// <param name="artificialObject">The physics object</param>
         /// <param name="state">The state</param>
         /// <param name="timeStep">The time step</param>
         private Vector3d CalculateNonGravityAcceleration(ArtificialPhysicsObject artificialObject, ref ObjectState state, double timeStep)
         {
             var nonGravityAcceleration = Vector3d.Zero;
-            var primaryBodyState = artificialObject.PrimaryBody.State;
+            var primaryBodyState = new ObjectState();
 
             if (artificialObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
                 nonGravityAcceleration += rocketObject.EngineAcceleration();
-                //if (rocketObject.IsEngineRunning)
+
+                //var currentStage = rocketObject.Stages.CurrentStage;
+
+                //if (currentStage.Engines.Count > 0)
                 //{
-                //    var currentStage = rocketObject.Stages.CurrentStage;
-                //    var deltaV = currentStage.EffectiveExhaustVelocity * Math.Log(rocketObject.Mass / (rocketObject.Mass - timeStep * currentStage.MassFlowRate));
-                //    var engineAcceleration = currentStage.NumberOfEngines * (deltaV / timeStep);
+                //    var currentEngine = currentStage.Engines[0];
+                //    var deltaV = currentEngine.EffectiveExhaustVelocity * Math.Log(rocketObject.Mass / (rocketObject.Mass - timeStep * currentEngine.MassFlowRate));
+                //    var engineAcceleration = currentStage.Engines.Count * (deltaV / timeStep);
                 //    nonGravityAcceleration += MathHelpers.Normalized(rocketObject.EngineAcceleration()) * engineAcceleration;
                 //}
             }
@@ -69,45 +72,23 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// </summary>
         /// <param name="physicsObject">The object</param>
         /// <param name="state">The state of the object</param>
-        /// <param name="objects">The objects</param>
         /// <param name="timeStep">The time step</param>
-        /// <param name="primary">Indicates if this is the primary acceleration</param>
-        private Vector3d CalculateAcceleration(PhysicsObject physicsObject, ref ObjectState state, IList<PhysicsObject> objects, double timeStep, bool primary)
+        private Vector3d CalculateAcceleration(PhysicsObject physicsObject, ref ObjectState state, double timeStep)
         {
-            //var totalAcceleration = Vector3d.Zero;
-            //foreach (var object2 in objects)
-            //{
-            //    if (physicsObject != object2 && object2.Type != PhysicsObjectType.ArtificialSatellite)
-            //    {
-            //        totalAcceleration += OrbitFormulas.GravityAcceleration(
-            //            object2.StandardGravitationalParameter,
-            //            state.Position - object2.Position);
-            //    }
-            //}
-            //return totalAcceleration;
-
-            //return OrbitFormulas.GravityAcceleration(
-            //    physicsObject.PrimaryBody.StandardGravitationalParameter,
-            //    state.Position - physicsObject.PrimaryBody.Position);
-
             if (physicsObject.PrimaryBody == null)
             {
                 return Vector3d.Zero;
             }
 
             var nonGravityAcceleration = Vector3d.Zero;
-            var primaryBodyState = physicsObject.PrimaryBody.State;
-
-            if (primary && physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
+            if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
             {
                 nonGravityAcceleration = this.CalculateNonGravityAcceleration(artificialPhysicsObject, ref state, timeStep);
             }
 
             return OrbitFormulas.GravityAcceleration(
                 physicsObject.PrimaryBody.StandardGravitationalParameter,
-                state.Position - physicsObject.PrimaryBody.State.Position)
-                + nonGravityAcceleration
-                + CalculateAcceleration(physicsObject.PrimaryBody, ref primaryBodyState, objects, timeStep, false);
+                state.Position) + nonGravityAcceleration;
         }
 
         /// <summary>
@@ -116,18 +97,22 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <param name="totalTime">The total simulated time</param>
         /// <param name="timeStep">The time step</param>
         /// <param name="currentObject">The current object</param>
-        /// <param name="otherObjects">The other objects</param>
         /// <param name="addObject">A function to add a new object</param>
-        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, IList<PhysicsObject> otherObjects, Action<PhysicsObject> addObject)
+        public void Update(double totalTime, double timeStep, PhysicsObject currentObject, Action<PhysicsObject> addObject)
         {
             var currentState = currentObject.State;
+            currentState.MakeRelative(currentObject.PrimaryBody.State);
+
             var nextState = this.numericIntegrator.Solve(
                 currentObject.PrimaryBody,
                 currentObject,
                 ref currentState,
                 totalTime,
                 timeStep,
-                (double t, ref ObjectState state) => this.CalculateAcceleration(currentObject, ref state, otherObjects, timeStep, true));
+                (double t, ref ObjectState state) => this.CalculateAcceleration(currentObject, ref state, timeStep));
+
+            nextState.MakeAbsolute(currentObject.PrimaryBody.State);
+            currentObject.SetNextState(nextState);
 
             if (currentObject is RocketObject rocketObject)
             {
@@ -138,8 +123,6 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
 
                 rocketObject.ClearStagedObjects(addObject);
             }
-
-            currentObject.SetNextState(nextState);
         }
     }
 }

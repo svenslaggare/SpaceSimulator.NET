@@ -36,6 +36,7 @@ namespace SpaceSimulator.UI
             : base(renderingManager2D, keyboardManager, simulatorContainer)
         {
             this.orbitCamera = orbitCamera;
+            this.focusObjectIndex = this.SimulatorEngine.Objects.Count - 1;
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];
 
             //this.SetScaleFactorFromFocusObject();

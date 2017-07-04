@@ -11,8 +11,8 @@ namespace SpaceSimulator.Common.Camera
 	/// <summary>
 	/// Represents a first person camera
 	/// </summary>
-	public class FPSCamera : BaseCamera
-	{
+	public class FPSCamera : SpaceCamera
+    {
 		private Vector2 prevMousePosition = Vector2.Zero;
 
 		/// <summary>
@@ -24,7 +24,6 @@ namespace SpaceSimulator.Common.Camera
 		/// Creates a new FPS camera
 		/// </summary>
 		public FPSCamera()
-			: base()
 		{
 			this.Speed = 50;
 		}

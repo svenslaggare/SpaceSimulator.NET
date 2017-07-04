@@ -108,7 +108,9 @@ namespace SpaceSimulator.Simulator.Rocket
 
         public void Update(double totalTime, double timeStep)
         {
-            this.ThrustDirection = this.rocketObject.State.Prograde;
+            var prograde = MathHelpers.Normalized(this.rocketObject.Velocity - this.rocketObject.PrimaryBody.Velocity);
+            this.ThrustDirection = prograde;
+
             switch (this.state)
             {
                 case State.InitialAscent:
@@ -127,7 +129,7 @@ namespace SpaceSimulator.Simulator.Rocket
                         var turnAmount = 0.70;
                         this.ThrustDirection = Vector3d.Transform(this.HorizontalThrustDirection(), Matrix3x3d.RotationY(MathUtild.Deg2Rad * turnAmount * 90.0));
                         //var rotationAxis = Vector3d.Cross(this.VerticalThrustDirection(), this.HorizontalThrustDirection());
-                        //this.ThrustDirection = Vector3d.Transform(this.rocketObject.State.Prograde, Matrix3x3d.RotationAxis(rotationAxis, 0.1 * 90.0 * MathUtild.Deg2Rad));
+                        //this.ThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(rotationAxis, 0.1 * 90.0 * MathUtild.Deg2Rad));
 
                         if (!this.pitchStarted)
                         {
@@ -146,13 +148,13 @@ namespace SpaceSimulator.Simulator.Rocket
                         if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 60.0)
                         {
                             var gravityAccelerationDir = MathHelpers.Normalized(this.rocketObject.Position - this.rocketObject.PrimaryBody.Position);
-                            this.ThrustDirection = MathHelpers.Normalized(this.rocketObject.State.Prograde + 0.1 * gravityAccelerationDir);
+                            this.ThrustDirection = MathHelpers.Normalized(prograde + 0.1 * gravityAccelerationDir);
                             //var rotationAxis = gravityAccelerationDir;
-                            //this.ThrustDirection = Vector3d.Transform(this.rocketObject.State.Prograde, Matrix3x3d.RotationAxis(rotationAxis, 0.15 * 90.0 * MathUtild.Deg2Rad));
+                            //this.ThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(rotationAxis, 0.15 * 90.0 * MathUtild.Deg2Rad));
                         }
                         else
                         {
-                            this.ThrustDirection = this.rocketObject.State.Prograde;
+                            this.ThrustDirection = prograde;
                         }
                     }
 
@@ -197,7 +199,7 @@ namespace SpaceSimulator.Simulator.Rocket
 
             if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
             {
-                //Console.WriteLine(MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(this.rocketObject.State.Prograde)));
+                //Console.WriteLine(MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde)));
                 this.lastTime = DateTime.UtcNow;
             }
         }
@@ -235,7 +237,7 @@ namespace SpaceSimulator.Simulator.Rocket
             double totalTime = 0.0;
             for (totalTime = rocketObject.State.Time; totalTime <= maxTime; totalTime += timeStep)
             {
-                orbitSimulator.Update(totalTime, timeStep, currentObject, otherObjects);
+                orbitSimulator.Update(totalTime, timeStep, currentObject);
                 currentObject.Update(totalTime, timeStep);
 
                 if (ascentProgram.Completed)

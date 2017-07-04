@@ -87,7 +87,13 @@ namespace SpaceSimulator.Simulator
             if (this.controlProgram != null)
             {
                 this.engineRunning = true;
-                this.state.HasImpacted = false;
+
+                if (this.state.HasImpacted)
+                {
+                    this.state.HasImpacted = false;
+                    this.state.Velocity = this.PrimaryBody.Velocity;
+                }
+
                 this.controlProgram.Start(this.state.Time);
             }
         }

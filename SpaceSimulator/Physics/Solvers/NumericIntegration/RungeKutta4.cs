@@ -44,7 +44,6 @@ namespace SpaceSimulator.Physics.Solvers
         /// Evaluates the state at the given time
         /// </summary>
         private DerivativeState Evaluate(
-            IPrimaryBodyObject primaryBody,
             ref ObjectState initial,
             double totalTime,
             double deltaTime,
@@ -80,18 +79,23 @@ namespace SpaceSimulator.Physics.Solvers
         {
             if (state.HasImpacted)
             {
+                var primaryBodyState = primaryBody.State;
+                primaryBodyState.Velocity = Vector3d.Zero;
+                primaryBodyState.Acceleration = Vector3d.Zero;
+                primaryBodyState.Position = Vector3d.Zero;
+
                 return SolverHelpers.MoveImpactedObject(
                     primaryBody,
-                    primaryBody.State,
-                    primaryBody.State,
+                    primaryBodyState,
+                    primaryBodyState,
                     state,
                     deltaTime);
             }
 
-            var k0 = this.Evaluate(primaryBody, ref state, totalTime, 0, ref zero, calculateAcceleration);
-            var k1 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
-            var k2 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
-            var k3 = this.Evaluate(primaryBody, ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
+            var k0 = this.Evaluate(ref state, totalTime, 0, ref zero, calculateAcceleration);
+            var k1 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
+            var k2 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
+            var k3 = this.Evaluate(ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
 
             var velocity = (1.0 / 6.0) * (k0.Velocity + 2 * (k1.Velocity + k2.Velocity) + k3.Velocity);
             var acceleration = (1.0 / 6.0) * (k0.Acceleration + 2 * (k1.Acceleration + k2.Acceleration) + k3.Acceleration);

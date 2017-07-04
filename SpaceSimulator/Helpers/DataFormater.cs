@@ -187,6 +187,11 @@ namespace SpaceSimulator.Helpers
             switch (unit)
             {
                 case DataUnit.Time:
+                    if (value >= 1000.0 * 365.0 * 24.0 * 60.0 * 60.0)
+                    {
+                        return "N/A";
+                    }
+
                     return TimeSpan.FromSeconds(Math.Round(value, numDecimals)).ToString();
                 case DataUnit.NoUnit:
                     return Math.Round(value, numDecimals) + "";

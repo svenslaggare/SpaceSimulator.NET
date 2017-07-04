@@ -17,8 +17,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <param name="totalTime">The total simulated time</param>
         /// <param name="timeStep">The time step</param>
         /// <param name="currentObject">The current object</param>
-        /// <param name="objects">The objects</param>
         /// <param name="addObject">A function to add a new object</param>
-        void Update(double totalTime, double timeStep, PhysicsObject currentObject, IList<PhysicsObject> objects, Action<PhysicsObject> addObject = null);
+        void Update(double totalTime, double timeStep, PhysicsObject currentObject, Action<PhysicsObject> addObject = null);
     }
 }
