@@ -17,6 +17,7 @@ using SpaceSimulator.Physics.Solvers;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Rendering.Plot;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Simulator.Rocket;
 
 namespace SpaceSimulator.UI
 {
@@ -28,16 +29,21 @@ namespace SpaceSimulator.UI
         private readonly UIManager uiManager;
         private readonly UIStyle uiStyle;
 
+        private readonly UIGroup maneuverUIGroup;
+
+        private readonly TextInputUIObject thurstAmountTextInput;
         private readonly TextInputUIObject changePeriapsisTextInput;
         private readonly TextInputUIObject changeApoapsisTextInput;
         private readonly TextInputUIObject changeInclinationTextInput;
 
-        private readonly TextInputUIObject thurstAmountTextInput;
         private readonly TextInputUIObject hohmannTransferRadiusTextInput;
-
         private readonly ListBoxUIObject interceptTargetList;
         private readonly ListBoxUIObject rendevouzTargetList;
         private readonly ListBoxUIObject planetaryRendevouzTargetList;
+
+        private readonly UIGroup ascentUIGroup;
+
+        private readonly TextInputUIObject ascentTargetAltitudeTextInput;
 
         private Heatmap deltaVChart;
         private bool showDeltaVChart = false;
@@ -63,27 +69,29 @@ namespace SpaceSimulator.UI
             this.uiManager = uiManager;
             this.uiStyle = uiStyle;
 
-            var startPosY = 500.0f;
-            var posY = startPosY;
-            var deltaY = -40.0f;
-            var offsetRight = 0;
-            var inputWidth = 150;
             var buttonWidth = 155;
             var buttonHeight = 30;
-            var positionRelationX = PositionRelationX.Right;
-            var positionRelationY = PositionRelationY.Bottom;
 
+            var startPosY = -20.0f;
+            var posY = startPosY;
+            var deltaY = 40.0f;
+            var offsetRight = buttonWidth + 40;
+            var inputWidth = 150;
+            var maneuverObjectsPositionRelationX = PositionRelationX.Right;
+            var maneuverObjectsPositionRelationY = PositionRelationY.Top;
+
+            #region Helpers
             Vector2 NextPosition(bool button)
             {
                 return new Vector2(offsetRight + 10.0f + (button ? - 2.5f : 0), posY += deltaY);
             }
 
-            ButtonUIObject CreateButton(string name, string text, UIElement parent = null)
+            ButtonUIObject CreateButton(string name, Vector2 position, PositionRelationX positionRelationX, PositionRelationY positionRelationY, string text, UIElement parent = null)
             {
                 return new ButtonUIObject(
                     this.RenderingManager2D,
                     name,
-                    NextPosition(true),
+                    position,
                     createParent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: createParent),
                     text,
                     Color.Yellow,
@@ -92,10 +100,23 @@ namespace SpaceSimulator.UI
                     parent: parent);
             }
 
-            void AddButton(string name, string text, Action leftMouseClick)
+            void AddElement(UIElement parent, UIObject newObject)
             {
-                var button = CreateButton(name, text);
-                this.uiManager.AddElement(button);
+                if (parent is UIGroup uiGroup)
+                {
+                    uiGroup.AddObject(newObject);
+                }
+                else
+                {
+                    this.uiManager.AddElement(newObject);
+                }
+            }
+
+            void AddButton(string name, Vector2 position, PositionRelationX positionRelationX, PositionRelationY positionRelationY, string text, Action leftMouseClick, UIElement parent)
+            {
+                var button = CreateButton(name, position, positionRelationX, positionRelationY, text, parent);
+                AddElement(parent, button);
+
                 button.LeftMouseButtonClicked += (sender, e) =>
                 {
                     try
@@ -112,7 +133,7 @@ namespace SpaceSimulator.UI
                 };
             }
 
-            TextInputUIObject AddButtonAndTextInput(string buttonName, string buttonText, string textInputName, string textInputDefaultText, Action leftMouseClick)
+            TextInputUIObject AddButtonAndTextInput(string buttonName, string buttonText, string textInputName, string textInputDefaultText, Action leftMouseClick, UIElement parent)
             {
                 var textInput = new TextInputUIObject(
                     this.RenderingManager2D,
@@ -120,19 +141,20 @@ namespace SpaceSimulator.UI
                     textInputName,
                     NextPosition(false),
                     new Size2(inputWidth, buttonHeight),
-                    positionRelationX: positionRelationX,
-                    positionRelationY: positionRelationY)
+                    positionRelationX: maneuverObjectsPositionRelationX,
+                    positionRelationY: maneuverObjectsPositionRelationY,
+                    parent: parent)
                 {
                     Text = textInputDefaultText
                 };
-                this.uiManager.AddElement(textInput);
+                AddElement(parent, textInput);
 
-                AddButton(buttonName, buttonText, leftMouseClick);
+                AddButton(buttonName, NextPosition(true), maneuverObjectsPositionRelationX, maneuverObjectsPositionRelationY, buttonText, leftMouseClick, parent);
 
                 return textInput;
             }
 
-            ListBoxUIObject AddButtonAndListBox(string buttonName, string buttonText, string listName, Action leftMouseClick)
+            ListBoxUIObject AddButtonAndListBox(string buttonName, string buttonText, string listName, Action leftMouseClick, UIElement parent)
             {
                 var listBox = new ListBoxUIObject(
                     this.RenderingManager2D,
@@ -140,95 +162,199 @@ namespace SpaceSimulator.UI
                     NextPosition(false),
                     inputWidth,
                     new List<ListBoxUIObject.Item>(),
-                    positionRelationX: positionRelationX,
-                    positionRelationY: positionRelationY);
-                this.uiManager.AddElement(listBox);
+                    positionRelationX: maneuverObjectsPositionRelationX,
+                    positionRelationY: maneuverObjectsPositionRelationY,
+                    parent: parent);
+                AddElement(parent, listBox);
 
-                AddButton(buttonName, buttonText, leftMouseClick);
+                AddButton(buttonName, NextPosition(true), maneuverObjectsPositionRelationX, maneuverObjectsPositionRelationY, buttonText, leftMouseClick, parent);
                 return listBox;
             }
+            #endregion
 
-            offsetRight = buttonWidth + 30;
+            #region MainMenu
+            var mainMenuPositionRelationX = PositionRelationX.Center;
+            var mainMenuPositionRelationY = PositionRelationY.Top;
+            var mainMenuSize = new Size2(buttonWidth + 30, (int)(buttonHeight + deltaY * 0.4) * 3 - 5);
+            var mainMenuUIGroup = new UIGroup(
+                this.RenderingManager2D,
+                "ManeuverMainMenu",
+                new Vector2(0, 0),
+                mainMenuSize,
+                PositionRelationX.Right,
+                PositionRelationY.Center);
+            this.uiManager.AddElement(mainMenuUIGroup);
+
+            var mainMenuBackground = new RectangleUIObject(
+                this.RenderingManager2D,
+                "Background",
+                new Vector2(0, 0),
+                new Size2(mainMenuSize.Width + 5, mainMenuSize.Height),
+                this.uiStyle.UIGroupBackgroundBrush,
+                this.uiStyle.ButtonBorderBrush,
+                parent: mainMenuUIGroup);
+            mainMenuUIGroup.AddObject(mainMenuBackground);
+
+            posY = 10.0f;
+            AddButton(
+                "AbortManeuverButton",
+                new Vector2(0, posY),
+                mainMenuPositionRelationX,
+                mainMenuPositionRelationY,
+                "Abort maneuver",
+                this.AbortManeuver,
+                mainMenuUIGroup);
+
+            AddButton(
+               "ShowManeuversButton",
+               new Vector2(0, posY += deltaY),
+               mainMenuPositionRelationX,
+               mainMenuPositionRelationY,
+               "Show maneuvers",
+               this.ShowManeuvers,
+               mainMenuUIGroup);
+
+            AddButton(
+                "ShowAscentButton",
+                new Vector2(0, posY += deltaY),
+                mainMenuPositionRelationX,
+                mainMenuPositionRelationY,
+                "Show ascent",
+                this.ShowAscent,
+                mainMenuUIGroup);
+            #endregion
+
+            #region Maneuvers
+            var maneuverUIGroupSize = new Size2(380, 350);
             posY = startPosY;
 
-            AddButton("AbortManeuverButton", "Abort maneuver", this.AbortManeuver);
+            this.maneuverUIGroup = new UIGroup(
+                this.RenderingManager2D,
+                "ManeuverUIGroup",
+                new Vector2(0, 0),
+                maneuverUIGroupSize,
+                PositionRelationX.Center,
+                PositionRelationY.Center);
+            this.uiManager.AddElement(this.maneuverUIGroup);
+            this.maneuverUIGroup.IsVisible = false;
 
-            this.changePeriapsisTextInput = AddButtonAndTextInput(
-                "ChangePeriapsisButton",
-                "Change periapsis",
-                "ChangePeriapsisTextInput",
-                "0",
-                this.ChangePeriapsis);
-
-            this.changeApoapsisTextInput = AddButtonAndTextInput(
-                "ChangeApoapsisButton",
-                "Change apoapsis",
-                "ChangeApoapsisTextInput",
-                "0",
-                this.ChangeApoapsis);
-
-            this.changeInclinationTextInput = AddButtonAndTextInput(
-                "ChangeInclinationButton",
-                "Change inclination",
-                "ChangeInclinationTextInput",
-                "0",
-                this.ChangeInclination);
-
-            offsetRight = 20;
-            posY = startPosY;
+            var maneuverUIGroupBackground = new RectangleUIObject(
+                this.RenderingManager2D,
+                "Background",
+                Vector2.Zero,
+                maneuverUIGroupSize,
+                this.uiStyle.UIGroupBackgroundBrush,
+                this.uiStyle.ButtonBorderBrush,
+                parent: this.maneuverUIGroup);
+            this.maneuverUIGroup.AddObject(maneuverUIGroupBackground);
 
             this.thurstAmountTextInput = AddButtonAndTextInput(
                 "ApplyThrustButton",
                 "Apply Thrust",
                 "ThrustAmountTextInput",
                 "100P",
-                this.ApplyThrust);
+                this.ApplyThrust,
+                this.maneuverUIGroup);
+
+            this.changePeriapsisTextInput = AddButtonAndTextInput(
+                "ChangePeriapsisButton",
+                "Change periapsis",
+                "ChangePeriapsisTextInput",
+                "0",
+                this.ChangePeriapsis,
+                this.maneuverUIGroup);
+
+            this.changeApoapsisTextInput = AddButtonAndTextInput(
+                "ChangeApoapsisButton",
+                "Change apoapsis",
+                "ChangeApoapsisTextInput",
+                "0",
+                this.ChangeApoapsis,
+                this.maneuverUIGroup);
+
+            this.changeInclinationTextInput = AddButtonAndTextInput(
+                "ChangeInclinationButton",
+                "Change inclination",
+                "ChangeInclinationTextInput",
+                "0",
+                this.ChangeInclination,
+                this.maneuverUIGroup);
+
+            offsetRight = 20;
+            posY = startPosY;
 
             this.hohmannTransferRadiusTextInput = AddButtonAndTextInput(
                 "HohmannTransferButton",
                 "Hohmann transfer",
                 "HohmannTransferRadiusTextInput",
-                "3",
-                this.HohmannTransfer);
+                "0",
+                this.HohmannTransfer,
+                this.maneuverUIGroup);
 
-            this.interceptTargetList = AddButtonAndListBox("InterceptButton", "Intercept", "InterceptTargetList", this.Intercept);
+            this.interceptTargetList = AddButtonAndListBox(
+                "InterceptButton",
+                "Intercept",
+                "InterceptTargetList",
+                this.Intercept,
+                this.maneuverUIGroup);
             this.UpdateInterceptTargetList(this.SelectedObject);
 
-            this.rendevouzTargetList = AddButtonAndListBox("RendevouzButton", "Rendevouz", "RendevouzTargetList", this.Rendevouz);
+            this.rendevouzTargetList = AddButtonAndListBox(
+                "RendevouzButton",
+                "Rendevouz",
+                "RendevouzTargetList",
+                this.Rendevouz,
+                this.maneuverUIGroup);
             this.UpdateRendevouzTargetList(this.SelectedObject);
 
-            this.planetaryRendevouzTargetList = AddButtonAndListBox("PlanetaryRendevouzButton", "Planetary rendevouz", "RendevouzTargetList", this.PlanetaryRendevouz);
+            this.planetaryRendevouzTargetList = AddButtonAndListBox(
+                "PlanetaryRendevouzButton",
+                "Planetary rendevouz",
+                "RendevouzTargetList",
+                this.PlanetaryRendevouz,
+                this.maneuverUIGroup);
             this.UpdatePlanetaryRendevouzTargetList(this.SelectedObject);
 
-            this.SimulatorContainer.SelectedObjectChanged += (sender, e) =>
+            this.SimulatorContainer.SelectedObjectChanged += (sender, args) =>
             {
-                this.UpdateRendevouzTargetList(e);
-                this.UpdatePlanetaryRendevouzTargetList(e);
-                this.UpdateInterceptTargetList(e);
+                this.UpdateRendevouzTargetList(args);
+                this.UpdatePlanetaryRendevouzTargetList(args);
+                this.UpdateInterceptTargetList(args);
             };
+            #endregion
 
-            var testGroup = new UIGroup(
-                this.RenderingManager2D,
-                "TestGroup",
-                new Vector2(300, 300),
-                new Size2(300, 300));
-            this.uiManager.AddElement(testGroup);
+            #region Ascent
+            var ascentUIGroupSize = new Size2(200, 110);
+            posY = startPosY;
 
-            var testButton = new ButtonUIObject(
+            this.ascentUIGroup = new UIGroup(
                 this.RenderingManager2D,
-                "Test",
-                new Vector2(10, 0),
-                createParent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: createParent),
-                "Wololo",
-                Color.Yellow,
-                positionRelationX: PositionRelationX.Left,
-                positionRelationY: PositionRelationY.Top,
-                parent: testGroup);
-            testButton.LeftMouseButtonClicked += (sender, args) =>
-            {
-                Console.WriteLine("Object clicked");
-            };
-            testGroup.AddObject(testButton);
+                "ManeuverUIGroup",
+                new Vector2(0, 0),
+                ascentUIGroupSize,
+                PositionRelationX.Center,
+                PositionRelationY.Center);
+            this.uiManager.AddElement(this.ascentUIGroup);
+            this.ascentUIGroup.IsVisible = false;
+
+            var ascentUIGroupBackground = new RectangleUIObject(
+                this.RenderingManager2D,
+                "Background",
+                Vector2.Zero,
+                ascentUIGroupSize,
+                this.uiStyle.UIGroupBackgroundBrush,
+                this.uiStyle.ButtonBorderBrush,
+                parent: this.ascentUIGroup);
+            this.ascentUIGroup.AddObject(ascentUIGroupBackground);
+
+            this.ascentTargetAltitudeTextInput = AddButtonAndTextInput(
+                "AscendToOrbitButton",
+                "Start ascent",
+                "AscentTargetAltitudeTextInput",
+                "300 km",
+                this.AscendToOrbit,
+                this.ascentUIGroup);
+            #endregion
         }
 
         /// <summary>
@@ -242,43 +368,105 @@ namespace SpaceSimulator.UI
             }
         }
 
-        /// <summary>
-        /// Changes the periapsis
-        /// </summary>
-        private void ChangePeriapsis()
+        enum ManeuverMenu
         {
-            var newPeriapsis = double.Parse(this.changePeriapsisTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
-            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
-                BasicManeuver.ChangePeriapsis(
-                    this.SimulatorEngine,
-                    this.SelectedObject,
-                    newPeriapsis * SolarSystemBodies.Earth.Radius));
+            Manuevers,
+            Ascent
         }
 
         /// <summary>
-        /// Changes the apoapsis
+        /// Shows the given menu
         /// </summary>
-        private void ChangeApoapsis()
+        /// <param name="maneuverMenu">The menu</param>
+        private void ShowMenu(ManeuverMenu maneuverMenu)
         {
-            var newApoapsis = double.Parse(this.changeApoapsisTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
-            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
-                BasicManeuver.ChangeApoapsis(
-                    this.SimulatorEngine,
-                    this.SelectedObject,
-                    newApoapsis * SolarSystemBodies.Earth.Radius));
+            switch (maneuverMenu)
+            {
+                case ManeuverMenu.Manuevers:
+                    this.maneuverUIGroup.IsVisible = !this.maneuverUIGroup.IsVisible;
+                    this.ascentUIGroup.IsVisible = false;
+                    break;
+                case ManeuverMenu.Ascent:
+                    this.ascentUIGroup.IsVisible = !this.ascentUIGroup.IsVisible;
+                    this.maneuverUIGroup.IsVisible = false;
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>
-        /// Changes the inclination
+        /// Shows the maneuvers
         /// </summary>
-        private void ChangeInclination()
+        private void ShowManeuvers()
         {
-            var newInclination = double.Parse(this.changeInclinationTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
-            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
-                BasicManeuver.ChangeInclination(
-                    this.SimulatorEngine,
-                    this.SelectedObject,
-                    newInclination * MathUtild.Deg2Rad));
+            this.ShowMenu(ManeuverMenu.Manuevers);
+        }
+
+        /// <summary>
+        /// Shows the ascent menu
+        /// </summary>
+        private void ShowAscent()
+        {
+            this.ShowMenu(ManeuverMenu.Ascent);
+        }
+
+        /// <summary>
+        /// Parses the given distance string
+        /// </summary>
+        /// <param name="text">The string</param>
+        /// <param name="primaryBody">The primary body</param>
+        /// <returns>The distance in meters</returns>
+        private double ParseDistance(string text, NaturalSatelliteObject primaryBody = null)
+        {
+            var numericPart = "";
+            var unitPart = "";
+            foreach (var currentChar in text)
+            {
+                if (char.IsDigit(currentChar) && unitPart == "")
+                {
+                    numericPart += currentChar;
+                }
+
+                if (char.IsLetter(currentChar))
+                {
+                    unitPart += currentChar;
+                }
+            }
+
+            var unitScaleFactor = 1.0;
+            switch (unitPart)
+            {
+                case "er":
+                case "ER":
+                    unitScaleFactor = SolarSystemBodies.Earth.Radius;
+                    break;
+                case "sr":
+                case "SR":
+                    unitScaleFactor = SolarSystemBodies.Sun.Radius;
+                    break;
+                case "au":
+                case "AU":
+                    unitScaleFactor = Constants.AstronomicalUnit;
+                    break;
+                case "km":
+                    unitScaleFactor = 1E3;
+                    break;
+                case "Mm":
+                    unitScaleFactor = 1E6;
+                    break;
+                case "Gm":
+                    unitScaleFactor = 1E9;
+                    break;
+            }
+
+            var offset = 0.0;
+            if (primaryBody != null && primaryBody.Name != "Sun")
+            {
+                offset = primaryBody.Radius;
+            }
+
+            return double.Parse(numericPart, System.Globalization.CultureInfo.InvariantCulture) * unitScaleFactor + offset;
         }
 
         /// <summary>
@@ -299,21 +487,63 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Changes the periapsis
+        /// </summary>
+        private void ChangePeriapsis()
+        {
+            //var newPeriapsis = double.Parse(this.changePeriapsisTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            var newPeriapsis = this.ParseDistance(this.changePeriapsisTextInput.Text, this.SelectedObject.PrimaryBody);
+            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
+                BasicManeuver.ChangePeriapsis(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    newPeriapsis));
+        }
+ 
+        /// <summary>
+        /// Changes the apoapsis
+        /// </summary>
+        private void ChangeApoapsis()
+        {
+            //var newApoapsis = double.Parse(this.changeApoapsisTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            var newApoapsis = this.ParseDistance(this.changeApoapsisTextInput.Text, this.SelectedObject.PrimaryBody);
+            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
+                BasicManeuver.ChangeApoapsis(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    newApoapsis));
+        }
+
+        /// <summary>
+        /// Changes the inclination
+        /// </summary>
+        private void ChangeInclination()
+        {
+            var newInclination = double.Parse(this.changeInclinationTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
+                BasicManeuver.ChangeInclination(
+                    this.SimulatorEngine,
+                    this.SelectedObject,
+                    newInclination * MathUtild.Deg2Rad));
+        }
+
+        /// <summary>
         /// Applies a hohmann transfer
         /// </summary>
         private void HohmannTransfer()
         {
-            var newRadius = double.Parse(this.hohmannTransferRadiusTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            //var newRadius = double.Parse(this.hohmannTransferRadiusTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            var newRadius = this.ParseDistance(this.hohmannTransferRadiusTextInput.Text, this.SelectedObject.PrimaryBody);
             var state = this.SelectedObject.State;
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.SelectedObject);
 
-            this.SimulatorEngine.ScheduleManeuver( this.SelectedObject,
+            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
                 HohmannTransferOrbit.Create(
                     this.SimulatorEngine,
                     this.SelectedObject,
                     ref state,
                     ref orbitPosition,
-                    newRadius * SolarSystemBodies.Earth.Radius,
+                    newRadius,
                     OrbitalManeuverTime.Periapsis()));
         }
 
@@ -514,6 +744,29 @@ namespace SpaceSimulator.UI
             else
             {
                 this.planetaryRendevouzTargetList.SetItems(new List<ListBoxUIObject.Item>());
+            }
+        }
+
+        /// <summary>
+        /// Ascends to orbit
+        /// </summary>
+        private void AscendToOrbit()
+        {
+            if (this.SelectedObject.HasImpacted && this.SelectedObject is RocketObject rocketObject)
+            {
+                var targetAltitude = this.ParseDistance(this.ascentTargetAltitudeTextInput.Text, this.SelectedObject.PrimaryBody);
+                var targetOrbit = Physics.Orbit.New(this.SelectedObject.PrimaryBody, semiMajorAxis: targetAltitude, eccentricity: 0.0);
+
+                var bestPitchStart = 2E3;
+                var bestPitchEnd = 12.8625E3;
+                rocketObject.SetControlProgram(new AscentControlProgram(
+                    rocketObject,
+                    targetOrbit,
+                    bestPitchStart,
+                    bestPitchEnd,
+                    this.SimulatorEngine.TextOutputWriter));
+
+                rocketObject.StartEngine();
             }
         }
 

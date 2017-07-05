@@ -163,8 +163,8 @@ namespace SpaceSimulator.Physics
         /// <param name="elevation">The elevation</param>
         public static Vector3d SphereNormal(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
-            //var direction = FromCoordinates(primaryBody, latitude, longitude, elevation) - primaryBody.State.Position;
-            var direction = FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
+            var direction = FromCoordinates(primaryBody, latitude, longitude, elevation) - primaryBody.State.Position;
+            //var direction = FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
             direction.Normalize();
             return direction;
         }

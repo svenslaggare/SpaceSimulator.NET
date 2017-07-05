@@ -105,6 +105,19 @@ namespace SpaceSimulator.Common.UI
             }
         }
 
+        public override void Update(TimeSpan elapsed)
+        {
+            base.Update(elapsed);
+
+            foreach (var currentObject in this.objects)
+            {
+                if (currentObject.IsVisible)
+                {
+                    currentObject.Update(elapsed);
+                }
+            }
+        }
+
         public override void Draw(DeviceContext deviceContext)
         {
             foreach (var currentObject in this.objects)

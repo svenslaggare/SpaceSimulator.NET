@@ -29,6 +29,11 @@ namespace SpaceSimulator.UI
         public IRenderingBrush ButtonBorderBrush { get; }
 
         /// <summary>
+        /// The background brush for ui groups
+        /// </summary>
+        public IRenderingBrush UIGroupBackgroundBrush { get; }
+
+        /// <summary>
         /// The color of the button text
         /// </summary>
         public Color ButtonTextColor { get; }
@@ -49,7 +54,9 @@ namespace SpaceSimulator.UI
                     new GradientStop() { Color = new Color(6, 127, 251), Position = 0.0f },
                     new GradientStop() { Color = new Color(5, 65, 231), Position = 1.0f },
                 });
+
             this.ButtonBorderBrush = this.renderingManager2D.CreateSolidColorBrush(new Color(255, 255, 255));
+            this.UIGroupBackgroundBrush = this.renderingManager2D.CreateSolidColorBrush(new Color(65, 157, 191));
             this.ButtonTextColor = Color.Yellow;
         }
 

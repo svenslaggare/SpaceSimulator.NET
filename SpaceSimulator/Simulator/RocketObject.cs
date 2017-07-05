@@ -20,6 +20,7 @@ namespace SpaceSimulator.Simulator
 
         private bool engineRunning;
         private IRocketControlProgram controlProgram;
+        private bool updateOrbit = false;
 
         private readonly IList<PhysicsObject> toStage = new List<PhysicsObject>();
 
@@ -128,13 +129,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="time">The time of the impulse</param>
         public void AfterImpulse(double time)
         {
-            var primaryBodyState = this.PrimaryBody.NextState;
-            var state = this.NextState;
-
-            this.ReferencePrimaryBodyState = primaryBodyState;
-            this.ReferenceState = state;
-            this.ReferenceOrbit = Orbit.CalculateOrbit(this.PrimaryBody, ref primaryBodyState, ref state);
-            this.orbitChanged = true;
+            this.updateOrbit = true;
 
             var deltaMass = this.rocketStages.UseFuel(time);
             if (deltaMass != null)
@@ -196,6 +191,20 @@ namespace SpaceSimulator.Simulator
         public override void Update(double totalTime, double timeStep)
         {
             base.Update(totalTime, timeStep);
+
+            if (this.updateOrbit)
+            {
+                var primaryBodyState = this.PrimaryBody.State;
+                var state = this.State;
+
+                this.ReferencePrimaryBodyState = primaryBodyState;
+                this.ReferenceState = state;
+                this.ReferenceOrbit = Orbit.CalculateOrbit(this.PrimaryBody, ref primaryBodyState, ref state);
+                this.orbitChanged = true;
+
+                this.updateOrbit = false;
+            }
+
             this.controlProgram?.Update(totalTime, timeStep);
         }
     }

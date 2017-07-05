@@ -101,7 +101,10 @@ namespace SpaceSimulator.Common.UI
         {
             foreach (var element in this.elements)
             {
-                element.Update(elapsed);
+                if (element.IsVisible)
+                {
+                    element.Update(elapsed);
+                }
             }
         }
 

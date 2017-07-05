@@ -54,6 +54,11 @@ namespace SpaceSimulator.Simulator.Rocket
             this.pitchManeuverStopAltitude = pitchEndAltitude;
         }
 
+        //private Vector3d SphereNormal(double longitude, double latitude)
+        //{
+
+        //}
+
         /// <summary>
         /// Calculates the horizontal thrust direction
         /// </summary>
