@@ -55,40 +55,6 @@ namespace SpaceSimulator.Common.UI
         }
 
         /// <summary>
-        /// Updates the UI elements
-        /// </summary>
-        /// <param name="elapsed">The elapsed time since the last update</param>
-        public void Update(TimeSpan elapsed)
-        {
-            foreach (var element in this.elements)
-            {
-                element.Update(elapsed);
-            }
-        }
-
-        /// <summary>
-        /// Draws the UI elements
-        /// </summary>
-        /// <param name="deviceContext">The device context</param>
-        public void Draw(DeviceContext deviceContext)
-        {
-            foreach (var element in this.elements)
-            {
-                element.Draw(deviceContext);
-
-                if (this.DrawBoundingRectangles)
-                {
-                    this.debugBrush.ApplyResource(brush =>
-                    {
-                        deviceContext.DrawRectangle(
-                            element.BoundingRectangle,
-                            brush);
-                    });
-                }
-            }
-        }
-
-        /// <summary>
         /// Sets focus to the given element
         /// </summary>
         /// <param name="focusElement">The element</param>
@@ -122,7 +88,7 @@ namespace SpaceSimulator.Common.UI
 
             foreach (var element in this.elements)
             {
-                if (element.BoundingRectangle.Contains(position.X, position.Y))
+                if (element.IsVisible && element.BoundingRectangle.Contains(position.X, position.Y))
                 {
                     if (topElement == null || element.ZOrder >= topElement.ZOrder)
                     {
@@ -151,6 +117,43 @@ namespace SpaceSimulator.Common.UI
             else
             {
                 this.SetFocus(null);
+            }
+        }
+
+        /// <summary>
+        /// Updates the UI elements
+        /// </summary>
+        /// <param name="elapsed">The elapsed time since the last update</param>
+        public void Update(TimeSpan elapsed)
+        {
+            foreach (var element in this.elements)
+            {
+                element.Update(elapsed);
+            }
+        }
+
+        /// <summary>
+        /// Draws the UI elements
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        public void Draw(DeviceContext deviceContext)
+        {
+            foreach (var element in this.elements)
+            {
+                if (element.IsVisible)
+                {
+                    element.Draw(deviceContext);
+
+                    if (this.DrawBoundingRectangles)
+                    {
+                        this.debugBrush.ApplyResource(brush =>
+                        {
+                            deviceContext.DrawRectangle(
+                                element.BoundingRectangle,
+                                brush);
+                        });
+                    }
+                }
             }
         }
 

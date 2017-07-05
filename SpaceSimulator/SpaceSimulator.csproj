@@ -122,6 +122,7 @@
     <Compile Include="Common\UI\TextInputUIObject.cs" />
     <Compile Include="Common\UI\TextUIObject.cs" />
     <Compile Include="Common\UI\UIElement.cs" />
+    <Compile Include="Common\UI\UIGroup.cs" />
     <Compile Include="Common\UI\UIHelpers.cs" />
     <Compile Include="Common\UI\UIManager.cs" />
     <Compile Include="Common\UI\UIObject.cs" />

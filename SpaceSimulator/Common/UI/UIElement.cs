@@ -87,6 +87,11 @@ namespace SpaceSimulator.Common.UI
         public bool HasFocus { get; set; } = false;
 
         /// <summary>
+        /// Indicates if the object is visible
+        /// </summary>
+        public bool IsVisible { get; set; } = true;
+
+        /// <summary>
         /// Creates a new UI element
         /// </summary>
         /// <param name="renderingManager2D">The 2D rendering manager</param>
@@ -223,7 +228,7 @@ namespace SpaceSimulator.Common.UI
         }
 
         /// <summary>
-        /// Invalidates the element, forcing a redraw
+        /// Invalidates the element, forcing the screen position to be recomputed
         /// </summary>
         public virtual void Invalidate()
         {

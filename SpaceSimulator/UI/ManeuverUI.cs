@@ -78,17 +78,18 @@ namespace SpaceSimulator.UI
                 return new Vector2(offsetRight + 10.0f + (button ? - 2.5f : 0), posY += deltaY);
             }
 
-            ButtonUIObject CreateButton(string name, string text)
+            ButtonUIObject CreateButton(string name, string text, UIElement parent = null)
             {
                 return new ButtonUIObject(
                     this.RenderingManager2D,
                     name,
                     NextPosition(true),
-                    parent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: parent),
+                    createParent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: createParent),
                     text,
                     Color.Yellow,
                     positionRelationX: positionRelationX,
-                    positionRelationY: positionRelationY);
+                    positionRelationY: positionRelationY,
+                    parent: parent);
             }
 
             void AddButton(string name, string text, Action leftMouseClick)
@@ -205,6 +206,29 @@ namespace SpaceSimulator.UI
                 this.UpdatePlanetaryRendevouzTargetList(e);
                 this.UpdateInterceptTargetList(e);
             };
+
+            var testGroup = new UIGroup(
+                this.RenderingManager2D,
+                "TestGroup",
+                new Vector2(300, 300),
+                new Size2(300, 300));
+            this.uiManager.AddElement(testGroup);
+
+            var testButton = new ButtonUIObject(
+                this.RenderingManager2D,
+                "Test",
+                new Vector2(10, 0),
+                createParent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: createParent),
+                "Wololo",
+                Color.Yellow,
+                positionRelationX: PositionRelationX.Left,
+                positionRelationY: PositionRelationY.Top,
+                parent: testGroup);
+            testButton.LeftMouseButtonClicked += (sender, args) =>
+            {
+                Console.WriteLine("Object clicked");
+            };
+            testGroup.AddObject(testButton);
         }
 
         /// <summary>

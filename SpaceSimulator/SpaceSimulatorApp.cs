@@ -61,7 +61,7 @@ namespace SpaceSimulator
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
-                DrawBoundingRectangles = false
+                DrawBoundingRectangles = true
             };
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
