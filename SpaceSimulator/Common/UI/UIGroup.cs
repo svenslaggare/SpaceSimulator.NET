@@ -60,21 +60,7 @@ namespace SpaceSimulator.Common.UI
         /// <param name="focusObject">The object</param>
         private void SetFocus(UIObject focusObject)
         {
-            foreach (var currentObject in this.objects)
-            {
-                if (currentObject.HasFocus)
-                {
-                    currentObject.LostFocus();
-                }
-
-                currentObject.HasFocus = false;
-            }
-
-            if (focusObject != null)
-            {
-                focusObject.HasFocus = true;
-                focusObject.GotFocus();
-            }
+            UIHelpers.SetFocus(this.objects, focusObject);
         }
 
         /// <summary>
@@ -84,20 +70,7 @@ namespace SpaceSimulator.Common.UI
         /// <returns>The object or null</returns>
         private UIObject SelectObject(Vector2 position)
         {
-            UIObject topObject = null;
-
-            foreach (var currentObject in this.objects)
-            {
-                if (currentObject.IsVisible && currentObject.BoundingRectangle.Contains(position.X, position.Y))
-                {
-                    if (topObject == null || currentObject.ZOrder >= topObject.ZOrder)
-                    {
-                        topObject = currentObject;
-                    }
-                }
-            }
-
-            return topObject;
+            return UIHelpers.SelectElement(this.objects, position);
         }
 
         public override void HandleClicked(Vector2 mousePosition, MouseButtons button)
@@ -113,7 +86,6 @@ namespace SpaceSimulator.Common.UI
             else
             {
                 this.SetFocus(null);
-                Console.WriteLine("Group clicked");
             }
         }
 

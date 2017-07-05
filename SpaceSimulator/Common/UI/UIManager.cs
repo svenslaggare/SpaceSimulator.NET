@@ -60,21 +60,7 @@ namespace SpaceSimulator.Common.UI
         /// <param name="focusElement">The element</param>
         public void SetFocus(UIElement focusElement)
         {
-            foreach (var element in this.elements)
-            {
-                if (element.HasFocus)
-                {
-                    element.LostFocus();
-                }
-
-                element.HasFocus = false;
-            }
-
-            if (focusElement != null)
-            {
-                focusElement.HasFocus = true;
-                focusElement.GotFocus();
-            }
+            UIHelpers.SetFocus(this.elements, focusElement);
         }
 
         /// <summary>
@@ -84,20 +70,7 @@ namespace SpaceSimulator.Common.UI
         /// <returns>The element or null</returns>
         public UIElement SelectElement(Vector2 position)
         {
-            UIElement topElement = null;
-
-            foreach (var element in this.elements)
-            {
-                if (element.IsVisible && element.BoundingRectangle.Contains(position.X, position.Y))
-                {
-                    if (topElement == null || element.ZOrder >= topElement.ZOrder)
-                    {
-                        topElement = element;
-                    }
-                }
-            }
-
-            return topElement;
+            return UIHelpers.SelectElement(this.elements, position);
         }
 
         /// <summary>

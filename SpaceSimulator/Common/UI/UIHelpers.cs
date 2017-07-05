@@ -51,5 +51,53 @@ namespace SpaceSimulator.Common.UI
 
             return screenPosition;
         }
+
+        /// <summary>
+        /// Sets focus to the given element
+        /// </summary>
+        /// <param name="elements">The elements</param>
+        /// <param name="focusElement">The element</param>
+        public static void SetFocus<T>(IList<T> elements, T focusElement) where T : UIElement
+        {
+            foreach (var element in elements)
+            {
+                if (element.HasFocus)
+                {
+                    element.LostFocus();
+                }
+
+                element.HasFocus = false;
+            }
+
+            if (focusElement != null)
+            {
+                focusElement.HasFocus = true;
+                focusElement.GotFocus();
+            }
+        }
+
+        /// <summary>
+        /// Selects an element at the given position
+        /// </summary>
+        /// <param name="elements">The elements</param>
+        /// <param name="position">The position</param>
+        /// <returns>The element or null</returns>
+        public static T SelectElement<T>(IList<T> elements, Vector2 position) where T : UIElement
+        {
+            T topElement = null;
+
+            foreach (var element in elements)
+            {
+                if (element.IsVisible && element.BoundingRectangle.Contains(position.X, position.Y))
+                {
+                    if (topElement == null || element.ZOrder >= topElement.ZOrder)
+                    {
+                        topElement = element;
+                    }
+                }
+            }
+
+            return topElement;
+        }
     }
 }
