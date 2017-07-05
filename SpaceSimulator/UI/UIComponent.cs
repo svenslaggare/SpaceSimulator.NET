@@ -17,8 +17,24 @@ namespace SpaceSimulator.UI
     /// </summary>
     public abstract class UIComponent : IDisposable
     {
+        /// <summary>
+        /// The rendering manager 2D
+        /// </summary>
         protected RenderingManager2D RenderingManager2D { get; }
+
+        /// <summary>
+        /// The keyboard manager
+        /// </summary>
         protected KeyboardManager KeyboardManager { get; }
+
+        /// <summary>
+        /// The mouse manager
+        /// </summary>
+        protected MouseManager MouseManager { get; }
+
+        /// <summary>
+        /// The simulator container
+        /// </summary>
         protected SimulatorContainer SimulatorContainer { get; }
 
         private readonly Queue<Action> mainThreadQueue = new Queue<Action>();
@@ -28,11 +44,13 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
-        public UIComponent(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, SimulatorContainer simulatorContainer)
+        public UIComponent(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, MouseManager mouseManager, SimulatorContainer simulatorContainer)
         {
             this.RenderingManager2D = renderingManager2D;
             this.KeyboardManager = keyboardManager;
+            this.MouseManager = mouseManager;
             this.SimulatorContainer = simulatorContainer;
         }
 

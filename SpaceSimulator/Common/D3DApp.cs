@@ -55,7 +55,10 @@ namespace SpaceSimulator.Common
         private RenderingManager2D renderingManager2D;
     
         private BaseCamera camera;
-        private KeyboardManager keyboardManager;
+
+        private readonly DirectInput directInput;
+        private readonly KeyboardManager keyboardManager;
+        private readonly MouseManager mouseManager;
 
         /// <summary>
         /// The position of the mouse
@@ -84,7 +87,10 @@ namespace SpaceSimulator.Common
             this.renderingManager2D = new RenderingManager2D(this.renderForm);
 
             this.camera = new OrbitCamera();
-            this.keyboardManager = new KeyboardManager();
+
+            this.directInput = new DirectInput();
+            this.keyboardManager = new KeyboardManager(this.directInput);
+            this.mouseManager = new MouseManager(this.directInput);
             this.CreateDevice();
 		}
 
@@ -178,10 +184,18 @@ namespace SpaceSimulator.Common
 			get { return this.keyboardManager; }
 		}
 
-		/// <summary>
-		/// Returns the total time
-		/// </summary>
-		public TimeSpan TotalTime
+        /// <summary>
+        /// Returns the mouse manager
+        /// </summary>
+        public MouseManager MouseManager
+        {
+            get { return this.mouseManager; }
+        }
+
+        /// <summary>
+        /// Returns the total time
+        /// </summary>
+        public TimeSpan TotalTime
 		{
 			get { return this.totalTimeWatch.Elapsed; }
 		}
@@ -350,16 +364,12 @@ namespace SpaceSimulator.Common
 			this.RenderForm.MouseDown += (sender, args) =>
 			{
 				this.OnMouseButtonDown(new Vector2(args.X, args.Y), args.Button);
-				//this.lastMousePosition.X = args.X;
-				//this.lastMousePosition.Y = args.Y;
-			};
+            };
 
 			this.RenderForm.MouseMove += (sender, args) =>
 			{
 				this.OnMouseMove(new Vector2(args.X, args.Y), args.Button);
-				//this.lastMousePosition.X = args.X;
-				//this.lastMousePosition.Y = args.Y;
-			};
+            };
 
             this.RenderForm.MouseWheel += (sender, args) =>
             {
@@ -413,6 +423,7 @@ namespace SpaceSimulator.Common
         public virtual void Update(TimeSpan elapsed)
 		{
             this.keyboardManager.Update();
+            this.mouseManager.Update(this.MousePosition);
             this.camera.HandleKeyboard(this.keyboardManager.State, elapsed);
             this.camera.UpdateViewMatrix();
         }
@@ -512,6 +523,8 @@ namespace SpaceSimulator.Common
             this.renderingManager2D.Dispose();
 
             this.keyboardManager.Dispose();
-		}
-	}
+            this.mouseManager.Dispose();
+            this.directInput.Dispose();
+        }
+    }
 }

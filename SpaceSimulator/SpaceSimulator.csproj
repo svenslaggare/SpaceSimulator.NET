@@ -103,6 +103,7 @@
     <Compile Include="Common\Effects\Old\TerrainRender.cs" />
     <Compile Include="Common\Effects\Old\TreeEffect.cs" />
     <Compile Include="Common\Effects\Old\Waves.cs" />
+    <Compile Include="Common\Input\MouseManager.cs" />
     <Compile Include="Common\Models\GeometryGenerator.cs" />
     <Compile Include="Common\Models\ModelLoader.cs" />
     <Compile Include="Common\Input\KeyboardManager.cs" />

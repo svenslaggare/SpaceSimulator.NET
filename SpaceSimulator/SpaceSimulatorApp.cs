@@ -101,13 +101,14 @@ namespace SpaceSimulator
             base.Initialize();
             this.CreateEffect();
 
-            this.uiComponents.Add(new TimeUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
-            this.uiComponents.Add(new SelectedObjectUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer));
-            this.uiComponents.Add(new CameraUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.OrbitCamera));
-            this.uiComponents.Add(new ManeuverUI(this.RenderingManager2D, this.KeyboardManager, this.simulatorContainer, this.uiManager, this.uiStyle));
+            this.uiComponents.Add(new TimeUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer));
+            this.uiComponents.Add(new SelectedObjectUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer));
+            this.uiComponents.Add(new CameraUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer, this.OrbitCamera));
+            this.uiComponents.Add(new ManeuverUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer, this.uiManager, this.uiStyle));
             this.uiComponents.Add(new OverlayUI(
                 this.RenderingManager2D,
                 this.KeyboardManager,
+                this.MouseManager,
                 this.uiManager,
                 this.simulatorContainer,
                 this.OrbitCamera,
@@ -171,6 +172,8 @@ namespace SpaceSimulator
         /// <param name="elapsed">The elapsed time since the last frame</param>
         public override void Update(TimeSpan elapsed)
         {
+            base.Update(elapsed);
+
             foreach (var component in this.uiComponents)
             {
                 component.Update(elapsed);
@@ -192,8 +195,6 @@ namespace SpaceSimulator
             {
                 currentObject.Update(this.simulatorEngine);
             }
-
-            base.Update(elapsed);
         }
 
         public override void BeforeFirstDraw()

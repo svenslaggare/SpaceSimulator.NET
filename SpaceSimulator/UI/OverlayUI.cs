@@ -136,6 +136,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="mouseManager">The mouse manager</param>
         /// <param name="uiManager">The UI manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
         /// <param name="camera">The camera</param>
@@ -144,12 +145,13 @@ namespace SpaceSimulator.UI
         public OverlayUI(
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
+            MouseManager mouseManager,
             UIManager uiManager,
             SimulatorContainer simulatorContainer,
             OrbitCamera camera,
             BasicEffect thumbnailEffect,
             RenderToTexture renderToTexture)
-            : base(renderingManager2D, keyboardManager, simulatorContainer)
+            : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
             this.uiManager = uiManager;
 
@@ -224,9 +226,51 @@ namespace SpaceSimulator.UI
             }
         }
 
+        /// <summary>
+        /// Selects an object at the given position
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        private void SelectObject(Vector2 mousePosition)
+        {
+            var selectedUIElement = this.uiManager.SelectElement(mousePosition);
+            if (selectedUIElement != null)
+            {
+                return;
+            }
+
+            foreach (var overlayObject in this.overlayObjects)
+            {
+                var selected = false;
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
+                var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
+
+                if (overlayObject.DrawThumbnail)
+                {
+                    selected = screenMouseDistance <= 12.5;
+                }
+                else
+                {
+                    if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
+                    {
+                        this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
+                        selected = screenMouseDistance <= renderedRadius;
+                    }
+                }
+
+                if (selected)
+                {
+                    this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
+                    break;
+                }
+            }
+        }
+
         public override void Update(TimeSpan elapsed)
         {
-
+            if (this.MouseManager.IsDoubleClick(MouseButtons.Left))
+            {
+                this.SelectObject(this.MouseManager.MousePosition);
+            }
         }
 
         public override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)

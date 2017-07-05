@@ -27,9 +27,14 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
-        public TimeUI(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, SimulatorContainer simulatorContainer)
-            : base(renderingManager2D, keyboardManager, simulatorContainer)
+        public TimeUI(
+            RenderingManager2D renderingManager2D,
+            KeyboardManager keyboardManager,
+            MouseManager mouseManager,
+            SimulatorContainer simulatorContainer)
+            : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
 
         }

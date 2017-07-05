@@ -30,10 +30,16 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
         /// <param name="orbitCamera">The orbit camera</param>
-        public CameraUI(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, SimulatorContainer simulatorContainer, OrbitCamera orbitCamera)
-            : base(renderingManager2D, keyboardManager, simulatorContainer)
+        public CameraUI(
+            RenderingManager2D renderingManager2D,
+            KeyboardManager keyboardManager,
+            MouseManager mouseManager,
+            SimulatorContainer simulatorContainer,
+            OrbitCamera orbitCamera)
+            : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
             this.orbitCamera = orbitCamera;
             this.focusObjectIndex = this.SimulatorEngine.Objects.Count - 1;

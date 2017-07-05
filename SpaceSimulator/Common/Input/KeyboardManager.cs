@@ -10,9 +10,8 @@ namespace SpaceSimulator.Common.Input
     /// <summary>
     /// Represents a keyboard manager
     /// </summary>
-    public class KeyboardManager : IDisposable
+    public sealed class KeyboardManager : IDisposable
     {
-        private readonly DirectInput directInput;
         private readonly Keyboard keyboard;
 
         private KeyboardState keyboardState = new KeyboardState();
@@ -21,10 +20,10 @@ namespace SpaceSimulator.Common.Input
         /// <summary>
         /// Creates a new keyboard manager
         /// </summary>
-        public KeyboardManager()
+        /// <param name="directInput">The direct input object</param>
+        public KeyboardManager(DirectInput directInput)
         {
-            this.directInput = new DirectInput();
-            this.keyboard = new Keyboard(this.directInput);
+            this.keyboard = new Keyboard(directInput);
             this.keyboard.Acquire();
         }
 
@@ -76,7 +75,6 @@ namespace SpaceSimulator.Common.Input
         public void Dispose()
         {
             this.keyboard.Dispose();
-            this.directInput.Dispose();
         }
     }
 }

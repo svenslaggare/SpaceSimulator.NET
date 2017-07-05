@@ -47,16 +47,18 @@ namespace SpaceSimulator.UI
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager</param>
         /// <param name="keyboardManager">The keyboard manager</param>
+        /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulation container</param>
         /// <param name="uiManager">The UI manager</param>
         /// <param name="uiStyle">The UI style</param>
         public ManeuverUI(
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
+            MouseManager mouseManager,
             SimulatorContainer simulatorContainer,
             UIManager uiManager,
             UIStyle uiStyle)
-            : base(renderingManager2D, keyboardManager, simulatorContainer)
+            : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
             this.uiManager = uiManager;
             this.uiStyle = uiStyle;
