@@ -828,7 +828,7 @@ namespace SpaceSimulator.UI
 
             if (this.showDeltaVChart)
             {
-                this.deltaVChart.Draw(deviceContext, new Vector2(400, 50));
+                this.deltaVChart.Draw(deviceContext, new Vector2(400, 50), this.MouseManager.MousePosition);
             }
         }
     }

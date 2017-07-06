@@ -17,12 +17,22 @@ namespace SpaceSimulator.Rendering.Plot
     public sealed class Heatmap
     {
         private readonly RenderingManager2D renderingManager2D;
-        private readonly IList<ColorRange> colorScheme;
         private readonly IList<HeatmapValue> values = new List<HeatmapValue>();
-        private readonly RenderingImage2D heatmapImage;
 
+        private Vector2d minPosition;
+        private Vector2d maxPosition;
+        private double minIntensity;
+        private double maxIntensity;
+        private Vector2d minIntensityPosition;
+        private Vector2d maxIntensityPosition;
+        private Vector2d deltaPosition;
+        private HeatmapValue?[,] valueMatrix;
+
+        private readonly IList<ColorRange> colorScheme;
+        private readonly RenderingImage2D heatmapImage;
         private readonly int minimumValueCrossSize;
         private readonly bool showMinimumValue;
+        private readonly Func<HeatmapValue, string> formatHoverValue;
 
         /// <summary>
         /// Represents a range of colors
@@ -103,14 +113,22 @@ namespace SpaceSimulator.Rendering.Plot
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="colorScheme">The color scheme</param>
         /// <param name="values">The values</param>
+        /// <param name="formatHoverValue">Formats the hover value</param>
         /// <param name="showMinimumValue">Indicates if the minimum value is shown as a cross</param>
         /// <param name="minimumValueCrossSize">The size of the minimum value cross</param>
-        public Heatmap(RenderingManager2D renderingManager2D, IList<ColorRange> colorScheme, IList<HeatmapValue> values, bool showMinimumValue, int minimumValueCrossSize = 5)
+        public Heatmap(
+            RenderingManager2D renderingManager2D,
+            IList<ColorRange> colorScheme,
+            IList<HeatmapValue> values,
+            Func<HeatmapValue, string> formatHoverValue,
+            bool showMinimumValue,
+            int minimumValueCrossSize = 5)
         {
             this.renderingManager2D = renderingManager2D;
             this.colorScheme = colorScheme;
             this.values = values;
 
+            this.formatHoverValue = formatHoverValue;
             this.showMinimumValue = showMinimumValue;
             this.minimumValueCrossSize = minimumValueCrossSize;
 
@@ -124,7 +142,10 @@ namespace SpaceSimulator.Rendering.Plot
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="possibleLaunches">The possible launches</param>
         /// <param name="deltaVLimit">The maximum allowed delta V</param>
-        public static Heatmap CreateDeltaVChart(RenderingManager2D renderingManager2D, IList<Physics.Maneuvers.InterceptManeuver.PossibleLaunch> possibleLaunches, double deltaVLimit = 30E3)
+        public static Heatmap CreateDeltaVChart(
+            RenderingManager2D renderingManager2D,
+            IList<Physics.Maneuvers.InterceptManeuver.PossibleLaunch> possibleLaunches,
+            double deltaVLimit = 30E3)
         {
             var minValue = double.MaxValue;
             var maxValue = double.MinValue;
@@ -137,7 +158,6 @@ namespace SpaceSimulator.Rendering.Plot
 
                 values.Add(new Heatmap.HeatmapValue(
                     new Vector2d(possibleLaunch.Duration, possibleLaunch.StartTime),
-                    //new Vector2d(possibleLaunch.ArrivalTime, possibleLaunch.StartTime),
                     deltaV));
 
                 minValue = Math.Min(minValue, deltaV);
@@ -148,6 +168,9 @@ namespace SpaceSimulator.Rendering.Plot
                 renderingManager2D,
                 Heatmap.DeltaVColorScheme(minValue, maxValue),
                 new List<Heatmap.HeatmapValue>(values),
+                value => $"Depature time: {DataFormatter.Format(value.Position.Y, DataUnit.Time)}, " +
+                         $"duration: {DataFormatter.Format(value.Position.X, DataUnit.Time)}, " +
+                         $"Δv: {DataFormatter.Format(value.Intensity, DataUnit.Velocity, numDecimals: 2)}",
                 true);
         }
 
@@ -183,38 +206,18 @@ namespace SpaceSimulator.Rendering.Plot
         }
 
         /// <summary>
-        /// Returns the color for the given value
+        /// Determines the min and maximum positions/intensities of the values
         /// </summary>
-        /// <param name="value">The value</param>
-        private Color GetColor(double value)
-        {
-            foreach (var color in this.colorScheme)
-            {
-                if (value >= color.Min && value <= color.Max)
-                {
-                    return Color.Lerp(
-                        color.MinColor,
-                        color.MaxColor,
-                        (float)MiscHelpers.RangeNormalize(color.Min, color.Max, value));
-                }
-            }
-
-            return Color.Gray;
-        }
-
-        /// <summary>
-        /// Creates the heatmap image
-        /// </summary>
-        private RenderingImage2D CreateImage()
+        private void DetermineMinAndMax()
         {
             //Find the min and max of the values
-            var minPosition = new Vector2d(double.MaxValue);
-            var maxPosition = new Vector2d(double.MinValue);
-            var minIntensity = double.MaxValue;
-            var maxIntensity = double.MinValue;
-            var minIntensityPosition = Vector2d.Zero;
-            var maxIntensityPosition = Vector2d.Zero;
-            var deltaPosition = Vector2d.Zero;
+            this.minPosition = new Vector2d(double.MaxValue);
+            this.maxPosition = new Vector2d(double.MinValue);
+            this.minIntensity = double.MaxValue;
+            this.maxIntensity = double.MinValue;
+            this.minIntensityPosition = Vector2d.Zero;
+            this.maxIntensityPosition = Vector2d.Zero;
+            this.deltaPosition = Vector2d.Zero;
 
             var prevValue = this.values[0];
             foreach (var value in this.values)
@@ -254,10 +257,61 @@ namespace SpaceSimulator.Rendering.Plot
 
                 prevValue = value;
             }
+        }
 
-            //Create the memory
+        /// <summary>
+        /// Returns the color for the given value
+        /// </summary>
+        /// <param name="value">The value</param>
+        private Color GetColor(double value)
+        {
+            foreach (var color in this.colorScheme)
+            {
+                if (value >= color.Min && value <= color.Max)
+                {
+                    return Color.Lerp(
+                        color.MinColor,
+                        color.MaxColor,
+                        (float)MiscHelpers.RangeNormalize(color.Min, color.Max, value));
+                }
+            }
+
+            return Color.Gray;
+        }
+
+        /// <summary>
+        /// Returns the pixel position
+        /// </summary>
+        /// <param name="position">The position in the heatmap</param>
+        private (int, int) GetPixelPosition(Vector2d position)
+        {
+            var x = (int)((position.X - this.minPosition.X) / this.deltaPosition.X);
+            var y = (int)((position.Y - this.minPosition.Y) / this.deltaPosition.Y);
+            return (x, y);
+        }
+
+        /// <summary>
+        /// Creates the heatmap image
+        /// </summary>
+        private RenderingImage2D CreateImage()
+        {
+            this.DetermineMinAndMax();
+
             var width = (int)Math.Ceiling((maxPosition.X - minPosition.X) / deltaPosition.X);
             var height = (int)Math.Ceiling((maxPosition.Y - minPosition.Y) / deltaPosition.Y);
+
+            //Create the heatmap matrix
+            this.valueMatrix = new HeatmapValue?[width, height];
+            foreach (var value in this.values)
+            {
+                (var x, var y) = this.GetPixelPosition(value.Position);
+                if (x >= 0 && y >= 0 && x < width && y < height)
+                {
+                    this.valueMatrix[x, y] = value;
+                }
+            }
+
+            //Create the memory
             var dataStream = new DataStream(sizeof(int) * width * height, true, true);
 
             void SetPixel(int x, int y, Color color)
@@ -285,8 +339,7 @@ namespace SpaceSimulator.Rendering.Plot
             //Fill in heatmap
             foreach (var value in this.values)
             {
-                var x = (int)((value.Position.X - minPosition.X) / deltaPosition.X);
-                var y = (int)((value.Position.Y - minPosition.Y) / deltaPosition.Y);
+                (var x, var y) = this.GetPixelPosition(value.Position);
                 SetPixel(x, y, this.GetColor(value.Intensity));
 
                 if (value.Intensity == minIntensity)
@@ -322,7 +375,8 @@ namespace SpaceSimulator.Rendering.Plot
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="position">The position to draw at</param>
-        public void Draw(DeviceContext deviceContext, Vector2 position)
+        /// <param name="mousePosition">The position of the mosue</param>
+        public void Draw(DeviceContext deviceContext, Vector2 position, Vector2 mousePosition)
         {
             if (!this.heatmapImage.HasBoundResources)
             {
@@ -330,6 +384,31 @@ namespace SpaceSimulator.Rendering.Plot
             }
 
             this.heatmapImage.Draw(deviceContext, position);
+
+            var hoverPosition = (Point)(mousePosition - position);
+
+            if (hoverPosition.X >= 0
+                && hoverPosition.Y >= 0
+                && hoverPosition.X < this.heatmapImage.Size.Width
+                && hoverPosition.Y < this.heatmapImage.Size.Height)
+            {
+                var hoverValue = this.valueMatrix[hoverPosition.X, hoverPosition.Y];
+
+                if (hoverValue.HasValue)
+                {
+                    var textFormat = this.renderingManager2D.DefaultTextFormat;
+                    var hoverValueString = this.formatHoverValue(hoverValue.Value);
+                    var textSize = this.renderingManager2D.TextSize(textFormat, hoverValueString);
+
+                    this.renderingManager2D.DefaultSolidColorBrush.DrawText(
+                        deviceContext,
+                        hoverValueString,
+                        textFormat,
+                        this.renderingManager2D.TextPosition(position + new Vector2(
+                            this.heatmapImage.Size.Width / 2 - textSize.Width / 2,
+                            this.heatmapImage.Size.Height)));
+                }
+            }
         }
     }
 }

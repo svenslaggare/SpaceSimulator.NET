@@ -96,7 +96,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 }
             }
 
-            return true; ;
+            return true;
         }
 
         /// <summary>

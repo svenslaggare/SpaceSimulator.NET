@@ -227,7 +227,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             var injectionDeltaV = v0 - orbitalSpeed;
 
             //Calculate the time when the maneuver should be applied
-            testStartTime = DateTime.UtcNow;
+            //testStartTime = DateTime.UtcNow;
             t = CalculatePlanetaryBurnTime(
                 simulatorEngine,
                 physicsObject,
@@ -240,7 +240,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 v0,
                 injectionDeltaV,
                 heliocentricTransferBurn);
-            Console.WriteLine($"Calculated maneuver time in {(DateTime.UtcNow - testStartTime)}.");
+            //Console.WriteLine($"Calculated maneuver time in {(DateTime.UtcNow - testStartTime)}.");
 
             var injectionState = SolverHelpers.AfterTime(
                 simulatorEngine.KeplerProblemSolver,
@@ -305,15 +305,15 @@ namespace SpaceSimulator.Physics.Maneuvers
                 allowedDeltaV: 150);
             Console.WriteLine($"Calculated mid-course correction burn in {(DateTime.UtcNow - testStartTime)}");
 
-            testStartTime = DateTime.UtcNow;
-            var minDistance = OrbitCalculators.ClosestApproach(
-                simulatorEngine.KeplerProblemSolver,
-                currentPlanet,
-                bestHeliocentricOrbitPosition,
-                target,
-                targetOrbitAtSOILeave,
-                deltaTime: 12.0 * 60 * 60.0).Distance;
-            Console.WriteLine($"Calculated closest approach in {(DateTime.UtcNow - testStartTime)}");
+            //testStartTime = DateTime.UtcNow;
+            //var minDistance = OrbitCalculators.ClosestApproach(
+            //    simulatorEngine.KeplerProblemSolver,
+            //    currentPlanet,
+            //    bestHeliocentricOrbitPosition,
+            //    target,
+            //    targetOrbitAtSOILeave,
+            //    deltaTime: 12.0 * 60 * 60.0).Distance;
+            //Console.WriteLine($"Calculated closest approach in {(DateTime.UtcNow - testStartTime)}");
 
             //Console.WriteLine(bestInjectionBurn.Length());
             Console.WriteLine(bestInjectionOrbitPosition);

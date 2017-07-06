@@ -152,6 +152,27 @@ namespace SpaceSimulator.Common.Rendering2D
         }
 
         /// <summary>
+        /// Computes the size of the given text
+        /// </summary>
+        /// <param name="textFormat">The text format</param>
+        /// <param name="text">The text</param>
+        public Size2 TextSize(TextFormat textFormat, string text)
+        {
+            using (var textLayout = new TextLayout(
+                                        this.FontFactory,
+                                        text,
+                                        textFormat,
+                                        this.ScreenRectangle.Width,
+                                        this.ScreenRectangle.Height))
+            {
+
+                return new Size2(
+                    (int)Math.Round(textLayout.Metrics.Width),
+                    (int)Math.Round(textLayout.Metrics.Height));
+            }
+        }
+
+        /// <summary>
         /// Updates the resources using the given device context
         /// </summary>
         /// <param name="deviceContext">The device context</param>

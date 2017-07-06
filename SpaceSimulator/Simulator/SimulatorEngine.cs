@@ -715,7 +715,7 @@ namespace SpaceSimulator.Simulator
                     if (this.totalTime >= maneuver.Maneuver.ManeuverTime - this.maneuverTimeEpsilon)
                     {
                         this.executedManeuvers.Add(maneuver);
-                        maneuver.Object.ApplyDeltaVelocity(this.totalTime, maneuver.Maneuver.DeltaVelocity);
+                        maneuver.Object.ApplyBurn(this.totalTime, maneuver.Maneuver.DeltaVelocity);
 
                         //If the current maneuver leads to a SOI change/crash, mark it
                         if (maneuver.Maneuver.DeltaVelocity != Vector3d.Zero)

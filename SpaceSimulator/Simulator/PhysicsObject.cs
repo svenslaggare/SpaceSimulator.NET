@@ -309,7 +309,7 @@ namespace SpaceSimulator.Simulator
 
         /// <summary>
         /// Indicates if the orbit of the object has changed.
-        /// If that this is the case, reset the indication.
+        /// If that this is the case, resets the indication.
         /// </summary>
         public bool HasChangedOrbit()
         {
@@ -319,10 +319,11 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Applies the given delta V
+        /// Applies the burn
         /// </summary>
+        /// <param name="totalTime">The total time</param>
         /// <param name="deltaV">The delta V</param>
-        public void ApplyDeltaVelocity(double totalTime, Vector3d deltaV)
+        public virtual void ApplyBurn(double totalTime, Vector3d deltaV)
         {
             this.state.Velocity += deltaV;
             this.state.HasImpacted = false;

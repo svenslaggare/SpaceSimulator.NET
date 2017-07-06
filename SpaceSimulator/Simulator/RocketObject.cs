@@ -145,6 +145,11 @@ namespace SpaceSimulator.Simulator
             }
         }
 
+        public override void ApplyBurn(double totalTime, Vector3d deltaV)
+        {
+            //base.ApplyBurn(totalTime, deltaV);
+        }
+
         /// <summary>
         /// Stages the current stage
         /// </summary>
