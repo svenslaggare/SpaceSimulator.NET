@@ -125,6 +125,7 @@ namespace SpaceSimulator.Common.UI
             (Key.Space, new KeyCommand(' ')),
             (Key.Slash, new KeyCommand('-')),
             (Key.Period, new KeyCommand('.')),
+            (Key.Comma, new KeyCommand(',')),
             (Key.Back, new KeyCommand(KeyCommandType.Backspace)),
             (Key.Delete, new KeyCommand(KeyCommandType.Delete)),
             (Key.Left, new KeyCommand(KeyCommandType.MoveCaretLeft)),
@@ -446,14 +447,14 @@ namespace SpaceSimulator.Common.UI
                 }
 
                 using (var textLayout = new TextLayout(
-                    this.RenderingManager2D.FontFactory,
-                    caretText,
-                    textFormat,
-                    this.RenderingManager2D.ScreenRectangle.Width,
-                    this.RenderingManager2D.ScreenRectangle.Height))
+                            this.RenderingManager2D.FontFactory,
+                            caretText,
+                            textFormat,
+                            this.RenderingManager2D.ScreenRectangle.Width,
+                            this.RenderingManager2D.ScreenRectangle.Height))
                 {
                     textSize = new Size2(
-                        (int)Math.Round(textLayout.Metrics.Width),
+                        (int)Math.Round(textLayout.Metrics.WidthIncludingTrailingWhitespace),
                         (int)Math.Round(textLayout.Metrics.Height));
                 }
 

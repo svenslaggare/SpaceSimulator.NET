@@ -20,6 +20,11 @@ namespace SpaceSimulator.Rendering.Plot
     {
         private readonly RenderingManager2D renderingManager2D;
 
+        /// <summary>
+        /// The position where the figure is drawn at
+        /// </summary>
+        public Vector2 Position { get; set; }
+
         private readonly RenderingPathGeometry linePathGeometry;
         private readonly IRenderingBrush figureBackgroundBrush;
         private readonly IRenderingBrush figureBackgroundBorderBrush;
@@ -40,13 +45,23 @@ namespace SpaceSimulator.Rendering.Plot
         /// </summary>
         /// <param name="renderingManager2D">The 2D rendering manager</param>
         /// <param name="values">The values</param>
+        /// <param name="position">The position to draw the figure at</param>
         /// <param name="color">The color</param>
         /// <param name="width">The width of the plot</param>
         /// <param name="height">The height of the plot</param>
         /// <param name="labelAxisX">The label for the x-axis</param>
         /// <param name="labelAxisY">The label for the y-axis</param>
-        public Function2D(RenderingManager2D renderingManager2D, IList<Vector2> values, Color color, int width, int height, string labelAxisX = "", string labelAxisY = "")
+        public Function2D(
+            RenderingManager2D renderingManager2D,
+            IList<Vector2> values,
+            Vector2 position,
+            Color color,
+            int width,
+            int height,
+            string labelAxisX = "",
+            string labelAxisY = "")
         {
+            this.Position = position;
             this.width = width;
             this.height = height;
 
@@ -100,10 +115,9 @@ namespace SpaceSimulator.Rendering.Plot
         /// Draws the plot
         /// </summary>
         /// <param name="deviceContext">The device context</param>
-        /// <param name="position">The position to draw the figure at</param>
-        public void Draw(DeviceContext deviceContext, Vector2 position)
+        public void Draw(DeviceContext deviceContext)
         {
-            var figureAreaRectangle = new RectangleF(position.X, position.Y, this.width, this.height);
+            var figureAreaRectangle = new RectangleF(this.Position.X, this.Position.Y, this.width, this.height);
 
             this.figureBackgroundBrush.ApplyResource(brush =>
             {
@@ -117,7 +131,7 @@ namespace SpaceSimulator.Rendering.Plot
 
             this.figureBrush.ApplyResource(brush =>
             {
-                this.linePathGeometry.DrawOutline(deviceContext, position, brush);
+                this.linePathGeometry.DrawOutline(deviceContext, this.Position, brush);
             });
 
             this.textBrush.ApplyResource(brush =>

@@ -202,8 +202,8 @@
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
-    <Compile Include="Simulator\SolarSystemBodies.cs" />
-    <Compile Include="Simulator\SolarSystemBody.cs" />
+    <Compile Include="Simulator\Data\SolarSystemBodies.cs" />
+    <Compile Include="Simulator\Data\SolarSystemBody.cs" />
     <Compile Include="SpaceSimulatorApp.cs" />
     <Compile Include="SimulatorContainer.cs" />
     <Compile Include="UI\CameraUI.cs" />

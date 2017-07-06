@@ -17,6 +17,14 @@ namespace SpaceSimulator.Rendering.Plot
     public sealed class Heatmap
     {
         private readonly RenderingManager2D renderingManager2D;
+
+        /// <summary>
+        /// The position where the figure is drawn at
+        /// </summary>
+        public Vector2 Position { get; set; }
+
+        private Vector2 mousePosition;
+
         private readonly IList<HeatmapValue> values = new List<HeatmapValue>();
 
         private Vector2d minPosition;
@@ -105,12 +113,13 @@ namespace SpaceSimulator.Rendering.Plot
                 this.Position = position;
                 this.Intensity = intensity;
             }
-        }   
+        }
 
         /// <summary>
         /// Creates a new heatmap plotter using the given color scheme
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
+        /// <param name="position">The position to draw the figure at</param>
         /// <param name="colorScheme">The color scheme</param>
         /// <param name="values">The values</param>
         /// <param name="formatHoverValue">Formats the hover value</param>
@@ -118,6 +127,7 @@ namespace SpaceSimulator.Rendering.Plot
         /// <param name="minimumValueCrossSize">The size of the minimum value cross</param>
         public Heatmap(
             RenderingManager2D renderingManager2D,
+            Vector2 position,
             IList<ColorRange> colorScheme,
             IList<HeatmapValue> values,
             Func<HeatmapValue, string> formatHoverValue,
@@ -125,6 +135,8 @@ namespace SpaceSimulator.Rendering.Plot
             int minimumValueCrossSize = 5)
         {
             this.renderingManager2D = renderingManager2D;
+            this.Position = position;
+
             this.colorScheme = colorScheme;
             this.values = values;
 
@@ -140,10 +152,12 @@ namespace SpaceSimulator.Rendering.Plot
         /// Creates a delta V chart
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
+        /// <param name="position">The position to draw at</param>
         /// <param name="possibleLaunches">The possible launches</param>
         /// <param name="deltaVLimit">The maximum allowed delta V</param>
         public static Heatmap CreateDeltaVChart(
             RenderingManager2D renderingManager2D,
+            Vector2 position,
             IList<Physics.Maneuvers.InterceptManeuver.PossibleLaunch> possibleLaunches,
             double deltaVLimit = 30E3)
         {
@@ -166,6 +180,7 @@ namespace SpaceSimulator.Rendering.Plot
 
             return new Heatmap(
                 renderingManager2D,
+                position,
                 Heatmap.DeltaVColorScheme(minValue, maxValue),
                 new List<Heatmap.HeatmapValue>(values),
                 value => $"Depature time: {DataFormatter.Format(value.Position.Y, DataUnit.Time)}, " +
@@ -371,21 +386,28 @@ namespace SpaceSimulator.Rendering.Plot
         }
 
         /// <summary>
+        /// Sets the position of the mouse
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        public void SetMousePosition(Vector2 mousePosition)
+        {
+            this.mousePosition = mousePosition;
+        }
+
+        /// <summary>
         /// Draws the heatmap at the given position
         /// </summary>
         /// <param name="deviceContext">The device context</param>
-        /// <param name="position">The position to draw at</param>
-        /// <param name="mousePosition">The position of the mosue</param>
-        public void Draw(DeviceContext deviceContext, Vector2 position, Vector2 mousePosition)
+        public void Draw(DeviceContext deviceContext)
         {
             if (!this.heatmapImage.HasBoundResources)
             {
                 this.heatmapImage.Update(deviceContext);
             }
 
-            this.heatmapImage.Draw(deviceContext, position);
+            this.heatmapImage.Draw(deviceContext, this.Position);
 
-            var hoverPosition = (Point)(mousePosition - position);
+            var hoverPosition = (Point)(this.mousePosition - this.Position);
 
             if (hoverPosition.X >= 0
                 && hoverPosition.Y >= 0
@@ -404,7 +426,7 @@ namespace SpaceSimulator.Rendering.Plot
                         deviceContext,
                         hoverValueString,
                         textFormat,
-                        this.renderingManager2D.TextPosition(position + new Vector2(
+                        this.renderingManager2D.TextPosition(this.Position + new Vector2(
                             this.heatmapImage.Size.Width / 2 - textSize.Width / 2,
                             this.heatmapImage.Size.Height)));
                 }

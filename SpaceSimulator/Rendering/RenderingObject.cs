@@ -157,7 +157,7 @@ namespace SpaceSimulator.Rendering
                 }
                 else
                 {
-                    size = this.camera.ToDraw(Simulator.SolarSystemBodies.Earth.Radius * 0.01);
+                    size = this.camera.ToDraw(Simulator.Data.SolarSystemBodies.Earth.Radius * 0.01);
                 }
 
                 return Matrix.Scaling(size);

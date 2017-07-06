@@ -34,10 +34,10 @@ namespace SpaceSimulator.Simulator.Environments
             var earth = new PlanetObject(
                 "Earth",
                 PhysicsObjectType.ObjectOfReference,
-                Simulator.SolarSystemBodies.Earth.Mass,
-                Simulator.SolarSystemBodies.Earth.Radius,
-                Simulator.SolarSystemBodies.Earth.RotationalPeriod,
-                Simulator.SolarSystemBodies.Earth.AxisOfRotation,
+                Simulator.Data.SolarSystemBodies.Earth.Mass,
+                Simulator.Data.SolarSystemBodies.Earth.Radius,
+                Simulator.Data.SolarSystemBodies.Earth.RotationalPeriod,
+                Simulator.Data.SolarSystemBodies.Earth.AxisOfRotation,
                 new EarthAtmosphericModel(),
                 null,
                 new ObjectState(),
@@ -106,13 +106,13 @@ namespace SpaceSimulator.Simulator.Environments
                 "Satellite 1",
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
+                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             var orbitPosition2 = new OrbitPosition(
                 Physics.Orbit.New(
                     earth,
-                    parameter: 3.0 * Simulator.SolarSystemBodies.Earth.Radius,
+                    parameter: 3.0 * Simulator.Data.SolarSystemBodies.Earth.Radius,
                     eccentricity: 0.2,
                     inclination: 0 * MathUtild.Deg2Rad),
                 87.2 * MathUtild.Deg2Rad);

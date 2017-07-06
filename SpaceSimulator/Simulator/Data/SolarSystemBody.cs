@@ -6,7 +6,7 @@ using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
 
-namespace SpaceSimulator.Simulator
+namespace SpaceSimulator.Simulator.Data
 {
     /// <summary>
     /// Represents a body in the solar system

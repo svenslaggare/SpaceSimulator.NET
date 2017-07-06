@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Simulator.Data;
 
 namespace SpaceSimulator.Helpers
 {
