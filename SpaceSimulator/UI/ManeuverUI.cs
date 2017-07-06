@@ -428,8 +428,10 @@ namespace SpaceSimulator.UI
                 new Vector2(0, 0),
                 createObjectGroupSize,
                 PositionRelationX.Center,
-                PositionRelationY.Center);
-            this.createObjectGroup.IsVisible = false;
+                PositionRelationY.Center)
+            {
+                IsVisible = false
+            };
             this.uiManager.AddElement(this.createObjectGroup);
 
             var createObjectGroupBackground = new RectangleUIObject(
@@ -821,8 +823,12 @@ namespace SpaceSimulator.UI
                         this.SimulatorEngine.ScheduleManeuver(stateTuple.Item1, maneuver);
                         this.SelectedObject.Target = stateTuple.Item2;
 
-                        this.showDeltaVChart = true;
-                        this.deltaVChart = Heatmap.CreateDeltaVChart(this.RenderingManager2D, new Vector2(400, 50), possibleDepartureBurns);
+
+                        if (possibleDepartureBurns.Count > 0)
+                        {
+                            this.showDeltaVChart = true;
+                            this.deltaVChart = Heatmap.CreateDeltaVChart(this.RenderingManager2D, new Vector2(400, 50), possibleDepartureBurns);
+                        }
 
                         this.SimulatorContainer.Unfreeze();
                     });

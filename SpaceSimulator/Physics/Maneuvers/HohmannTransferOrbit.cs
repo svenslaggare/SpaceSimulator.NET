@@ -73,40 +73,48 @@ namespace SpaceSimulator.Physics.Maneuvers
             /// <summary>
             /// The deltaV for the first maneuver
             /// </summary>
-            public double FirstBurn { get; set; }
+            public double FirstBurn { get; }
 
             /// <summary>
             /// The deltaV for the second maneuver
             /// </summary>
-            public double SecondBurn { get; set; }
+            public double SecondBurn { get; }
 
             /// <summary>
             /// The coast time
             /// </summary>
-            public double CoastTime { get; set; }
+            public double CoastTime { get; }
+
+            /// <summary>
+            /// Creates new data
+            /// </summary>
+            /// <param name="firstBurn">The deltaV for the first maneuver</param>
+            /// <param name="secondBurn">The deltaV for the second maneuver</param>
+            /// <param name="coastTime">The coast time</param>
+            public HohmannTransferOrbitData(double firstBurn, double secondBurn, double coastTime)
+            {
+                this.FirstBurn = firstBurn;
+                this.SecondBurn = secondBurn;
+                this.CoastTime = coastTime;
+            }
         }
 
         /// <summary>
         /// Calculates the burns and coast time for a Hohmann transfer orbit
         /// </summary>
-        /// <param name="mu">The standard gravitational parameter</param>
-        /// <param name="r1">The current radius</param>
-        /// <param name="r2">The new radis</param>
-        public static HohmannTransferOrbitData CalculateBurn(double mu, double r1, double r2)
+        /// <param name="standardGravitationalParameter">The standard gravitational parameter</param>
+        /// <param name="currentRadius">The current radius</param>
+        /// <param name="newRadius">The new radis</param>
+        public static HohmannTransferOrbitData CalculateBurn(double standardGravitationalParameter, double currentRadius, double newRadius)
         {
             //DeltaV for the burns
-            var dv1 = Math.Sqrt(mu / r1) * (Math.Sqrt((2 * r2) / (r1 + r2)) - 1);
-            var dv2 = Math.Sqrt(mu / r2) * (1 - Math.Sqrt((2 * r1) / (r1 + r2)));
+            var burn1DeltaV = Math.Sqrt(standardGravitationalParameter / currentRadius) * (Math.Sqrt((2 * newRadius) / (currentRadius + newRadius)) - 1);
+            var burn2DeltaV = Math.Sqrt(standardGravitationalParameter / newRadius) * (1 - Math.Sqrt((2 * currentRadius) / (currentRadius + newRadius)));
 
             //The time between the maneuvers
-            var coastTime = Math.PI * Math.Sqrt(Math.Pow(r1 + r2, 3) / (8 * mu));
+            var coastTime = Math.PI * Math.Sqrt(Math.Pow(currentRadius + newRadius, 3) / (8 * standardGravitationalParameter));
 
-            return new HohmannTransferOrbitData()
-            {
-                FirstBurn = dv1,
-                SecondBurn = dv2,
-                CoastTime = coastTime
-            };
+            return new HohmannTransferOrbitData(burn1DeltaV, burn2DeltaV, coastTime);
         }
 
         /// <summary>
