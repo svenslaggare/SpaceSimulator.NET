@@ -283,7 +283,7 @@ namespace SpaceSimulator.Common.Camera
         {
             var screenPosition = Vector3.TransformCoordinate(position, this.ViewProjection);
             depth = screenPosition.Z;
-            screenPosition /= screenPosition.Z;
+            //screenPosition /= screenPosition.Z;
 
             screenPosition.X = this.viewportWidth * (screenPosition.X + 1.0f) / 2.0f;
             screenPosition.Y = this.viewportHeight * (1.0f - ((screenPosition.Y + 1.0f) / 2.0f));

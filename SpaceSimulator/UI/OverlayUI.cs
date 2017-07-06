@@ -348,8 +348,11 @@ namespace SpaceSimulator.UI
         /// <param name="overlayObject">The overlay object</param>
         private void DetermineOverlayVisiblity(OverlayObject overlayObject)
         {
-            overlayObject.DrawText = true;
-            overlayObject.DrawThumbnail = true;
+            //overlayObject.DrawText = true;
+            //overlayObject.DrawThumbnail = true;
+            var inview = overlayObject.DrawDepth <= 1.0 && overlayObject.DrawDepth >= 0.0;
+            overlayObject.DrawText = inview;
+            overlayObject.DrawThumbnail = inview;
             var physicsObject = overlayObject.RenderingObject.PhysicsObject;
 
             if (physicsObject is NaturalSatelliteObject naturalSatelliteObject)
@@ -360,7 +363,7 @@ namespace SpaceSimulator.UI
 
                 overlayObject.DrawText = screenWidth * screenWidth <= 100.0f;
                 var drawnSize = overlayObject.ThumbnailSize;
-                overlayObject.DrawThumbnail = screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
+                overlayObject.DrawThumbnail = inview && screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
                 overlayObject.RenderingObject.ShowSphere = !overlayObject.DrawThumbnail;
             }
 
@@ -387,7 +390,7 @@ namespace SpaceSimulator.UI
                     }
                 }
 
-                overlayObject.DrawText = renderedDistance >= 24.0f;
+                overlayObject.DrawText = inview && renderedDistance >= 24.0f;
                 overlayObject.RenderingObject.ShowOrbit = overlayObject.DrawText;
 
                 if (overlayObject.DrawThumbnail)
@@ -418,10 +421,11 @@ namespace SpaceSimulator.UI
 
             foreach (var overlayObject in this.overlayObjects)
             {
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
+                var physicsObject = overlayObject.RenderingObject.PhysicsObject;
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition, out var depth);
+
                 this.DetermineOverlayVisiblity(overlayObject);
 
-                var physicsObject = overlayObject.RenderingObject.PhysicsObject;
                 if (overlayObject.DrawThumbnail && physicsObject.Type != PhysicsObjectType.ArtificialSatellite)
                 {
                     overlayObject.Thumbnail.ApplyResource(bitmap =>

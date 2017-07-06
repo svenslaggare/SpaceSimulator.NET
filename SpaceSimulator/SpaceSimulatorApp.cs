@@ -50,7 +50,7 @@ namespace SpaceSimulator
             Console.WriteLine("");
 
             (this.simulatorEngine, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera, false);
-            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             //(this.simulatorEngine, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;

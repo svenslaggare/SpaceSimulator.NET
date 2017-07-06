@@ -826,10 +826,10 @@ namespace SpaceSimulator.UI
         {
             this.DrawManeuverTexts(deviceContext);
 
-            if (this.showDeltaVChart)
-            {
-                this.deltaVChart.Draw(deviceContext, new Vector2(400, 50), this.MouseManager.MousePosition);
-            }
+            //if (this.showDeltaVChart)
+            //{
+            //    this.deltaVChart.Draw(deviceContext, new Vector2(400, 50), this.MouseManager.MousePosition);
+            //}
         }
     }
 }
