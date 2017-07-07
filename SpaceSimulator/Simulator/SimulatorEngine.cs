@@ -799,6 +799,17 @@ namespace SpaceSimulator.Simulator
                 }
             }
 
+            //Set the absolute state for all objects
+            foreach (var currentObject in this.objects)
+            {
+                if (!currentObject.IsObjectOfReference)
+                {
+                    var nextState = currentObject.NextState;
+                    nextState.MakeAbsolute(currentObject.PrimaryBody.NextState);
+                    currentObject.SetNextState(nextState);     
+                }
+            }
+
             //Add new objects
             if (this.newObjects.Count > 0)
             {
@@ -809,17 +820,6 @@ namespace SpaceSimulator.Simulator
                 }
 
                 this.newObjects.Clear();
-            }
-
-            //Set the absolute state for all objects
-            foreach (var currentObject in this.objects)
-            {
-                if (!currentObject.IsObjectOfReference)
-                {
-                    var nextState = currentObject.NextState;
-                    nextState.MakeAbsolute(currentObject.PrimaryBody.NextState);
-                    currentObject.SetNextState(nextState);     
-                }
             }
         }
 

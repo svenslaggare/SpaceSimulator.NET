@@ -48,7 +48,7 @@ namespace SpaceSimulator
             Console.WriteLine("");
 
             this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
-            this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
