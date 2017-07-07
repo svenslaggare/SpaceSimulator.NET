@@ -121,6 +121,16 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Normalizes the given vector
+        /// </summary>
+        /// <param name="vector">The vector</param>
+        public static Vector3 Normalized(Vector3 vector)
+        {
+            vector.Normalize();
+            return vector;
+        }
+
+        /// <summary>
         /// Squares the given value
         /// </summary>
         /// <param name="x">The value</param>

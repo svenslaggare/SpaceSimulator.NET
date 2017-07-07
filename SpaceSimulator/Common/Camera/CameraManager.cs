@@ -27,6 +27,11 @@ namespace SpaceSimulator.Common.Camera
         }
 
         /// <summary>
+        /// Returns the cameras
+        /// </summary>
+        public IEnumerable<BaseCamera> Cameras => this.cameras.Values;
+
+        /// <summary>
         /// Adds the given camera
         /// </summary>
         /// <param name="name">The name of the camera</param>

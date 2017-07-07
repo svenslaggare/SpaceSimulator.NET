@@ -47,20 +47,22 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
+            //this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            this.OrbitCamera.MinRadius = 0.001f;
-            //this.OrbitCamera.MaxRadius = 15000.0f;
-            this.OrbitCamera.MaxRadius = 10000.0f;
+            var orbitCamera = (OrbitCamera)this.CameraManager["OrbitCamera"];
+            orbitCamera.MinRadius = 0.001f;
+            orbitCamera.MaxRadius = 10000.0f;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
                 //DrawBoundingRectangles = true
             };
+
+            this.CameraManager.AddCamera("FollowCamera", new FollowCamera(), true);
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
         }
@@ -79,11 +81,6 @@ namespace SpaceSimulator
         /// Returns the space camera
         /// </summary>
         private SpaceCamera SpaceCamera => this.ActiveCamera as SpaceCamera;
-
-        /// <summary>
-        /// Returns the orbit camera
-        /// </summary>
-        private OrbitCamera OrbitCamera => this.ActiveCamera as OrbitCamera;
 
         /// <summary>
         /// Creates the effect
@@ -282,6 +279,7 @@ namespace SpaceSimulator
         private void DrawDebug()
         {
             var textBuilder = new StringBuilder();
+            textBuilder.AppendLine($"Camera position: {this.CameraManager.ActiveCamera.Position}");
 
             foreach (var renderingObject in this.RenderingObjects)
             {

@@ -116,9 +116,7 @@ namespace SpaceSimulator.Rendering
             if (ringColor.HasValue && physicsObject is NaturalSatelliteObject naturalSatelliteObject)
             {
                 var ringPositions = OrbitPositions.Create(
-                    Physics.Orbit.New(
-                        naturalSatelliteObject,
-                        semiMajorAxis: ringRadius),
+                    Physics.Orbit.New(naturalSatelliteObject, semiMajorAxis: ringRadius),
                     true);
 
                 this.ringRenderingOrbit = new Rendering.Orbit(

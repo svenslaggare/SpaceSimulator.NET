@@ -23,35 +23,73 @@ namespace SpaceSimulator.UI
         /// <param name="keyUp">The up key</param>
         /// <param name="keyDown">The down key</param>
         /// <param name="changed">Indicates if the object was changed</param>
+        /// <param name="validObject">Predicate to determine if the object is valid</param>
+        /// <param name="deltaMultiplier">The detlta multiplier</param>
         /// <returns>The selected object</returns>
-        public static PhysicsObject SelectObjectUpAndDown(KeyboardManager keyboardManager, IList<PhysicsObject> objects, ref int index, Key keyUp, Key keyDown, out bool changed)
+        public static PhysicsObject SelectObjectUpAndDown
+            (KeyboardManager keyboardManager,
+            IList<PhysicsObject> objects,
+            ref int index,
+            Key keyUp,
+            Key keyDown,
+            out bool changed,
+            Predicate<PhysicsObject> validObject = null,
+            int deltaMultiplier = 1)
         {
+            if (deltaMultiplier > objects.Count)
+            {
+                changed = false;
+                return null;
+            }
+
             var deltaIndex = 0;
             if (keyboardManager.IsKeyPressed(keyUp))
             {
-                deltaIndex = -1;
+                deltaIndex = -1 * deltaMultiplier;
             }
 
             if (keyboardManager.IsKeyPressed(keyDown))
             {
-                deltaIndex = 1;
+                deltaIndex = 1 * deltaMultiplier;
+            }
+
+            var newIndex = index + deltaIndex;
+            if (deltaIndex != 0)
+            {
+                newIndex = newIndex % objects.Count;
+                if (newIndex < 0)
+                {
+                    newIndex += objects.Count;
+                }
             }
 
             if (deltaIndex != 0)
             {
-                index += deltaIndex;
-                if (index < 0)
-                {
-                    index = objects.Count - 1;
-                }
+                var isValid = validObject != null ? validObject(objects[newIndex]) : true;
 
-                if (index >= objects.Count)
+                if (isValid)
                 {
-                    index = 0;
+                    changed = true;
+                    index = newIndex;
+                }
+                else
+                {
+                    return SelectObjectUpAndDown(
+                        keyboardManager,
+                        objects,
+                        ref index,
+                        keyUp,
+                        keyDown,
+                        out changed,
+                        validObject,
+                        deltaMultiplier + 1);
                 }
             }
+            else
+            {
+                changed = false;
+            }
 
-            changed = deltaIndex != 0;
             return objects[index];
         }
     }

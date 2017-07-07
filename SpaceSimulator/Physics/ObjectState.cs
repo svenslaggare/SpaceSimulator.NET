@@ -76,7 +76,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                return OrbitHelpers.Normal(this.Prograde);
+                return OrbitHelpers.Normal(this.Position, this.Prograde);
             }
         }
 
@@ -87,7 +87,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                return OrbitHelpers.Radial(this.Prograde);
+                return OrbitHelpers.Radial(this.Position);
             }
         }
 

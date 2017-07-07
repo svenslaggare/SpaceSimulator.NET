@@ -25,19 +25,21 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the normal vector
         /// </summary>
+        /// <param name="position">The position vector</param>
         /// <param name="prograde">The prograde vector</param>
-        public static Vector3d Normal(Vector3d prograde)
+        public static Vector3d Normal(Vector3d position, Vector3d prograde)
         {
-            return MathHelpers.Normalized(Vector3d.Cross(prograde, Radial(prograde)));
+            return MathHelpers.Normalized(Vector3d.Cross(prograde, Radial(position)));
         }
 
         /// <summary>
         /// Returns the radial vector
         /// </summary>
-        /// <param name="prograde">The prograde vector</param>
-        public static Vector3d Radial(Vector3d prograde)
+        /// <param name="position">The position vector</param>
+        public static Vector3d Radial( Vector3d position)
         {
-            return MathHelpers.Normalized(Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+            //return MathHelpers.Normalized(Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+            return MathHelpers.Normalized(position);
         }
 
         /// <summary>
@@ -86,10 +88,10 @@ namespace SpaceSimulator.Physics
         /// <param name="objectPosition">The position of the object</param>
         public static double AngleToPrograde(Vector3d primaryBodyPosition, Vector3d primaryBodyVelocity, Vector3d objectPosition)
         {
+            var positionVector = objectPosition - primaryBodyPosition;
             var progradeAngle = MathHelpers.AngleBetween(
                 primaryBodyVelocity,
-                objectPosition - primaryBodyPosition,
-                Normal(Prograde(primaryBodyVelocity)));
+                positionVector,
 
             if (progradeAngle < 0)
             {

@@ -82,6 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\FollowCamera.cs" />
     <Compile Include="Common\BitmapHelpers.cs" />
     <Compile Include="Common\Camera\BaseCamera.cs" />
     <Compile Include="Common\Camera\CameraHelpers.cs" />

@@ -51,7 +51,13 @@ namespace SpaceSimulator.UI
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];
 
             //this.SetScaleFactorFromFocusObject();
-            this.orbitCamera.SetScaleFactor(SimulatorContainer.SimulatorEngine.ObjectOfReference);
+            //this.orbitCamera.SetScaleFactor(SimulatorContainer.SimulatorEngine.ObjectOfReference);
+            foreach (var spaceCamera in this.cameraManager.Cameras.OfType<SpaceCamera>())
+            {
+                spaceCamera.SetScaleFactor(SimulatorContainer.SimulatorEngine.ObjectOfReference);
+                spaceCamera.SetFocus(this.focusObject);
+            }
+
             this.orbitCamera.Radius = this.GetStartRadius();
         }
 
@@ -85,6 +91,20 @@ namespace SpaceSimulator.UI
             }
         }
 
+        /// <summary>
+        /// Indicates if the given object can be set as focus
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        private bool CanSetFocus(PhysicsObject physicsObject)
+        {
+            if (this.cameraManager.ActiveCamera is SpaceCamera spaceCamera)
+            {
+                return spaceCamera.CanSetFocus(physicsObject);
+            }
+
+            return true;
+        }
+
         public override void Update(TimeSpan elapsed)
         {
             this.focusObject = UIComponentHelpers.SelectObjectUpAndDown(
@@ -93,7 +113,8 @@ namespace SpaceSimulator.UI
                 ref this.focusObjectIndex,
                 SharpDX.DirectInput.Key.End,
                 SharpDX.DirectInput.Key.Home,
-                out var changed);
+                out var changed,
+                this.CanSetFocus);
 
             if (changed)
             {
@@ -104,7 +125,14 @@ namespace SpaceSimulator.UI
 
         public override void AfterSimulationUpdate()
         {
-            this.orbitCamera.Focus = this.focusObject.Position;
+            var spaceCamera = this.cameraManager.ActiveCamera as SpaceCamera;
+            //spaceCamera.Focus = this.focusObject.Position;
+            spaceCamera.SetFocus(this.focusObject);
+
+            //if (spaceCamera is FollowCamera followCamera)
+            //{
+            //    followCamera.SetFocus(this.focusObject);
+            //}
         }
 
         public override void Draw(DeviceContext deviceContext)

@@ -134,7 +134,7 @@ namespace SpaceSimulator.Camera
 			this.look.Normalize();
 			this.right = Vector3.Cross(this.Up, this.Look);
 
-            var focusPosition = this.ToDrawPosition(this.Focus);
+            var focusPosition = this.ToDrawPosition(this.FocusPosition);
             this.position = this.position + focusPosition;
             this.view = Matrix.LookAtLH(this.position, focusPosition, this.up);
             this.UpdateViewProjection();

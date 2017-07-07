@@ -18,9 +18,9 @@ namespace SpaceSimulator.Camera
         protected double scaleFactor = 1.0;
 
         /// <summary>
-        /// The focus position
+        /// The object being focused
         /// </summary>
-        public Vector3d Focus { get; set; }
+        public PhysicsObject Focus { get; private set; }
 
         /// <summary>
         /// Creates a new space camera
@@ -29,6 +29,11 @@ namespace SpaceSimulator.Camera
         {
 
         }
+
+        /// <summary>
+        /// The focus object
+        /// </summary>
+        public Vector3d FocusPosition => this.Focus?.Position ?? Vector3d.Zero;
 
         /// <summary>
         /// Creates a new camera that is a copy of the given camera
@@ -60,6 +65,16 @@ namespace SpaceSimulator.Camera
         }
 
         /// <summary>
+        /// Converts the given scalar in draw scale to world scale
+        /// </summary>
+        /// <param name="draw">The draw scalar</param>
+        /// <remarks>Precision is lost when converting between draw/world </remarks>
+        public virtual double FromDraw(float draw)
+        {
+            return (double)(draw / this.scaleFactor);
+        }
+
+        /// <summary>
         /// Converts the given position in the world position to a draw position
         /// </summary>
         /// <param name="worldPosition">The position in the world</param>
@@ -68,10 +83,25 @@ namespace SpaceSimulator.Camera
         {
             if (relativeToFocus)
             {
-                worldPosition -= this.Focus;
+                worldPosition -= this.FocusPosition;
             }
 
             return MathHelpers.ToFloat(this.scaleFactor * worldPosition);
         }
+
+        /// <summary>
+        /// Sets the focus to the given object
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public virtual void SetFocus(PhysicsObject physicsObject)
+        {
+            this.Focus = physicsObject;
+        }
+
+        /// <summary>
+        /// Indicates if the given object can be set as focus
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public virtual bool CanSetFocus(PhysicsObject physicsObject) => true;
     }
 }

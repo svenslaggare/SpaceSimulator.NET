@@ -110,7 +110,7 @@ namespace SpaceSimulator.Simulator.Environments
                     earth,
                     parameter: 3.0 * Simulator.Data.SolarSystemBodies.Earth.Radius,
                     eccentricity: 0.2,
-                    inclination: 0 * MathUtild.Deg2Rad),
+                    inclination: 30 * MathUtild.Deg2Rad),
                 87.2 * MathUtild.Deg2Rad);
 
             var object2 = simulatorEngine.AddSatelliteInOrbit(
