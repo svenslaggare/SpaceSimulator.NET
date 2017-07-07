@@ -70,6 +70,7 @@ namespace SpaceSimulator.Rendering
 
         private OrbitVertex[] vertices;   
         private Buffer vertexBuffer;
+        private VertexBufferBinding vertexBufferBinding;
 
         /// <summary>
         /// Indicates if the positions are relative to the focus
@@ -255,6 +256,8 @@ namespace SpaceSimulator.Rendering
                 this.vertices,
                 usage: ResourceUsage.Dynamic,
                 accessFlags: CpuAccessFlags.Write);
+
+            this.vertexBufferBinding = new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<OrbitVertex>(), 0);
         }
 
         /// <summary>
@@ -291,9 +294,9 @@ namespace SpaceSimulator.Rendering
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
         /// <param name="world">The world matrix</param>
-        /// <param name="currentPosition">The position of the object in the orbit</param>
+        /// <param name="objectPosition">The position of the object in the orbit</param>
         /// <param name="lineWidth">The width of the orbit line</param>
-        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, BaseCamera camera, Matrix world, Vector3 currentPosition, float? lineWidth = null)
+        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, BaseCamera camera, Matrix world, Vector3 objectPosition, float? lineWidth = null)
         {
             if (this.vertexBuffer == null)
             {
@@ -302,7 +305,7 @@ namespace SpaceSimulator.Rendering
 
             this.UpdateVertices(deviceContext, camera);
 
-            effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, currentPosition)));
+            effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, objectPosition)));
 
             //Set draw type
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;
@@ -310,7 +313,7 @@ namespace SpaceSimulator.Rendering
             deviceContext.OutputMerger.SetBlendState(this.blendStates.Transparent, Color.Black, 0xffffffff);
 
             //Set buffers
-            deviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<OrbitVertex>(), 0));
+            deviceContext.InputAssembler.SetVertexBuffers(0, this.vertexBufferBinding);
 
             //Set per object constants
             effect.SetTransform(camera.ViewProjection, world);
@@ -323,11 +326,7 @@ namespace SpaceSimulator.Rendering
 
         public void Dispose()
         {
-            if (this.vertexBuffer != null)
-            {
-                this.vertexBuffer.Dispose();
-            }
-
+            this.vertexBuffer?.Dispose();
             this.rasterizerStates.Dispose();
             this.blendStates.Dispose();
         }

@@ -22,14 +22,15 @@ namespace SpaceSimulator.Common
         public static Texture2D FromFile(Device graphicsDevice, string fileName)
         {
             var bitmap = new System.Drawing.Bitmap(fileName);
-            if (bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+            var bitmapFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+            var bitmapRectangle = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+
+            if (bitmap.PixelFormat != bitmapFormat)
             {
-                bitmap = bitmap.Clone(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                bitmap = bitmap.Clone(bitmapRectangle, bitmapFormat);
             }
 
-            var data = bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var data = bitmap.LockBits(bitmapRectangle, System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmapFormat);
 
             var texture = new Texture2D(graphicsDevice, new Texture2DDescription()
             {
@@ -40,11 +41,11 @@ namespace SpaceSimulator.Common
                 Usage = ResourceUsage.Immutable,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
-                //Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
                 MipLevels = 1,
                 OptionFlags = ResourceOptionFlags.None,
                 SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
             }, new DataRectangle(data.Scan0, data.Stride));
+
             bitmap.UnlockBits(data);
             return texture;
         }

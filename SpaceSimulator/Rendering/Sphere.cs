@@ -28,6 +28,7 @@ namespace SpaceSimulator.Rendering
         private readonly int[] indices;
 
         private readonly Buffer vertexBuffer;
+        private readonly VertexBufferBinding vertexBufferBinding;
         private readonly Buffer indexBuffer;
 
         private readonly Texture2D texture;
@@ -64,6 +65,8 @@ namespace SpaceSimulator.Rendering
                 BindFlags.VertexBuffer,
                 this.vertices);
 
+            this.vertexBufferBinding = new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<BasicVertex>(), 0);
+
             this.indexBuffer = Buffer.Create(
                 graphicsDevice,
                 BindFlags.IndexBuffer,
@@ -88,7 +91,7 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             //Set buffers
-            deviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<BasicVertex>(), 0));
+            deviceContext.InputAssembler.SetVertexBuffers(0, this.vertexBufferBinding);
             deviceContext.InputAssembler.SetIndexBuffer(this.indexBuffer, Format.R32_UInt, 0);
 
             //Set per object constants
