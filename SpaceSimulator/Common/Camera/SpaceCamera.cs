@@ -13,6 +13,24 @@ namespace SpaceSimulator.Common.Camera
     public abstract class SpaceCamera : BaseCamera
     {
         /// <summary>
+        /// Creates a new space camera
+        /// </summary>
+        public SpaceCamera()
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a new camera that is a copy of the given camera
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        public SpaceCamera(SpaceCamera camera)
+            : base(camera)
+        {
+
+        }
+
+        /// <summary>
         /// Sets the scale factor
         /// </summary>
         /// <param name="primaryBody">The primary body to base the scale on</param>

@@ -39,6 +39,22 @@ namespace SpaceSimulator.Common.Camera
             this.radius = 200;
         }
 
+        /// <summary>
+        /// Creates a new camera that is a copy of the given camera
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        public OrbitCamera(OrbitCamera camera)
+            : base(camera)
+        {
+            this.theta = camera.theta;
+            this.phi = camera.phi;
+            this.radius = camera.radius;
+            this.minRadius = camera.minRadius;
+            this.maxRadius = camera.maxRadius;
+
+            this.lastMousePosition = camera.lastMousePosition;
+        }
+
 		/// <summary>
 		/// The theta angle
 		/// </summary>

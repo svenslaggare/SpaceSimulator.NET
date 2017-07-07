@@ -181,22 +181,17 @@ namespace SpaceSimulator.UI
                 Color.Transparent,
                 render: deviceContext =>
                 {
+                    var overlayCamera = new OrbitCamera(this.camera);
                     var radius = 1E3;
                     if (renderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
                     {
                         radius = naturalSatelliteObject.Radius;
-                        this.camera.SetScaleFactor(naturalSatelliteObject);
+                        overlayCamera.SetScaleFactor(naturalSatelliteObject);
                     }
 
-                    this.thumbnailEffect.SetEyePosition(this.camera.Position);
-                    this.thumbnailEffect.SetPointLightSource(this.camera.ToDrawPosition(Vector3d.Zero));
-
-                    var originalRadius = this.camera.Radius;
-                    var originalPhi = this.camera.Phi;
-
-                    this.camera.Radius = this.camera.ToDraw(radius * 3.0);
-                    this.camera.Phi += MathUtil.DegreesToRadians(60.0f);
-                    this.camera.UpdateViewMatrix();
+                    overlayCamera.Radius = overlayCamera.ToDraw(radius * 3.0);
+                    overlayCamera.Phi += MathUtil.DegreesToRadians(60.0f);
+                    overlayCamera.UpdateViewMatrix();
 
                     deviceContext.InputAssembler.InputLayout = this.thumbnailEffect.InputLayout;
                     foreach (var pass in this.thumbnailEffect.Passes)
@@ -205,14 +200,9 @@ namespace SpaceSimulator.UI
                             deviceContext,
                             this.thumbnailEffect,
                             pass,
-                            this.camera,
+                            overlayCamera,
                             position: Vector3.Zero);
                     }
-
-                    this.camera.SetScaleFactor(this.SimulatorEngine.ObjectOfReference);
-                    this.camera.Radius = originalRadius;
-                    this.camera.Phi = originalPhi;
-                    this.camera.UpdateViewMatrix();
                 });
         }
 

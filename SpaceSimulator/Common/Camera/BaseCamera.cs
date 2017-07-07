@@ -39,7 +39,6 @@ namespace SpaceSimulator.Common.Camera
         /// </summary>
         public Vector3d Focus { get; set; }
 
-
         /// <summary>
         /// Creates a new base camera
         /// </summary>
@@ -48,6 +47,33 @@ namespace SpaceSimulator.Common.Camera
             this.right = Vector3.Right;
             this.up = Vector3.Up;
             this.look = Vector3.ForwardLH;
+        }
+
+        /// <summary>
+        /// Creates a new camera that is a copy of the given camera
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        public BaseCamera(BaseCamera camera)
+        {
+            this.position = camera.position;
+            this.right = camera.right;
+            this.up = camera.up;
+            this.look = camera.look;
+
+            this.nearZ = camera.nearZ;
+            this.farZ = camera.farZ;
+            this.viewportWidth = camera.viewportWidth;
+            this.viewportHeight = camera.viewportHeight;
+            this.fovY = camera.fovY;
+            this.nearWindowHeight = camera.nearWindowHeight;
+            this.farWindowHeight = camera.farWindowHeight;
+
+            this.view = camera.view;
+            this.projection = camera.projection;
+            this.viewProjection = camera.viewProjection;
+
+            this.scaleFactor = camera.scaleFactor;
+            this.Focus = camera.Focus;
         }
 
         /// <summary>
