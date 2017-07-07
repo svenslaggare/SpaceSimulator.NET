@@ -92,6 +92,7 @@ namespace SpaceSimulator.Physics
             var progradeAngle = MathHelpers.AngleBetween(
                 primaryBodyVelocity,
                 positionVector,
+                Normal(primaryBodyPosition, Prograde(primaryBodyVelocity)));
 
             if (progradeAngle < 0)
             {
