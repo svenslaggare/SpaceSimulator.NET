@@ -25,8 +25,7 @@ namespace SpaceSimulator.Simulator.Environments
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <returns>Simulator engine, rendering objects</returns>
-        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice)
+        public static SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice)
         {
             var baseDir = "Content/Textures/Planets/";
 
@@ -52,13 +51,13 @@ namespace SpaceSimulator.Simulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>() { earthRenderingObject };
 
-            simulatorEngine.ObjectAdded += (sender, newObject) =>
+            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
             {
-                renderingObjects.Add(new RenderingObject(
+                return new RenderingObject(
                     graphicsDevice,
                     newObject,
                     Color.Yellow,
-                    baseDir + "Satellite.png"));
+                    baseDir + "Satellite.png");
             };
 
             //var moon = simulatorEngine.AddPlanetInOrbit(
@@ -145,7 +144,7 @@ namespace SpaceSimulator.Simulator.Environments
             //Console.WriteLine($"Computed in {(DateTime.UtcNow - startTime).TotalSeconds} seconds.");
             //simulatorEngine.ScheduleManeuver(rocketObject, maneuvers);
 
-            return (simulatorEngine, renderingObjects);
+            return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
         }
     }
 }

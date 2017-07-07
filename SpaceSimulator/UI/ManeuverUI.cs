@@ -929,24 +929,24 @@ namespace SpaceSimulator.UI
 
             var parameter = this.ParseDistance(this.parameterTextInput.Text, this.SelectedObject.PrimaryBody);
             var eccentricity = this.ParseDouble(this.eccentricityTextInput.Text);
-            var inclination = this.ParseDouble(this.inclinationTextInput.Text);
-            var longitudeOfAscendingNode = this.ParseDouble(this.longitudeOfAscendingNodeTextInput.Text);
-            var argumentOfPeriapsis = this.ParseDouble(this.argumentOfPeriapsisTextInput.Text);
+            var inclination = this.ParseDouble(this.inclinationTextInput.Text) * MathUtild.Deg2Rad;
+            var longitudeOfAscendingNode = this.ParseDouble(this.longitudeOfAscendingNodeTextInput.Text) * MathUtild.Deg2Rad;
+            var argumentOfPeriapsis = this.ParseDouble(this.argumentOfPeriapsisTextInput.Text) * MathUtild.Deg2Rad;
 
-            //var orbit = Physics.Orbit.New(
-            //    primaryBody,
-            //    parameter: parameter,
-            //    eccentricity: eccentricity,
-            //    inclination: inclination,
-            //    longitudeOfAscendingNode: longitudeOfAscendingNode,
-            //    argumentOfPeriapsis: argumentOfPeriapsis);
+            var orbit = Physics.Orbit.New(
+                primaryBody,
+                parameter: parameter,
+                eccentricity: eccentricity,
+                inclination: inclination,
+                longitudeOfAscendingNode: longitudeOfAscendingNode,
+                argumentOfPeriapsis: argumentOfPeriapsis);
 
-            //var satellite = this.SimulatorEngine.AddSatelliteInOrbit(
-            //    "Satellite",
-            //    1000,
-            //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-            //    new OrbitPosition(orbit, 0.0));
-            //this.SimulatorContainer.RenderingObjects.Add(new RenderingObject(this.gr, this.camera, satellite, Color.Yellow, "Content/Textures/Planets/Satellite.png"));
+            var satellite = this.SimulatorEngine.AddSatelliteInOrbit(
+                "Satellite",
+                1000,
+                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
+                new OrbitPosition(orbit, 0.0));
+            this.SimulatorContainer.AddRenderingObject(satellite);
         }
 
         public override void Update(TimeSpan elapsed)

@@ -26,8 +26,7 @@ namespace SpaceSimulator.Simulator.Environments
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
-        /// <returns>Simulator engine, rendering objects</returns>
-        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
+        public static SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -43,6 +42,16 @@ namespace SpaceSimulator.Simulator.Environments
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();
+            var baseDir = "Content/Textures/Planets/";
+
+            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
+            {
+                return new RenderingObject(
+                    graphicsDevice,
+                    newObject,
+                    Color.Yellow,
+                    baseDir + "Satellite.png");
+            };
 
             PlanetObject AddPlanet(
                 NaturalSatelliteObject primaryBody,
@@ -80,8 +89,6 @@ namespace SpaceSimulator.Simulator.Environments
                     ringRadius: ringRadius));
                 return newObject;
             }
-
-            var baseDir = "Content/Textures/Planets/";
 
             var sunRenderingObject = new RenderingObject(graphicsDevice, sun, Color.Yellow, baseDir + "Sun.jpg");
             renderingObjects.Add(sunRenderingObject);
@@ -169,7 +176,7 @@ namespace SpaceSimulator.Simulator.Environments
             //    isRealSize: false);
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite3));
 
-            return (simulatorEngine, renderingObjects);
+            return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
         }
     }
 }

@@ -28,14 +28,12 @@ namespace SpaceSimulator
     {
         private readonly RenderingPasses renderingPasses = new RenderingPasses();
 
+        private readonly SimulatorContainer simulatorContainer;
+
         private BasicEffect sunEffect;
         private BasicEffect planetNoLightEffect;
         private BasicEffect planetEffect;
         private OrbitEffect orbitEffect;
-
-        private readonly IList<RenderingObject> renderingObjects;
-        private readonly SimulatorEngine simulatorEngine;
-        private readonly SimulatorContainer simulatorContainer;
 
         private readonly UIManager uiManager;
         private readonly UIStyle uiStyle;
@@ -49,10 +47,10 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            (this.simulatorEngine, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
-            this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
+            this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //(this.simulatorEngine, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
@@ -65,9 +63,17 @@ namespace SpaceSimulator
             };
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
-
-            this.simulatorContainer = new SimulatorContainer(this.simulatorEngine, this.renderingObjects);
         }
+
+        /// <summary>
+        /// Returns the simulator engine
+        /// </summary>
+        private SimulatorEngine SimulatorEngine => this.simulatorContainer.SimulatorEngine;
+
+        /// <summary>
+        /// Returns the rendering objects
+        /// </summary>
+        private IList<RenderingObject> RenderingObjects => this.simulatorContainer.RenderingObjects;
 
         /// <summary>
         /// Returns the space camera
@@ -210,7 +216,7 @@ namespace SpaceSimulator
 
             if (!this.simulatorContainer.IsPaused)
             {
-                this.simulatorEngine.Update();
+                this.SimulatorEngine.Update();
             }
 
             foreach (var component in this.uiComponents)
@@ -218,9 +224,9 @@ namespace SpaceSimulator
                 component.AfterSimulationUpdate();
             }
 
-            foreach (var currentObject in this.renderingObjects)
+            foreach (var currentObject in this.RenderingObjects)
             {
-                currentObject.Update(this.simulatorEngine);
+                currentObject.Update(this.SimulatorEngine);
             }
         }
 
@@ -236,7 +242,7 @@ namespace SpaceSimulator
 
             this.renderingPasses.Add3D((deviceContext, deviceContext2D) =>
             {
-                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.SpaceCamera, this.renderingObjects);
+                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.SpaceCamera, this.RenderingObjects);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>
@@ -255,7 +261,7 @@ namespace SpaceSimulator
                     this.planetEffect,
                     this.orbitEffect,
                     this.SpaceCamera,
-                    this.renderingObjects);
+                    this.RenderingObjects);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>
@@ -277,7 +283,7 @@ namespace SpaceSimulator
         {
             var textBuilder = new StringBuilder();
 
-            foreach (var renderingObject in this.renderingObjects)
+            foreach (var renderingObject in this.RenderingObjects)
             {
                 textBuilder.AppendLine(
                     $"{renderingObject.PhysicsObject.Name} - " +
@@ -325,9 +331,9 @@ namespace SpaceSimulator
             this.planetNoLightEffect.Dispose();
             this.orbitEffect.Dispose();
 
-            foreach (var currentObject in this.renderingObjects)
+            foreach (var renderingObject in this.RenderingObjects)
             {
-                currentObject.Dispose();
+                renderingObject.Dispose();
             }
 
             foreach (var component in this.uiComponents)

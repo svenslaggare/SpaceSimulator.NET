@@ -184,6 +184,11 @@ namespace SpaceSimulator.Simulator
         private readonly double maneuverTimeEpsilon = 1E-6;
 
         /// <summary>
+        /// Fires when a new object is added
+        /// </summary>
+        public event EventHandler<PhysicsObject> ObjectAdded;
+
+        /// <summary>
         /// The text output writer
         /// </summary>
         public ITextOutputWriter TextOutputWriter { get; } = new ConsoleTextOutputWriter();
@@ -192,6 +197,22 @@ namespace SpaceSimulator.Simulator
         /// The simulation speed
         /// </summary>
         public int SimulationSpeed { get; set; }
+
+        /// <summary>
+        /// Creates a new simulator engine
+        /// </summary>
+        /// <param name="objects">The objects</param>
+        public SimulatorEngine(IList<PhysicsObject> objects)
+        {
+            foreach (var current in objects)
+            {
+                this.AddObject(current);
+            }
+
+            this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator));
+            this.orbitSimulators.Add(PhysicsSimulationMode.KeplerProblemUniversalVariable, new TwoBodySimulator(this.keplerProblemSolver));
+            this.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
+        }
 
         /// <summary>
         /// Returns the numeric integrator
@@ -217,26 +238,6 @@ namespace SpaceSimulator.Simulator
             get { return this.gaussProblemSolver; }
         }
 
-        /// <summary>
-        /// Fires when a new object is added
-        /// </summary>
-        public event EventHandler<PhysicsObject> ObjectAdded;
-
-        /// <summary>
-        /// Creates a new simulator engine
-        /// </summary>
-        /// <param name="objects">The objects</param>
-        public SimulatorEngine(IList<PhysicsObject> objects)
-        {
-            foreach (var current in objects)
-            {
-                this.AddObject(current);
-            }
-
-            this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator));
-            this.orbitSimulators.Add(PhysicsSimulationMode.KeplerProblemUniversalVariable, new TwoBodySimulator(this.keplerProblemSolver));
-            this.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
-        }
 
         /// <summary>
         /// The simulation mode

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 
@@ -23,6 +24,8 @@ namespace SpaceSimulator
 
         private PhysicsObject selectedObject;
 
+        private readonly Func<PhysicsObject, RenderingObject> createRenderingObject;
+
         /// <summary>
         /// Event for when the selected object changes
         /// </summary>
@@ -38,10 +41,21 @@ namespace SpaceSimulator
         /// </summary>
         /// <param name="simulatorEngine">The simulator engine</param>
         /// <param name="renderingObjects">The rendering objects</param>
-        public SimulatorContainer(SimulatorEngine simulatorEngine, IList<RenderingObject> renderingObjects)
+        /// <param name="createRenderingObject">Creates a rendering object at runtime</param>
+        public SimulatorContainer(SimulatorEngine simulatorEngine, IList<RenderingObject> renderingObjects, Func<PhysicsObject, RenderingObject> createRenderingObject)
         {
             this.SimulatorEngine = simulatorEngine;
             this.RenderingObjects = renderingObjects;
+
+            if (createRenderingObject != null)
+            {
+                this.createRenderingObject = createRenderingObject;
+
+                this.SimulatorEngine.ObjectAdded += (sender, newObject) =>
+                {
+                    this.RenderingObjects.Add(this.createRenderingObject(newObject));
+                };
+            }
         }
 
         /// <summary>
@@ -91,6 +105,19 @@ namespace SpaceSimulator
         public void Unfreeze()
         {
             this.isFrozen = false;
+        }
+
+        /// <summary>
+        /// Adds a rendering object for the given object
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public void AddRenderingObject(PhysicsObject physicsObject)
+        {
+            if (this.createRenderingObject != null)
+            {
+                var renderingObject = this.createRenderingObject(physicsObject);
+                this.RenderingObjects.Add(renderingObject);
+            }
         }
     }
 }
