@@ -58,9 +58,9 @@ namespace SpaceSimulator.Helpers
                 {
                     foreach (var stage in rocketObject.Stages)
                     {
-                        if (stage.FuelMass > 0.0)
+                        if (stage.InitialFuelMass > 0.0)
                         {
-                            AddBulletItem($"{stage.Name}: {FormatMass(stage.Mass)} ({Math.Round(100 * (stage.FuelMassRemaining / stage.FuelMass), 1)}%)");
+                            AddBulletItem($"{stage.Name}: {FormatMass(stage.Mass)} ({Math.Round(100 * (stage.FuelMassRemaining / stage.InitialFuelMass), 1)}%)");
                         }
                         else
                         {

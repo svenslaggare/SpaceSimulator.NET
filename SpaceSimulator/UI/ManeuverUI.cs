@@ -899,8 +899,11 @@ namespace SpaceSimulator.UI
                 var targetAltitude = this.ParseDistance(this.ascentTargetAltitudeTextInput.Text, this.SelectedObject.PrimaryBody);
                 var targetOrbit = Physics.Orbit.New(this.SelectedObject.PrimaryBody, semiMajorAxis: targetAltitude, eccentricity: 0.0);
 
-                var bestPitchStart = 2E3;
-                var bestPitchEnd = 12.8625E3;
+                //var bestPitchStart = 2E3;
+                //var bestPitchEnd = 12.8625E3;
+                var bestPitchStart = 1E3;
+                var bestPitchEnd = 15.7875E3;
+
                 rocketObject.SetControlProgram(new AscentControlProgram(
                     rocketObject,
                     targetOrbit,

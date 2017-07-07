@@ -67,11 +67,6 @@ namespace SpaceSimulator.Simulator.Environments
             //    new OrbitPosition(Simulator.SolarSystem.Moon.Orbit(earth), 0.0));
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Magenta, baseDir + "Moon.jpg", moon));
 
-            //var falcon9TargetAltitude = 250E3;
-            //var falcon9TargetAltitude = 300E3;
-            //var falcon9TargetAltitude = 1000E3;
-
-            //var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
             var falcon9Object = simulatorEngine.AddRocket(
                 earth,
                 "Falcon 9",
@@ -81,22 +76,27 @@ namespace SpaceSimulator.Simulator.Environments
                 Vector3d.Zero);
             renderingObjects.Add(new RenderingObject(graphicsDevice, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
+            var falcon9TargetAltitude = 300E3;
+
+            var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
+
             //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
             //    simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
             //    falcon9Object,
-            //    2E3,
+            //    1E3,
             //    falcon9TargetOrbit);
-            //var bestPitchStart = 2E3;
-            //var bestPitchEnd = 12.8625E3;
-            //falcon9Object.SetControlProgram(new AscentControlProgram(
-            //    falcon9Object,
-            //    falcon9TargetOrbit,
-            //    bestPitchStart,
-            //    bestPitchEnd,
-            //    simulatorEngine.TextOutputWriter));
+            var bestPitchStart = 1E3;
+            var bestPitchEnd = 15.7875E3;
 
-            //falcon9Object.CheckImpacted(0);
-            //falcon9Object.StartEngine();
+            falcon9Object.SetControlProgram(new AscentControlProgram(
+                falcon9Object,
+                falcon9TargetOrbit,
+                bestPitchStart,
+                bestPitchEnd,
+                simulatorEngine.TextOutputWriter));
+
+            falcon9Object.CheckImpacted(0);
+            falcon9Object.StartEngine();
 
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",

@@ -27,7 +27,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// <summary>
         /// The amount of mass dedicated to fuel (in kg)
         /// </summary>
-        public double FuelMass { get; }
+        public double InitialFuelMass { get; }
 
         /// <summary>
         /// The dry mass (in kg)
@@ -61,8 +61,8 @@ namespace SpaceSimulator.Physics.Rocket
             this.engines = new List<RocketEngine>(engines);
 
             this.DryMass = nonEngineDryMass + this.engines.Sum(x => x.Mass);
-            this.FuelMass = fuelMass;
-            this.InitialTotalMass = this.DryMass + this.FuelMass;
+            this.InitialFuelMass = fuelMass;
+            this.InitialTotalMass = this.DryMass + this.InitialFuelMass;
             this.FuelMassRemaining = fuelMass;
 
             this.totalThrust = this.engines.Sum(engine => engine.Thrust);
@@ -74,20 +74,21 @@ namespace SpaceSimulator.Physics.Rocket
         /// <summary>
         /// Copies the given stage
         /// </summary>
-        private RocketStage(string name, IList<RocketEngine> engines, double dryMass, double fuelMass, double initialTotalMass, double fuelMassRemaining, AtmosphericProperties atmosphericProperties)
+        /// <param name="rocketStage">The rocket stage to copy</param>
+        private RocketStage(RocketStage rocketStage)
         {
-            this.Name = name;
-            this.engines = new List<RocketEngine>(engines);
+            this.Name = rocketStage.Name;
+            this.engines = new List<RocketEngine>(rocketStage.engines);
 
-            this.DryMass = dryMass;
-            this.FuelMass = fuelMass;
-            this.InitialTotalMass = initialTotalMass;
-            this.FuelMassRemaining = fuelMassRemaining;
+            this.DryMass = rocketStage.DryMass;
+            this.InitialFuelMass = rocketStage.InitialFuelMass;
+            this.InitialTotalMass = rocketStage.InitialTotalMass;
+            this.FuelMassRemaining = rocketStage.FuelMassRemaining;
 
             this.totalThrust = this.engines.Sum(engine => engine.Thrust);
             this.totalMassFlowRate = this.engines.Sum(engine => engine.MassFlowRate);
 
-            this.AtmosphericProperties = atmosphericProperties;
+            this.AtmosphericProperties = rocketStage.AtmosphericProperties;
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public RocketStage Clone()
         {
-            return new RocketStage(this.Name, this.engines, this.DryMass, this.FuelMass, this.InitialTotalMass, this.FuelMassRemaining, this.AtmosphericProperties);
+            return new RocketStage(this);
         }
 
         /// <summary>
@@ -181,6 +182,7 @@ namespace SpaceSimulator.Physics.Rocket
         {
             var deltaMass = this.TotalMassFlowRate * time;
             if (this.FuelMassRemaining - deltaMass > 0)
+            //if ((this.FuelMassRemaining - deltaMass) / this.InitialFuelMass > 0.10)
             {
                 this.FuelMassRemaining -= deltaMass;
                 return deltaMass;
