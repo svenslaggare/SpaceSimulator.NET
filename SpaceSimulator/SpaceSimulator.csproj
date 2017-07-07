@@ -88,6 +88,7 @@
     <Compile Include="Camera\FPSCamera.cs" />
     <Compile Include="Camera\OrbitCamera.cs" />
     <Compile Include="Camera\SpaceCamera.cs" />
+    <Compile Include="Common\Camera\CameraManager.cs" />
     <Compile Include="Common\D3DApp.cs" />
     <Compile Include="Common\Effects\BasicEffect.cs" />
     <Compile Include="Common\Effects\BlendStates.cs" />
@@ -228,7 +229,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

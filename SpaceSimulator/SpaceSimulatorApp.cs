@@ -45,7 +45,7 @@ namespace SpaceSimulator
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-            : base("SpaceSimulator", new OrbitCamera())
+            : base("SpaceSimulator", new OrbitCamera(), "OrbitCamera")
         {
             Console.WriteLine("");
 
@@ -72,12 +72,12 @@ namespace SpaceSimulator
         /// <summary>
         /// Returns the space camera
         /// </summary>
-        private SpaceCamera SpaceCamera => this.Camera as SpaceCamera;
+        private SpaceCamera SpaceCamera => this.ActiveCamera as SpaceCamera;
 
         /// <summary>
         /// Returns the orbit camera
         /// </summary>
-        private OrbitCamera OrbitCamera => this.Camera as OrbitCamera;
+        private OrbitCamera OrbitCamera => this.ActiveCamera as OrbitCamera;
 
         /// <summary>
         /// Creates the effect

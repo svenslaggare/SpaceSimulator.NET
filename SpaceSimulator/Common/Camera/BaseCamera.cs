@@ -186,14 +186,14 @@ namespace SpaceSimulator.Common.Camera
         }
 
         /// <summary>
-        /// Sets the frustum
+        /// Sets the projection matrix
         /// </summary>
         /// <param name="fovY">The field of view in the y-direction</param>
         /// <param name="viewportWidth">The width of the viewport</param>
         /// <param name="viewportHeight">The height of the viewport</param>
         /// <param name="nearPlane">The near plane</param>
         /// <param name="farPlane">The far plane</param>
-        public virtual void SetLens(float fovY, float viewportWidth, float viewportHeight, float nearPlane, float farPlane)
+        public virtual void SetProjection(float fovY, float viewportWidth, float viewportHeight, float nearPlane, float farPlane)
         {
             this.fovY = fovY;
             this.viewportWidth = viewportWidth;
@@ -303,6 +303,5 @@ namespace SpaceSimulator.Common.Camera
             screenPosition.Y = this.viewportHeight * (1.0f - ((screenPosition.Y + 1.0f) / 2.0f));
             return new Vector2(screenPosition.X, screenPosition.Y);
         }
-
     }
 }

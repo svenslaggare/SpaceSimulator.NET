@@ -22,22 +22,22 @@ using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace SpaceSimulator.Common
 {
-	/// <summary>
-	/// Represents a D3D application
-	/// </summary>
-	public abstract class D3DApp : IDisposable
-	{
-		private readonly string title;
+    /// <summary>
+    /// Represents a D3D application
+    /// </summary>
+    public abstract class D3DApp : IDisposable
+    {
+        private readonly string title;
 
-		private readonly RenderForm renderForm;
-		private SharpDX.Direct3D11.Device graphicsDevice;
-		private SwapChain swapChain;
-		private SharpDX.Direct3D11.DeviceContext deviceContext;
+        private readonly RenderForm renderForm;
+        private SharpDX.Direct3D11.Device graphicsDevice;
+        private SwapChain swapChain;
+        private SharpDX.Direct3D11.DeviceContext deviceContext;
         //private DeviceDebug graphicsDeviceDebug;
 
         private SharpDX.DXGI.Factory factory;
 
-		private readonly int swapChainBufferCount = 1;
+        private readonly int swapChainBufferCount = 1;
 
         //private readonly Format backbufferFormat = Format.R8G8B8A8_UNorm;
         private readonly Format backBufferFormat = Format.B8G8R8A8_UNorm;
@@ -47,14 +47,15 @@ namespace SpaceSimulator.Common
         private bool resized = true;
 
         private Texture2D backBuffer;
-		private RenderTargetView backBufferRenderView;
-		private Texture2D depthBuffer;
-		private DepthStencilView backBufferDepthView;
+        private RenderTargetView backBufferRenderView;
+        private Texture2D depthBuffer;
+        private DepthStencilView backBufferDepthView;
 
         private SharpDX.Direct2D1.DeviceContext deviceContext2D;
         private RenderingManager2D renderingManager2D;
-    
-        private BaseCamera camera;
+
+        //private BaseCamera camera;
+        private readonly CameraManager cameraManager;
 
         private readonly DirectInput directInput;
         private readonly KeyboardManager keyboardManager;
@@ -68,18 +69,19 @@ namespace SpaceSimulator.Common
         private RenderToTexture renderToTexture;
 
         private int frameCount;
-		private float elapsed;
-		private float fps;
-		private Stopwatch totalTimeWatch;
+        private float elapsed;
+        private float fps;
+        private Stopwatch totalTimeWatch;
 
-		/// <summary>
-		/// Creates a new D3D application
-		/// </summary>
-		/// <param name="title">The title of the application</param>
-        /// <param name="camera">The camera</param>
-		public D3DApp(string title, BaseCamera camera)
-		{
-			this.title = title;
+        /// <summary>
+        /// Creates a new D3D application
+        /// </summary>
+        /// <param name="title">The title of the application</param>
+        /// <param name="camera">The default camera</param>
+        /// <param name="cameraName">The name of the default camera</param>
+        public D3DApp(string title, BaseCamera camera, string cameraName = "Default")
+        {
+            this.title = title;
             this.renderForm = new RenderForm(title)
             {
                 ClientSize = new System.Drawing.Size(1440, 900)
@@ -87,61 +89,62 @@ namespace SpaceSimulator.Common
 
             this.renderingManager2D = new RenderingManager2D(this.renderForm);
 
-            this.camera = camera;
+            this.cameraManager = new CameraManager();
+            this.cameraManager.AddCamera(cameraName, camera, true);
 
             this.directInput = new DirectInput();
             this.keyboardManager = new KeyboardManager(this.directInput);
             this.mouseManager = new MouseManager(this.directInput);
             this.CreateDevice();
-		}
+        }
 
-		/// <summary>
-		/// Returns the render form
-		/// </summary>
-		public RenderForm RenderForm
-		{
-			get { return this.renderForm; }
-		}
+        /// <summary>
+        /// Returns the render form
+        /// </summary>
+        public RenderForm RenderForm
+        {
+            get { return this.renderForm; }
+        }
 
-		/// <summary>
-		/// Returns the graphics device
-		/// </summary>
-		public SharpDX.Direct3D11.Device GraphicsDevice
-		{
-			get { return this.graphicsDevice; }
-		}
+        /// <summary>
+        /// Returns the graphics device
+        /// </summary>
+        public SharpDX.Direct3D11.Device GraphicsDevice
+        {
+            get { return this.graphicsDevice; }
+        }
 
         /// <summary>
         /// Returns the swap chain
         /// </summary>
         public SwapChain SwapChain
-		{
-			get { return this.swapChain; }
-		}
+        {
+            get { return this.swapChain; }
+        }
 
-		/// <summary>
-		/// Returns the D3D device context
-		/// </summary>
-		public SharpDX.Direct3D11.DeviceContext DeviceContext
-		{
-			get { return this.deviceContext; }
-		}
+        /// <summary>
+        /// Returns the D3D device context
+        /// </summary>
+        public SharpDX.Direct3D11.DeviceContext DeviceContext
+        {
+            get { return this.deviceContext; }
+        }
 
-		/// <summary>
-		/// Returns the render view
-		/// </summary>
-		public RenderTargetView BackBufferRenderView
-		{
-			get { return this.backBufferRenderView; }
-		}
+        /// <summary>
+        /// Returns the render view
+        /// </summary>
+        public RenderTargetView BackBufferRenderView
+        {
+            get { return this.backBufferRenderView; }
+        }
 
         /// <summary>
         /// Returns the depth view
         /// </summary>
         public DepthStencilView BackBufferDepthView
-		{
-			get { return this.backBufferDepthView; }
-		}
+        {
+            get { return this.backBufferDepthView; }
+        }
 
         /// <summary>
         /// Returns the description for the back buffer
@@ -170,20 +173,28 @@ namespace SpaceSimulator.Common
         }
 
         /// <summary>
-        /// Returns the camera
+        /// Returns the active camera
         /// </summary>
-        public BaseCamera Camera
+        public BaseCamera ActiveCamera
         {
-            get { return this.camera; }
+            get { return this.cameraManager.ActiveCamera; }
+        }
+
+        /// <summary>
+        /// Returns the camera manager
+        /// </summary>
+        public CameraManager CameraManager
+        {
+            get { return this.cameraManager; }
         }
 
         /// <summary>
         /// Returns the keyboard manager
         /// </summary>
         public KeyboardManager KeyboardManager
-		{
-			get { return this.keyboardManager; }
-		}
+        {
+            get { return this.keyboardManager; }
+        }
 
         /// <summary>
         /// Returns the mouse manager
@@ -197,9 +208,9 @@ namespace SpaceSimulator.Common
         /// Returns the total time
         /// </summary>
         public TimeSpan TotalTime
-		{
-			get { return this.totalTimeWatch.Elapsed; }
-		}
+        {
+            get { return this.totalTimeWatch.Elapsed; }
+        }
 
         /// <summary>
         /// Renders to texture
@@ -230,41 +241,41 @@ namespace SpaceSimulator.Common
         /// Creates the device
         /// </summary>
         private void CreateDevice()
-		{
+        {
             this.sampleDescription = new SampleDescription(4, 0);
             //this.sampleDescription = new SampleDescription(1, 0);
 
             //Create the device and swap chain
             var swapChainDescription = new SwapChainDescription()
-			{
-				BufferCount = this.swapChainBufferCount,
-				ModeDescription = new ModeDescription(
-					this.renderForm.ClientSize.Width,
-					this.renderForm.ClientSize.Height,
-					new Rational(60, 1),
-					this.backBufferFormat),
-				IsWindowed = true,
-				OutputHandle = this.renderForm.Handle,
-				SampleDescription = this.sampleDescription,
-				SwapEffect = SwapEffect.Discard,
-				Usage = Usage.RenderTargetOutput,
-			};
+            {
+                BufferCount = this.swapChainBufferCount,
+                ModeDescription = new ModeDescription(
+                    this.renderForm.ClientSize.Width,
+                    this.renderForm.ClientSize.Height,
+                    new Rational(60, 1),
+                    this.backBufferFormat),
+                IsWindowed = true,
+                OutputHandle = this.renderForm.Handle,
+                SampleDescription = this.sampleDescription,
+                SwapEffect = SwapEffect.Discard,
+                Usage = Usage.RenderTargetOutput,
+            };
 
             Device.CreateWithSwapChain(
-				DriverType.Hardware,
+                DriverType.Hardware,
                 DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug,
                 //DeviceCreationFlags.BgraSupport,
                 swapChainDescription,
-				out this.graphicsDevice,
-				out this.swapChain);
+                out this.graphicsDevice,
+                out this.swapChain);
 
             //this.graphicsDeviceDebug = new DeviceDebug(this.graphicsDevice);
 
             this.deviceContext = this.graphicsDevice.ImmediateContext;
 
-			// Ignore all windows events
-			this.factory = swapChain.GetParent<SharpDX.DXGI.Factory>();
-			this.factory.MakeWindowAssociation(this.renderForm.Handle, WindowAssociationFlags.IgnoreAll);
+            // Ignore all windows events
+            this.factory = swapChain.GetParent<SharpDX.DXGI.Factory>();
+            this.factory.MakeWindowAssociation(this.renderForm.Handle, WindowAssociationFlags.IgnoreAll);
         }
 
         /// <summary>
@@ -272,47 +283,47 @@ namespace SpaceSimulator.Common
         /// </summary>
         /// <param name="isFirstTime">Indicates if this is the first time the buffers are resized</param>
         private void ResizeRenderBuffers(bool isFirstTime = false)
-		{
-			//Dispose all previous allocated resources
-			Utilities.Dispose(ref this.backBuffer);
-			Utilities.Dispose(ref this.backBufferRenderView);
-			Utilities.Dispose(ref this.depthBuffer);
-			Utilities.Dispose(ref this.backBufferDepthView);
+        {
+            //Dispose all previous allocated resources
+            Utilities.Dispose(ref this.backBuffer);
+            Utilities.Dispose(ref this.backBufferRenderView);
+            Utilities.Dispose(ref this.depthBuffer);
+            Utilities.Dispose(ref this.backBufferDepthView);
 
             Utilities.Dispose(ref this.deviceContext2D);
 
             //Resize the backbuffer
             this.swapChain.ResizeBuffers(
-				this.swapChainBufferCount,
-				this.renderForm.ClientSize.Width,
-				this.renderForm.ClientSize.Height,
-				this.backBufferFormat,
-				SwapChainFlags.None);
+                this.swapChainBufferCount,
+                this.renderForm.ClientSize.Width,
+                this.renderForm.ClientSize.Height,
+                this.backBufferFormat,
+                SwapChainFlags.None);
 
-			//Get the backbuffer from the swapchain
-			this.backBuffer = Texture2D.FromSwapChain<Texture2D>(this.swapChain, 0);
+            //Get the backbuffer from the swapchain
+            this.backBuffer = Texture2D.FromSwapChain<Texture2D>(this.swapChain, 0);
 
-			//Renderview on the backbuffer
-			this.backBufferRenderView = new RenderTargetView(this.graphicsDevice, this.backBuffer);
+            //Renderview on the backbuffer
+            this.backBufferRenderView = new RenderTargetView(this.graphicsDevice, this.backBuffer);
 
-			//Create the depth buffer
-			this.depthBuffer = new Texture2D(this.graphicsDevice, new Texture2DDescription()
-			{
-				Format = Format.D24_UNorm_S8_UInt,
-				ArraySize = 1,
-				MipLevels = 1,
-				Width = this.renderForm.ClientSize.Width,
-				Height = this.renderForm.ClientSize.Height,
-				SampleDescription = this.sampleDescription,
-				Usage = ResourceUsage.Default,
-				BindFlags = BindFlags.DepthStencil,
+            //Create the depth buffer
+            this.depthBuffer = new Texture2D(this.graphicsDevice, new Texture2DDescription()
+            {
+                Format = Format.D24_UNorm_S8_UInt,
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = this.renderForm.ClientSize.Width,
+                Height = this.renderForm.ClientSize.Height,
+                SampleDescription = this.sampleDescription,
+                Usage = ResourceUsage.Default,
+                BindFlags = BindFlags.DepthStencil,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None
             });
 
             //Create the depth buffer view
             this.backBufferDepthView = new DepthStencilView(this.graphicsDevice, this.depthBuffer);
-            
+
             //Setup targets and viewport for rendering
             this.deviceContext.Rasterizer.SetViewport(new Viewport(
                 0,
@@ -348,35 +359,35 @@ namespace SpaceSimulator.Common
         /// Called when the window is resized
         /// </summary>
         protected virtual void OnResized()
-		{
-            this.camera.SetLens(
+        {
+            this.cameraManager.SetProjection(
                 0.25f * MathUtil.Pi,
                 this.RenderForm.ClientSize.Width,
                 this.RenderForm.ClientSize.Height,
                 0.001f,
                 100000.0f);
-		}
+        }
 
-		/// <summary>
-		/// Initializes the application
-		/// </summary>
-		public virtual void Initialize()
-		{
-			this.RenderForm.MouseDown += (sender, args) =>
-			{
-				this.OnMouseButtonDown(new Vector2(args.X, args.Y), args.Button);
+        /// <summary>
+        /// Initializes the application
+        /// </summary>
+        public virtual void Initialize()
+        {
+            this.RenderForm.MouseDown += (sender, args) =>
+            {
+                this.OnMouseButtonDown(new Vector2(args.X, args.Y), args.Button);
             };
 
-			this.RenderForm.MouseMove += (sender, args) =>
-			{
-				this.OnMouseMove(new Vector2(args.X, args.Y), args.Button);
+            this.RenderForm.MouseMove += (sender, args) =>
+            {
+                this.OnMouseMove(new Vector2(args.X, args.Y), args.Button);
             };
 
             this.RenderForm.MouseWheel += (sender, args) =>
             {
                 this.OnMouseScroll(args.Delta);
             };
-		}
+        }
 
         /// <summary>
         /// Loads the content
@@ -387,26 +398,26 @@ namespace SpaceSimulator.Common
 
         }
 
-		/// <summary>
-		/// The mouse moved
-		/// </summary>
-		/// <param name="mousePosition">The position of the mouse</param>
-		/// <param name="button">The state of the buttons</param>
-		protected virtual void OnMouseMove(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
-		{
+        /// <summary>
+        /// The mouse moved
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        /// <param name="button">The state of the buttons</param>
+        protected virtual void OnMouseMove(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
+        {
             this.MousePosition = mousePosition;
-            this.camera.HandleMouseMove(mousePosition, button);
-		}
+            this.ActiveCamera.HandleMouseMove(mousePosition, button);
+        }
 
-		/// <summary>
-		/// A mouse button is pressed down
-		/// </summary>
-		/// <param name="mousePosition">The position of the mouse</param>
-		/// <param name="button">The state of the buttons</param>
-		protected virtual void OnMouseButtonDown(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
-		{
-            this.camera.HandleMouseDown(mousePosition, button);
-		}
+        /// <summary>
+        /// A mouse button is pressed down
+        /// </summary>
+        /// <param name="mousePosition">The position of the mouse</param>
+        /// <param name="button">The state of the buttons</param>
+        protected virtual void OnMouseButtonDown(Vector2 mousePosition, System.Windows.Forms.MouseButtons button)
+        {
+            this.ActiveCamera.HandleMouseDown(mousePosition, button);
+        }
 
         /// <summary>
         /// The mouse was scrolled
@@ -414,7 +425,7 @@ namespace SpaceSimulator.Common
         /// <param name="delta">the delta</param>
         protected virtual void OnMouseScroll(int delta)
         {
-            this.camera.HandleMouseScroll(delta);
+            this.ActiveCamera.HandleMouseScroll(delta);
         }
 
         /// <summary>
@@ -422,11 +433,11 @@ namespace SpaceSimulator.Common
         /// </summary>
         /// <param name="elapsed">The elapsed time since the last frame</param>
         public virtual void Update(TimeSpan elapsed)
-		{
+        {
             this.keyboardManager.Update();
             this.mouseManager.Update(this.MousePosition);
-            this.camera.HandleKeyboard(this.keyboardManager.State, elapsed);
-            this.camera.UpdateViewMatrix();
+            this.ActiveCamera.HandleKeyboard(this.keyboardManager.State, elapsed);
+            this.ActiveCamera.UpdateViewMatrix();
         }
 
         /// <summary>
@@ -437,34 +448,34 @@ namespace SpaceSimulator.Common
 
         }
 
-		/// <summary>
-		/// Draws the application
-		/// </summary>
-		/// <param name="elapsed">The elapsed time since the last frame</param>
-		public abstract void Draw(TimeSpan elapsed);
+        /// <summary>
+        /// Draws the application
+        /// </summary>
+        /// <param name="elapsed">The elapsed time since the last frame</param>
+        public abstract void Draw(TimeSpan elapsed);
 
-		/// <summary>
-		/// Runs the application
-		/// </summary>
-		public void Run()
-		{
+        /// <summary>
+        /// Runs the application
+        /// </summary>
+        public void Run()
+        {
             this.Initialize();
 
             var clock = new Stopwatch();
-			var elapsed = new TimeSpan();
+            var elapsed = new TimeSpan();
 
-			this.totalTimeWatch = new Stopwatch();
-			this.totalTimeWatch.Start();
+            this.totalTimeWatch = new Stopwatch();
+            this.totalTimeWatch.Start();
             var hasLoaded = false;
             var firstFrame = true;
 
-			RenderLoop.Run(this.renderForm, () =>
-			{
-				if (this.resized)
-				{
+            RenderLoop.Run(this.renderForm, () =>
+            {
+                if (this.resized)
+                {
                     this.ResizeRenderBuffers(!hasLoaded);
                     this.OnResized();
-					this.resized = false;
+                    this.resized = false;
 
                     if (!hasLoaded)
                     {
@@ -473,21 +484,21 @@ namespace SpaceSimulator.Common
                     }
                 }
 
-				this.elapsed += (float)elapsed.TotalMilliseconds;
+                this.elapsed += (float)elapsed.TotalMilliseconds;
 
-				if (this.elapsed > 1000.0f)
-				{
-					this.fps = this.frameCount / (this.elapsed / 1000.0f);
-					this.elapsed = 0;
-					this.frameCount = 0;
-				}
-				else
-				{
-					this.frameCount++;
-				}
+                if (this.elapsed > 1000.0f)
+                {
+                    this.fps = this.frameCount / (this.elapsed / 1000.0f);
+                    this.elapsed = 0;
+                    this.frameCount = 0;
+                }
+                else
+                {
+                    this.frameCount++;
+                }
 
-				this.renderForm.Text = this.title + " FPS: " + this.fps;
-				this.Update(elapsed);
+                this.renderForm.Text = this.title + " FPS: " + this.fps;
+                this.Update(elapsed);
 
                 if (firstFrame)
                 {
@@ -499,26 +510,26 @@ namespace SpaceSimulator.Common
                 this.Draw(elapsed);
 
                 elapsed = clock.Elapsed;
-				clock.Restart();
-			});
-		}
+                clock.Restart();
+            });
+        }
 
-		/// <summary>
-		/// Disposes resources
-		/// </summary>
-		public virtual void Dispose()
-		{
-			this.depthBuffer.Dispose();
-			this.backBufferDepthView.Dispose();
-			this.backBufferRenderView.Dispose();
-			this.backBuffer.Dispose();
+        /// <summary>
+        /// Disposes resources
+        /// </summary>
+        public virtual void Dispose()
+        {
+            this.depthBuffer.Dispose();
+            this.backBufferDepthView.Dispose();
+            this.backBufferRenderView.Dispose();
+            this.backBuffer.Dispose();
 
-			this.deviceContext.ClearState();
-			this.deviceContext.Flush();
-			this.swapChain.Dispose();
-			this.graphicsDevice.Dispose();
-			this.renderForm.Dispose();
-			this.factory.Dispose();
+            this.deviceContext.ClearState();
+            this.deviceContext.Flush();
+            this.swapChain.Dispose();
+            this.graphicsDevice.Dispose();
+            this.renderForm.Dispose();
+            this.factory.Dispose();
 
             this.deviceContext2D.Dispose();
             this.renderingManager2D.Dispose();
