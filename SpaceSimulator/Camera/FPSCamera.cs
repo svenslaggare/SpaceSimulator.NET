@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DirectInput;
 
-namespace SpaceSimulator.Common.Camera
+namespace SpaceSimulator.Camera
 {
 	/// <summary>
 	/// Represents a first person camera
 	/// </summary>
 	public class FPSCamera : SpaceCamera
     {
-		private Vector2 prevMousePosition = Vector2.Zero;
+		private Vector2 lastMousePosition = Vector2.Zero;
 
 		/// <summary>
 		/// The speed of the camera
@@ -137,14 +137,14 @@ namespace SpaceSimulator.Common.Camera
 			if (buttonDown == System.Windows.Forms.MouseButtons.Left)
 			{
 				//Make each pixel correspond to a quarter of a degree.
-				float dx = MathUtil.DegreesToRadians(0.25f * (float)(position.X - this.prevMousePosition.X));
-				float dy = MathUtil.DegreesToRadians(0.25f * (float)(position.Y - this.prevMousePosition.Y));
+				float dx = MathUtil.DegreesToRadians(0.25f * (float)(position.X - this.lastMousePosition.X));
+				float dy = MathUtil.DegreesToRadians(0.25f * (float)(position.Y - this.lastMousePosition.Y));
 
 				this.Pitch(dy);
 				this.RotateY(dx);
 			}
 
-			this.prevMousePosition = position;
+			this.lastMousePosition = position;
 		}
 	}
 }

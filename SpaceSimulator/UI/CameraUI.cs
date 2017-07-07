@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SpaceSimulator.Common;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;

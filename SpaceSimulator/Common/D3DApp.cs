@@ -76,7 +76,8 @@ namespace SpaceSimulator.Common
 		/// Creates a new D3D application
 		/// </summary>
 		/// <param name="title">The title of the application</param>
-		public D3DApp(string title)
+        /// <param name="camera">The camera</param>
+		public D3DApp(string title, BaseCamera camera)
 		{
 			this.title = title;
             this.renderForm = new RenderForm(title)
@@ -86,7 +87,7 @@ namespace SpaceSimulator.Common
 
             this.renderingManager2D = new RenderingManager2D(this.renderForm);
 
-            this.camera = new OrbitCamera();
+            this.camera = camera;
 
             this.directInput = new DirectInput();
             this.keyboardManager = new KeyboardManager(this.directInput);

@@ -10,7 +10,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SpaceSimulator.Common;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Models;
 using SpaceSimulator.Mathematics;
@@ -85,7 +85,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
         /// <param name="world">The world matrix</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, EffectPass pass, BaseCamera camera, Matrix world)
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, EffectPass pass, SpaceCamera camera, Matrix world)
         {
             //Set draw type
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;

@@ -9,7 +9,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SpaceSimulator.Common;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.UI;
 using SpaceSimulator.Helpers;
@@ -45,7 +45,7 @@ namespace SpaceSimulator
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-            : base("SpaceSimulator")
+            : base("SpaceSimulator", new OrbitCamera())
         {
             Console.WriteLine("");
 
@@ -70,12 +70,14 @@ namespace SpaceSimulator
         }
 
         /// <summary>
+        /// Returns the space camera
+        /// </summary>
+        private SpaceCamera SpaceCamera => this.Camera as SpaceCamera;
+
+        /// <summary>
         /// Returns the orbit camera
         /// </summary>
-        private OrbitCamera OrbitCamera
-        {
-            get { return this.Camera as OrbitCamera; }
-        }
+        private OrbitCamera OrbitCamera => this.Camera as OrbitCamera;
 
         /// <summary>
         /// Creates the effect
@@ -209,7 +211,7 @@ namespace SpaceSimulator
 
             this.renderingPasses.Add3D((deviceContext, deviceContext2D) =>
             {
-                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.Camera, this.renderingObjects);
+                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.SpaceCamera, this.renderingObjects);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>
@@ -227,7 +229,7 @@ namespace SpaceSimulator
                     this.sunEffect,
                     this.planetEffect,
                     this.orbitEffect,
-                    this.Camera,
+                    this.SpaceCamera,
                     this.renderingObjects);
             });
 
@@ -254,7 +256,7 @@ namespace SpaceSimulator
             {
                 textBuilder.AppendLine(
                     $"{renderingObject.PhysicsObject.Name} - " +
-                    $"Position: {renderingObject.DrawPosition(this.Camera)}, " +
+                    $"Position: {renderingObject.DrawPosition(this.SpaceCamera)}, " +
                     $"ShowSphere: {renderingObject.ShowSphere}, " +
                     $"ShowOrbit: {renderingObject.ShowOrbit}");
             }

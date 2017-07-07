@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Models;

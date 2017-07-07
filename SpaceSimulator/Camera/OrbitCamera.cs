@@ -9,7 +9,7 @@ using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
 
-namespace SpaceSimulator.Common.Camera
+namespace SpaceSimulator.Camera
 {
 	/// <summary>
 	/// Represents an orbit camera

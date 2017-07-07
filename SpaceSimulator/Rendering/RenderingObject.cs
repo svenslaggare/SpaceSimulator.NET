@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SpaceSimulator.Common;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
@@ -138,7 +138,7 @@ namespace SpaceSimulator.Rendering
         /// Returns the scaling matrix
         /// </summary>
         /// <param name="camera">The camera</param>
-        private Matrix ScalingMatrix(BaseCamera camera)
+        private Matrix ScalingMatrix(SpaceCamera camera)
         {
             var size = 0.0f;
             if (this.PhysicsObject is NaturalSatelliteObject naturalObject)
@@ -178,7 +178,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="camera">The camera</param>
         /// <param name="renderingOrbit">The rendering orbit</param>
         /// <param name="primaryBody">The primary body</param>
-        private Matrix PrimaryBodyTransform(BaseCamera camera, Orbit renderingOrbit, NaturalSatelliteObject primaryBody = null)
+        private Matrix PrimaryBodyTransform(SpaceCamera camera, Orbit renderingOrbit, NaturalSatelliteObject primaryBody = null)
         {
             primaryBody = primaryBody ?? this.PhysicsObject.PrimaryBody;
             if (primaryBody == null)
@@ -200,7 +200,7 @@ namespace SpaceSimulator.Rendering
         /// Returns the draw position
         /// </summary>
         /// <param name="camera">The camera</param>
-        public Vector3 DrawPosition(BaseCamera camera) => camera.ToDrawPosition(this.PhysicsObject.Position);
+        public Vector3 DrawPosition(SpaceCamera camera) => camera.ToDrawPosition(this.PhysicsObject.Position);
 
         /// <summary>
         /// Draws the sphere
@@ -211,7 +211,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
         /// <param name="position">The position to draw at.</param>
-        public void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, EffectPass pass, BaseCamera camera, Vector3? position = null)
+        public void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, EffectPass pass, SpaceCamera camera, Vector3? position = null)
         {
             this.renderingSphere.Draw(
                 deviceContext,
@@ -230,7 +230,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
-        public void DrawOrbit(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, BaseCamera camera)
+        public void DrawOrbit(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, SpaceCamera camera)
         {
             if (!this.PhysicsObject.HasImpacted)
             {
@@ -251,7 +251,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
-        private void DrawNextManeuver(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, BaseCamera camera)
+        private void DrawNextManeuver(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, SpaceCamera camera)
         {
             if (this.drawNextManeuver)
             {
@@ -272,7 +272,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
-        private void DrawRings(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, BaseCamera camera)
+        private void DrawRings(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, SpaceCamera camera)
         {
             if (this.ringRenderingOrbit != null)
             {
@@ -364,7 +364,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="planetEffect">The planet effect</param>
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The camera</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, BaseCamera camera)
+        public void Draw(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, SpaceCamera camera)
         {
             //Draw planet
             planetEffect.SetEyePosition(camera.Position);
@@ -404,7 +404,7 @@ namespace SpaceSimulator.Rendering
             BasicEffect sunEffect,
             BasicEffect planetEffect,
             OrbitEffect ringEffect,
-            BaseCamera camera,
+            SpaceCamera camera,
             IList<RenderingObject> objects)
         {
             //Draw the sun
@@ -454,7 +454,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitEffect">The orbit effect</param>
         /// <param name="camera">The cameraa</param>
         /// <param name="objects">The objects</param>
-        public static void DrawOrbits(DeviceContext deviceContext, OrbitEffect orbitEffect, BaseCamera camera, IList<RenderingObject> objects)
+        public static void DrawOrbits(DeviceContext deviceContext, OrbitEffect orbitEffect, SpaceCamera camera, IList<RenderingObject> objects)
         {
             //Draw orbits
             deviceContext.InputAssembler.InputLayout = orbitEffect.InputLayout;

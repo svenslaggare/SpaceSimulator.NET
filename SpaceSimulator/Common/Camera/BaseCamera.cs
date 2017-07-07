@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DirectInput;
-using SpaceSimulator.Mathematics;
-using SpaceSimulator.Physics;
 
 namespace SpaceSimulator.Common.Camera
 {
@@ -31,13 +29,6 @@ namespace SpaceSimulator.Common.Camera
         protected Matrix view;
         protected Matrix projection;
         private Matrix viewProjection;
-
-        protected double scaleFactor = 1.0;
-
-        /// <summary>
-        /// The focus position
-        /// </summary>
-        public Vector3d Focus { get; set; }
 
         /// <summary>
         /// Creates a new base camera
@@ -71,9 +62,6 @@ namespace SpaceSimulator.Common.Camera
             this.view = camera.view;
             this.projection = camera.projection;
             this.viewProjection = camera.viewProjection;
-
-            this.scaleFactor = camera.scaleFactor;
-            this.Focus = camera.Focus;
         }
 
         /// <summary>
@@ -316,28 +304,5 @@ namespace SpaceSimulator.Common.Camera
             return new Vector2(screenPosition.X, screenPosition.Y);
         }
 
-        /// <summary>
-        /// Converts the given scalar in world scale to draw scale
-        /// </summary>
-        /// <param name="world">The world scalar</param>
-        public virtual float ToDraw(double world)
-        {
-            return (float)(this.scaleFactor * world);
-        }
-
-        /// <summary>
-        /// Converts the given position in the world position to a draw position
-        /// </summary>
-        /// <param name="worldPosition">The position in the world</param>
-        /// <param name="relativeToFocus">Indicates if the position is relative to the focus</param>
-        public virtual Vector3 ToDrawPosition(Vector3d worldPosition, bool relativeToFocus = true)
-        {
-            if (relativeToFocus)
-            {
-                worldPosition -= this.Focus;
-            }
-
-            return MathHelpers.ToFloat(this.scaleFactor * worldPosition);
-        }
     }
 }

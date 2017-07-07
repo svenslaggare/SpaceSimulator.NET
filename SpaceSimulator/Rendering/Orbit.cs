@@ -12,7 +12,7 @@ using SharpDX.Direct3D;
 using System.Runtime.InteropServices;
 using SharpDX.DXGI;
 using SpaceSimulator.Mathematics;
-using SpaceSimulator.Common.Camera;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
 
 namespace SpaceSimulator.Rendering
@@ -167,7 +167,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="camera">The camera</param>
-        private void UpdateVertices(DeviceContext deviceContext, BaseCamera camera)
+        private void UpdateVertices(DeviceContext deviceContext, SpaceCamera camera)
         {
             deviceContext.MapSubresource(
                 this.vertexBuffer,
@@ -238,7 +238,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="camera">The camera</param>
         /// <param name="position">The position of the object (in game space)</param>
-        public static float OrbitLineWidth(BaseCamera camera, Vector3 position)
+        public static float OrbitLineWidth(SpaceCamera camera, Vector3 position)
         {
             //var width = Vector3.Distance(position, camera.Position) / 200.0f;
             //return MathUtil.Clamp(width, 0.0001f, 100.0f) / 1.5f;
@@ -296,7 +296,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="world">The world matrix</param>
         /// <param name="objectPosition">The position of the object in the orbit</param>
         /// <param name="lineWidth">The width of the orbit line</param>
-        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, BaseCamera camera, Matrix world, Vector3 objectPosition, float? lineWidth = null)
+        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, SpaceCamera camera, Matrix world, Vector3 objectPosition, float? lineWidth = null)
         {
             if (this.vertexBuffer == null)
             {
