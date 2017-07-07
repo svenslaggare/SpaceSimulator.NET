@@ -25,10 +25,9 @@ namespace SpaceSimulator.Simulator.Environments
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="camera">The camera</param>
         /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
         /// <returns>Simulator engine, rendering objects</returns>
-        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, SpaceCamera camera, bool coplanar = false)
+        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -41,7 +40,6 @@ namespace SpaceSimulator.Simulator.Environments
                 null,
                 new ObjectState(),
                 new Physics.Orbit());
-            //camera.SetScaleFactor(sun);
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();

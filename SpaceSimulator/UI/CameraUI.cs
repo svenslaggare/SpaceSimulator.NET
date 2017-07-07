@@ -12,6 +12,7 @@ using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Common.Camera;
 
 namespace SpaceSimulator.UI
 {
@@ -20,6 +21,7 @@ namespace SpaceSimulator.UI
     /// </summary>
     public class CameraUI : UIComponent
     {
+        private readonly CameraManager cameraManager;
         private readonly OrbitCamera orbitCamera;
 
         private PhysicsObject focusObject;
@@ -31,16 +33,19 @@ namespace SpaceSimulator.UI
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
         /// <param name="mouseManager">The mouse manager</param>
+        /// <param name="cameraManager">The camera manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
         /// <param name="orbitCamera">The orbit camera</param>
         public CameraUI(
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
             MouseManager mouseManager,
+            CameraManager cameraManager,
             SimulatorContainer simulatorContainer,
             OrbitCamera orbitCamera)
             : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
+            this.cameraManager = cameraManager;
             this.orbitCamera = orbitCamera;
             this.focusObjectIndex = this.SimulatorEngine.Objects.Count - 1;
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];

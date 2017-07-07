@@ -75,6 +75,13 @@ namespace SpaceSimulator.Common.Camera
         }
 
         /// <summary>
+        /// Returns a camera with the given name
+        /// </summary>
+        /// <param name="name">The name of the camera</param>
+        /// <returns>The camera or null</returns>
+        public BaseCamera this[string name] => this.GetCamera(name);
+
+        /// <summary>
         /// Sets the projection matrix for all cameras
         /// </summary>
         /// <param name="fovY">The field of view in the y-direction</param>

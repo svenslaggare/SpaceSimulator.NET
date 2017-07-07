@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DirectWrite;
 using SpaceSimulator.Common;
+using SpaceSimulator.Common.Camera;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Simulator;
@@ -46,7 +47,11 @@ namespace SpaceSimulator.UI
         /// <param name="keyboardManager">The keyboard manager</param>
         /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
-        public UIComponent(RenderingManager2D renderingManager2D, KeyboardManager keyboardManager, MouseManager mouseManager, SimulatorContainer simulatorContainer)
+        public UIComponent(
+            RenderingManager2D renderingManager2D,
+            KeyboardManager keyboardManager,
+            MouseManager mouseManager,
+            SimulatorContainer simulatorContainer)
         {
             this.RenderingManager2D = renderingManager2D;
             this.KeyboardManager = keyboardManager;

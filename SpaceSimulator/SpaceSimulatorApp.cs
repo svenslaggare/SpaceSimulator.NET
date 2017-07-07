@@ -49,10 +49,10 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            (this.simulatorEngine, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, this.OrbitCamera, false);
+            (this.simulatorEngine, this.renderingObjects) = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
             this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //(this.simulatorEngine, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice, this.OrbitCamera);
+            //(this.simulatorEngine, this.renderingObjects) = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.OrbitCamera.MinRadius = 0.001f;
@@ -103,17 +103,42 @@ namespace SpaceSimulator
             base.Initialize();
             this.CreateEffect();
 
-            this.uiComponents.Add(new TimeUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer));
-            this.uiComponents.Add(new SelectedObjectUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer));
-            this.uiComponents.Add(new CameraUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer, this.OrbitCamera));
-            this.uiComponents.Add(new ManeuverUI(this.RenderingManager2D, this.KeyboardManager, this.MouseManager, this.simulatorContainer, this.uiManager, this.uiStyle));
+            this.uiComponents.Add(new TimeUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer));
+
+            this.uiComponents.Add(new SelectedObjectUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer));
+
+            this.uiComponents.Add(new CameraUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.CameraManager,
+                this.simulatorContainer,
+                (OrbitCamera)this.CameraManager["OrbitCamera"]));
+
+            this.uiComponents.Add(new ManeuverUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer,
+                this.uiManager,
+                this.uiStyle));
+
             this.uiComponents.Add(new OverlayUI(
                 this.RenderingManager2D,
                 this.KeyboardManager,
                 this.MouseManager,
+                this.CameraManager,
                 this.uiManager,
                 this.simulatorContainer,
-                this.OrbitCamera,
+                (OrbitCamera)this.CameraManager["OrbitCamera"],
                 this.planetNoLightEffect,
                 this.RenderToTexture));
 

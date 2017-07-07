@@ -25,9 +25,8 @@ namespace SpaceSimulator.Simulator.Environments
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="camera">The camera</param>
         /// <returns>Simulator engine, rendering objects</returns>
-        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice, SpaceCamera camera)
+        public static (SimulatorEngine, IList<RenderingObject>) Create(SharpDX.Direct3D11.Device graphicsDevice)
         {
             var baseDir = "Content/Textures/Planets/";
 

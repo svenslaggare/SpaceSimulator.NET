@@ -18,6 +18,7 @@ using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Common.Camera;
 
 namespace SpaceSimulator.UI
 {
@@ -26,9 +27,10 @@ namespace SpaceSimulator.UI
     /// </summary>
     public class OverlayUI : UIComponent
     {
+        private readonly CameraManager cameraManager;
         private readonly UIManager uiManager;
 
-        private readonly OrbitCamera camera;
+        private readonly OrbitCamera orbitCamera;
         private readonly BasicEffect thumbnailEffect;
 
         private readonly RenderToTexture renderToTexture;
@@ -137,25 +139,28 @@ namespace SpaceSimulator.UI
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
         /// <param name="mouseManager">The mouse manager</param>
+        /// <param name="cameraManager">The camera manager</param>
         /// <param name="uiManager">The UI manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
-        /// <param name="camera">The camera</param>
+        /// <param name="orbitCamera">The camera</param>
         /// <param name="thumbnailEffect">The thumbnail effect</param>
         /// <param name="renderToTexture">Renders to texture</param>
         public OverlayUI(
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
             MouseManager mouseManager,
+            CameraManager cameraManager,
             UIManager uiManager,
             SimulatorContainer simulatorContainer,
-            OrbitCamera camera,
+            OrbitCamera orbitCamera,
             BasicEffect thumbnailEffect,
             RenderToTexture renderToTexture)
             : base(renderingManager2D, keyboardManager, mouseManager, simulatorContainer)
         {
+            this.cameraManager = cameraManager;
             this.uiManager = uiManager;
 
-            this.camera = camera;
+            this.orbitCamera = orbitCamera;
             this.thumbnailEffect = thumbnailEffect;
             this.renderToTexture = renderToTexture;
 
@@ -181,7 +186,7 @@ namespace SpaceSimulator.UI
                 Color.Transparent,
                 render: deviceContext =>
                 {
-                    var overlayCamera = new OrbitCamera(this.camera);
+                    var overlayCamera = new OrbitCamera(this.orbitCamera);
                     var radius = 1E3;
                     if (renderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
                     {
@@ -218,6 +223,11 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Indicates if the orbit camera is the active one
+        /// </summary>
+        private bool OrbitCameraIsActive => this.orbitCamera == this.cameraManager.ActiveCamera;
+
+        /// <summary>
         /// Selects an object at the given position
         /// </summary>
         /// <param name="mousePosition">The position of the mouse</param>
@@ -232,7 +242,7 @@ namespace SpaceSimulator.UI
             foreach (var overlayObject in this.overlayObjects)
             {
                 var selected = false;
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera));
+                var screenPosition = this.orbitCamera.Project(overlayObject.RenderingObject.DrawPosition(this.orbitCamera));
                 var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
 
                 if (overlayObject.DrawThumbnail)
@@ -258,48 +268,13 @@ namespace SpaceSimulator.UI
 
         public override void Update(TimeSpan elapsed)
         {
-            if (this.MouseManager.IsDoubleClick(MouseButtons.Left))
+            if (this.OrbitCameraIsActive)
             {
-                this.SelectObject(this.MouseManager.MousePosition);
+                if (this.MouseManager.IsDoubleClick(MouseButtons.Left))
+                {
+                    this.SelectObject(this.MouseManager.MousePosition);
+                }
             }
-        }
-
-        public override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)
-        {
-            //if (button == MouseButtons.Left)
-            //{
-            //    var selectedUIElement = this.uiManager.SelectElement(mousePosition);
-            //    if (selectedUIElement != null)
-            //    {
-            //        return;
-            //    }
-
-            //    foreach (var overlayObject in this.overlayObjects)
-            //    {
-            //        var selected = false;
-            //        var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
-            //        var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
-
-            //        if (overlayObject.DrawThumbnail)
-            //        {
-            //            selected = screenMouseDistance <= 12.5;
-            //        }
-            //        else
-            //        {
-            //            if (overlayObject.RenderingObject.PhysicsObject is NaturalSatelliteObject naturalSatelliteObject)
-            //            {
-            //                this.GetRenderedSize(naturalSatelliteObject, out var minPosition, out var maxPosition, out var renderedRadius);
-            //                selected = screenMouseDistance <= renderedRadius;
-            //            }
-            //        }
-
-            //        if (selected)
-            //        {
-            //            this.SimulatorContainer.SelectedObject = overlayObject.RenderingObject.PhysicsObject;
-            //            break;
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
@@ -313,7 +288,7 @@ namespace SpaceSimulator.UI
         {
             var spherePositions = this.spherePoints.Select(x => physicsObject.Position + physicsObject.Radius * x);
 
-            var screenPositions = spherePositions.Select(x => this.camera.Project(this.camera.ToDrawPosition(x))).ToList();
+            var screenPositions = spherePositions.Select(x => this.orbitCamera.Project(this.orbitCamera.ToDrawPosition(x))).ToList();
             minPosition = new Vector2(float.MaxValue);
             maxPosition = new Vector2(float.MinValue);
 
@@ -364,7 +339,7 @@ namespace SpaceSimulator.UI
                 void AddOrbitScreenPosition(double trueAnomaly)
                 {
                     var orbitPosition = new Physics.OrbitPosition(physicsObject.ReferenceOrbit, trueAnomaly).CalculateState().Position;
-                    orbitScreenPositions.Add(this.camera.Project(this.camera.ToDrawPosition(orbitPosition)));
+                    orbitScreenPositions.Add(this.orbitCamera.Project(this.orbitCamera.ToDrawPosition(orbitPosition)));
                 }
 
                 AddOrbitScreenPosition(0.0);
@@ -404,7 +379,7 @@ namespace SpaceSimulator.UI
         {
             foreach (var overlayObject in this.overlayObjects)
             {
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera), out var depth);
+                var screenPosition = this.orbitCamera.Project(overlayObject.RenderingObject.DrawPosition(this.orbitCamera), out var depth);
                 overlayObject.DrawDepth = depth;
             }
 
@@ -413,7 +388,7 @@ namespace SpaceSimulator.UI
             foreach (var overlayObject in this.overlayObjects)
             {
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera), out var depth);
+                var screenPosition = this.orbitCamera.Project(overlayObject.RenderingObject.DrawPosition(this.orbitCamera), out var depth);
 
                 this.DetermineOverlayVisiblity(overlayObject);
 
@@ -460,7 +435,10 @@ namespace SpaceSimulator.UI
 
         public override void Draw(DeviceContext deviceContext)
         {
-            this.DrawOverlay(deviceContext);
+            if (this.OrbitCameraIsActive)
+            {
+                this.DrawOverlay(deviceContext);
+            }
         }
 
         public override void Dispose()
