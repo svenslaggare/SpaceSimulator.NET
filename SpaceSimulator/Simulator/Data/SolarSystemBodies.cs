@@ -13,17 +13,60 @@ namespace SpaceSimulator.Simulator.Data
     /// </summary>
     public static class SolarSystemBodies
     {
-        private static readonly SolarSystemBody sun;
-        private static readonly SolarSystemBody mercury;
-        private static readonly SolarSystemBody venus;
-        private static readonly SolarSystemBody earth;
-        private static readonly SolarSystemBody moon;
-        private static readonly SolarSystemBody mars;
-        private static readonly SolarSystemBody jupiter;
-        private static readonly SolarSystemBody saturn;
-        private static readonly SolarSystemBody uranus;
-        private static readonly SolarSystemBody neptune;
-        private static readonly SolarSystemBody pluto;
+        /// <summary>
+        /// Returns the sun
+        /// </summary>
+        public static SolarSystemBody Sun { get; }
+
+        /// <summary>
+        /// Returns the planet Mercury
+        /// </summary>
+        public static SolarSystemBody Mercury { get; }
+
+        /// <summary>
+        /// Returns the planet Venus
+        /// </summary>
+        public static SolarSystemBody Venus { get; }
+
+        /// <summary>
+        /// Returns the planet Earth
+        /// </summary>
+        public static SolarSystemBody Earth { get; }
+
+        /// <summary>
+        /// Returns the earth's moon
+        /// </summary>
+        public static SolarSystemBody Moon { get; }
+
+        /// <summary>
+        /// Returns the planet Mars
+        /// </summary>
+        public static SolarSystemBody Mars { get; }
+
+        /// <summary>
+        /// Returns the planet Jupiter
+        /// </summary>
+        public static SolarSystemBody Jupiter { get; }
+
+        /// <summary>
+        /// Returns the planet Saturn
+        /// </summary>
+        public static SolarSystemBody Saturn { get; }
+
+        /// <summary>
+        /// Returns the planet Uranus
+        /// </summary>
+        public static SolarSystemBody Uranus { get; }
+
+        /// <summary>
+        /// Returns the planet Neptune
+        /// </summary>
+        public static SolarSystemBody Neptune { get; }
+
+        /// <summary>
+        /// Returns the planet Pluto
+        /// </summary>
+        public static SolarSystemBody Pluto { get; }
 
         static SolarSystemBodies()
         {
@@ -31,7 +74,7 @@ namespace SpaceSimulator.Simulator.Data
             var oneDay = 24.0 * 60.0 * 60.0;
             var oneHour = 60.0 * 60.0;
 
-            sun = new SolarSystemBody(
+            Sun = new SolarSystemBody(
                 695700 * 1000,
                 695700 * 1000,
                 1.98855E30,
@@ -40,7 +83,7 @@ namespace SpaceSimulator.Simulator.Data
                 new NoAtmosphereModel(),
                 new Orbit());
 
-            mercury = new SolarSystemBody(
+            Mercury = new SolarSystemBody(
                 2439.7 * 1000,
                 2439.7 * 1000,
                 3.3011E23,
@@ -55,7 +98,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 29.124
                ));
 
-            venus = new SolarSystemBody(
+            Venus = new SolarSystemBody(
                 6051.8 * 1000,
                 6051.8 * 1000,
                 4.8675E24,
@@ -70,7 +113,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 54.884
                 ));
 
-            earth = new SolarSystemBody(
+            Earth = new SolarSystemBody(
                 6378.1370 * 1000,
                 6371 * 1000,
                 5.9722E24,
@@ -85,7 +128,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 114.20783
                 ));
 
-            moon = new SolarSystemBody(
+            Moon = new SolarSystemBody(
                 1738.1 * 1000,
                 1737.1 * 1000,
                 7.342E22,
@@ -98,7 +141,7 @@ namespace SpaceSimulator.Simulator.Data
                     inclination: MathUtild.Deg2Rad * 5.145
                 ));
 
-            mars = new SolarSystemBody(
+            Mars = new SolarSystemBody(
                 3396.2 * 1000,
                 3389.5 * 1000,
                 6.4171E23,
@@ -113,7 +156,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 286.502
                ));
 
-            jupiter = new SolarSystemBody(
+            Jupiter = new SolarSystemBody(
                 71492 * 1000,
                 69911 * 1000,
                 1.8986E27,
@@ -128,7 +171,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 273.867
                ));
 
-            saturn = new SolarSystemBody(
+            Saturn = new SolarSystemBody(
                 60268 * 1000,
                 58232 * 1000,
                 5.6836E26,
@@ -143,7 +186,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 339.392
                ));
 
-            uranus = new SolarSystemBody(
+            Uranus = new SolarSystemBody(
                 25559 * 1000,
                 25362 * 1000,
                 8.6810E25,
@@ -158,7 +201,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 96.998857
                ));
 
-            neptune = new SolarSystemBody(
+            Neptune = new SolarSystemBody(
                 24764 * 1000,
                 24622 * 1000,
                 1.0243E26,
@@ -173,7 +216,7 @@ namespace SpaceSimulator.Simulator.Data
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 276.336
                ));
 
-            pluto = new SolarSystemBody(
+            Pluto = new SolarSystemBody(
                 1187 * 1000,
                 1187 * 1000,
                 1.303E22,
@@ -187,94 +230,6 @@ namespace SpaceSimulator.Simulator.Data
                    longitudeOfAscendingNode: MathUtild.Deg2Rad * 110.299,
                    argumentOfPeriapsis: MathUtild.Deg2Rad * 113.834
                ));
-        }
-
-        /// <summary>
-        /// Returns the sun
-        /// </summary>
-        public static SolarSystemBody Sun
-        {
-            get { return sun; }
-        }
-
-        /// <summary>
-        /// Returns the planet Mercury
-        /// </summary>
-        public static SolarSystemBody Mercury
-        {
-            get { return mercury; }
-        }
-
-        /// <summary>
-        /// Returns the planet Venus
-        /// </summary>
-        public static SolarSystemBody Venus
-        {
-            get { return venus; }
-        }
-
-        /// <summary>
-        /// Returns the planet Earth
-        /// </summary>
-        public static SolarSystemBody Earth
-        {
-            get { return earth; }
-        }
-
-        /// <summary>
-        /// Returns the earth's moon
-        /// </summary>
-        public static SolarSystemBody Moon
-        {
-            get { return moon; }
-        }
-
-        /// <summary>
-        /// Returns the planet Mars
-        /// </summary>
-        public static SolarSystemBody Mars
-        {
-            get { return mars; }
-        }
-
-        /// <summary>
-        /// Returns the planet Jupiter
-        /// </summary>
-        public static SolarSystemBody Jupiter
-        {
-            get { return jupiter; }
-        }
-
-        /// <summary>
-        /// Returns the planet Saturn
-        /// </summary>
-        public static SolarSystemBody Saturn
-        {
-            get { return saturn; }
-        }
-
-        /// <summary>
-        /// Returns the planet Uranus
-        /// </summary>
-        public static SolarSystemBody Uranus
-        {
-            get { return uranus; }
-        }
-
-        /// <summary>
-        /// Returns the planet Neptune
-        /// </summary>
-        public static SolarSystemBody Neptune
-        {
-            get { return neptune; }
-        }
-
-        /// <summary>
-        /// Returns the planet Pluto
-        /// </summary>
-        public static SolarSystemBody Pluto
-        {
-            get { return pluto; }
         }
     }
 }

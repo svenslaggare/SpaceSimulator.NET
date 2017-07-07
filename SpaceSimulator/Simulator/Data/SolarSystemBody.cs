@@ -95,27 +95,5 @@ namespace SpaceSimulator.Simulator.Data
                 this.referenceOrbit.LongitudeOfAscendingNode,
                 this.referenceOrbit.ArgumentOfPeriapsis);
         }
-
-        /// <summary>
-        /// Creates a physics object using the current body around the given body
-        /// </summary>
-        /// <param name="primaryBody">The primary body</param>
-        /// <param name="name">The name of the body</param>
-        /// <param name="initialTrueAnomaly">The initial true anomaly</param>
-        public PlanetObject Create(NaturalSatelliteObject primaryBody, string name, double initialTrueAnomaly)
-        {
-            var initialOrbit = this.Orbit(primaryBody);
-            return new PlanetObject(
-                name,
-                PhysicsObjectType.NaturalSatellite,
-                this.Mass,
-                this.Radius,
-                this.RotationalPeriod,
-                this.AxisOfRotation,
-                this.AtmosphericModel,
-                primaryBody,
-                initialOrbit.CalculateState(initialTrueAnomaly, primaryBody.State),
-                initialOrbit);
-        }
     }
 }
