@@ -209,7 +209,7 @@ namespace SpaceSimulator
 
             this.renderingPasses.Add3D((deviceContext, deviceContext2D) =>
             {
-                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.renderingObjects);
+                RenderingObject.DrawOrbits(deviceContext, this.orbitEffect, this.Camera, this.renderingObjects);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>
@@ -227,6 +227,7 @@ namespace SpaceSimulator
                     this.sunEffect,
                     this.planetEffect,
                     this.orbitEffect,
+                    this.Camera,
                     this.renderingObjects);
             });
 
@@ -253,7 +254,7 @@ namespace SpaceSimulator
             {
                 textBuilder.AppendLine(
                     $"{renderingObject.PhysicsObject.Name} - " +
-                    $"Position: {renderingObject.DrawPosition}, " +
+                    $"Position: {renderingObject.DrawPosition(this.Camera)}, " +
                     $"ShowSphere: {renderingObject.ShowSphere}, " +
                     $"ShowOrbit: {renderingObject.ShowOrbit}");
             }

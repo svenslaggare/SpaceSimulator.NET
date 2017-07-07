@@ -74,7 +74,6 @@ namespace SpaceSimulator.Simulator.Environments
 
                 renderingObjects.Add(new RenderingObject(
                     graphicsDevice,
-                    camera,
                     newObject,
                     color,
                     textureName,
@@ -86,7 +85,7 @@ namespace SpaceSimulator.Simulator.Environments
 
             var baseDir = "Content/Textures/Planets/";
 
-            var sunRenderingObject = new RenderingObject(graphicsDevice, camera, sun, Color.Yellow, baseDir + "Sun.jpg");
+            var sunRenderingObject = new RenderingObject(graphicsDevice, sun, Color.Yellow, baseDir + "Sun.jpg");
             renderingObjects.Add(sunRenderingObject);
 
             AddPlanet(sun, "Mercury", Simulator.Data.SolarSystemBodies.Mercury, Color.Gray, baseDir + "Mercury.png");
@@ -113,7 +112,7 @@ namespace SpaceSimulator.Simulator.Environments
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddSatellite(
             //    earth,
@@ -136,7 +135,7 @@ namespace SpaceSimulator.Simulator.Environments
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
                 Vector3d.Zero);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
             //var bestPitchStart = 2E3;
             //var bestPitchEnd = 12.8625E3;

@@ -45,7 +45,6 @@ namespace SpaceSimulator.Simulator.Environments
 
             var earthRenderingObject = new RenderingObject(
                 graphicsDevice,
-                camera,
                 earth,
                 Color.Yellow,
                 baseDir + "Earth.jpg",
@@ -58,7 +57,6 @@ namespace SpaceSimulator.Simulator.Environments
             {
                 renderingObjects.Add(new RenderingObject(
                     graphicsDevice,
-                    camera,
                     newObject,
                     Color.Yellow,
                     baseDir + "Satellite.png"));
@@ -83,7 +81,7 @@ namespace SpaceSimulator.Simulator.Environments
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
                 Vector3d.Zero);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
             //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
             //    simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
@@ -107,7 +105,7 @@ namespace SpaceSimulator.Simulator.Environments
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, satellite1, Color.Yellow, baseDir + "Satellite.png"));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             var orbitPosition2 = new OrbitPosition(
                 Physics.Orbit.New(
@@ -122,7 +120,7 @@ namespace SpaceSimulator.Simulator.Environments
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 orbitPosition2);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, camera, object2, Color.Yellow, baseDir + "Satellite.png"));
+            renderingObjects.Add(new RenderingObject(graphicsDevice, object2, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddObject(
             //    PhysicsObjectType.ArtificialSatellite,

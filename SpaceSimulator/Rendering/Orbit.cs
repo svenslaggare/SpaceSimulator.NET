@@ -64,7 +64,6 @@ namespace SpaceSimulator.Rendering
     public sealed class Orbit : IDisposable
     {
         private readonly Device graphicsDevice;
-        private readonly BaseCamera camera;
 
         private readonly Color color;
         private IList<Point> positions;
@@ -126,49 +125,19 @@ namespace SpaceSimulator.Rendering
         /// Creates a new orbit
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="camera">The camera</param>
         /// <param name="positions">The positions of the points in the orbit</param>
         /// <param name="color">The color of the orbit</param>
         /// <param name="drawRelativeToFocus">Indicates if the positions are relative to the focus</param>
-        public Orbit(Device graphicsDevice, BaseCamera camera, IList<Point> positions, Color color, bool drawRelativeToFocus)
+        public Orbit(Device graphicsDevice, IList<Point> positions, Color color, bool drawRelativeToFocus)
         {
             this.graphicsDevice = graphicsDevice;
-            this.camera = camera;
 
-            this.positions = positions;
-            this.UpdateVertices();
-
-            if (positions.Count > 0)
-            {
-                this.CreateVertexBuffer();
-            }
-
+            this.Update(positions);
             this.color = color;
             this.DrawRelativeToFocus = drawRelativeToFocus;
 
             this.rasterizerStates = new RasterizerStates(graphicsDevice);
             this.blendStates = new BlendStates(graphicsDevice);
-        }
-
-        /// <summary>
-        /// Creates the vertex buffer
-        /// </summary>
-        private void CreateVertexBuffer()
-        {
-            this.vertexBuffer = Buffer.Create(
-                this.graphicsDevice,
-                BindFlags.VertexBuffer,
-                this.vertices,
-                usage: ResourceUsage.Dynamic,
-                accessFlags: CpuAccessFlags.Write);
-        }
-
-        /// <summary>
-        /// Updates the verticies
-        /// </summary>
-        private void UpdateVertices()
-        {
-            this.vertices = new OrbitVertex[this.positions.Count];
         }
 
         /// <summary>
@@ -193,9 +162,11 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Updates the passed positions
+        /// Updates the vertices
         /// </summary>
-        private void UpdatePassedPositions(DeviceContext deviceContext)
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="camera">The camera</param>
+        private void UpdateVertices(DeviceContext deviceContext, BaseCamera camera)
         {
             deviceContext.MapSubresource(
                 this.vertexBuffer,
@@ -239,13 +210,13 @@ namespace SpaceSimulator.Rendering
                 var up = Vector3d.Cross(next - current, current);
                 up.Normalize();
 
-                vertex.Position = this.camera.ToDrawPosition(current, this.DrawRelativeToFocus);
-                vertex.NextPosition = this.camera.ToDrawPosition(next, this.DrawRelativeToFocus);
-                vertex.PrevPosition = this.camera.ToDrawPosition(prev, this.DrawRelativeToFocus);
+                vertex.Position = camera.ToDrawPosition(current, this.DrawRelativeToFocus);
+                vertex.NextPosition = camera.ToDrawPosition(next, this.DrawRelativeToFocus);
+                vertex.PrevPosition = camera.ToDrawPosition(prev, this.DrawRelativeToFocus);
 
                 if (this.RotateToFaceCamera)
                 {
-                    vertex.Normal = this.camera.Look;
+                    vertex.Normal = camera.Look;
                 }
                 else
                 {
@@ -274,6 +245,19 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Creates the vertex buffer
+        /// </summary>
+        private void CreateVertexBuffer()
+        {
+            this.vertexBuffer = Buffer.Create(
+                this.graphicsDevice,
+                BindFlags.VertexBuffer,
+                this.vertices,
+                usage: ResourceUsage.Dynamic,
+                accessFlags: CpuAccessFlags.Write);
+        }
+
+        /// <summary>
         /// Updates the orbit
         /// </summary>
         /// <param name="positions">The new positions</param>
@@ -285,8 +269,8 @@ namespace SpaceSimulator.Rendering
             }
 
             this.positions = positions;
-            var beforeVerticiesCount = this.vertices.Length;
-            this.UpdateVertices();
+            var beforeVerticiesCount = this.vertices != null ? this.vertices.Length : 0;
+            this.vertices = new OrbitVertex[this.positions.Count];
 
             if (this.vertexBuffer == null)
             {
@@ -297,8 +281,6 @@ namespace SpaceSimulator.Rendering
                 this.vertexBuffer.Dispose();
                 this.CreateVertexBuffer();
             }
-
-            this.UpdateVertices();
         }
 
         /// <summary>
@@ -307,17 +289,18 @@ namespace SpaceSimulator.Rendering
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
         /// <param name="pass">The effect pass</param>
+        /// <param name="camera">The camera</param>
         /// <param name="world">The world matrix</param>
         /// <param name="currentPosition">The position of the object in the orbit</param>
         /// <param name="lineWidth">The width of the orbit line</param>
-        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, Matrix world, Vector3 currentPosition, float? lineWidth = null)
+        public void Draw(DeviceContext deviceContext, OrbitEffect effect, EffectPass pass, BaseCamera camera, Matrix world, Vector3 currentPosition, float? lineWidth = null)
         {
             if (this.vertexBuffer == null)
             {
                 return;
             }
 
-            this.UpdatePassedPositions(deviceContext);
+            this.UpdateVertices(deviceContext, camera);
 
             effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, currentPosition)));
 

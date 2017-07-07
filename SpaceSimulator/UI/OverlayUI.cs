@@ -205,6 +205,7 @@ namespace SpaceSimulator.UI
                             deviceContext,
                             this.thumbnailEffect,
                             pass,
+                            this.camera,
                             position: Vector3.Zero);
                     }
 
@@ -241,7 +242,7 @@ namespace SpaceSimulator.UI
             foreach (var overlayObject in this.overlayObjects)
             {
                 var selected = false;
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition);
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera));
                 var screenMouseDistance = Vector2.Distance(screenPosition, mousePosition);
 
                 if (overlayObject.DrawThumbnail)
@@ -413,7 +414,7 @@ namespace SpaceSimulator.UI
         {
             foreach (var overlayObject in this.overlayObjects)
             {
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition, out var depth);
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera), out var depth);
                 overlayObject.DrawDepth = depth;
             }
 
@@ -422,7 +423,7 @@ namespace SpaceSimulator.UI
             foreach (var overlayObject in this.overlayObjects)
             {
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
-                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition, out var depth);
+                var screenPosition = this.camera.Project(overlayObject.RenderingObject.DrawPosition(this.camera), out var depth);
 
                 this.DetermineOverlayVisiblity(overlayObject);
 
