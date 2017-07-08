@@ -148,6 +148,12 @@ namespace SpaceSimulator
                 this.planetNoLightEffect,
                 this.RenderToTexture));
 
+            this.uiComponents.Add(new SimulatorControlUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer));
+
             //var values = new List<Vector2>();
             //var earthAtmosphericModel = new EarthAtmosphericModel();
             //for (double altitude = 0; altitude <= 100E3; altitude += 100)

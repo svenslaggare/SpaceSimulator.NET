@@ -215,6 +215,7 @@
     <Compile Include="UI\ManeuverUI.cs" />
     <Compile Include="UI\SelectedObjectUI.cs" />
     <Compile Include="UI\OverlayUI.cs" />
+    <Compile Include="UI\SimulatorControlUI.cs" />
     <Compile Include="UI\TimeUI.cs" />
     <Compile Include="UI\UIComponent.cs" />
     <Compile Include="UI\UIComponentHelpers.cs" />

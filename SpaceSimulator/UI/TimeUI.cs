@@ -61,6 +61,21 @@ namespace SpaceSimulator.UI
                 this.SimulatorContainer.IsPaused = !this.SimulatorContainer.IsPaused;
             }
 
+            if (this.KeyboardManager.IsKeyPressed(Key.J))
+            {
+                var events = this.SimulatorEngine.Maneuvers
+                    .Select(x => x.Maneuver.ManeuverTime)
+                    .Union(this.SimulatorEngine.Events.Select(x => x.Time))
+                    .OrderBy(x => x);
+
+                if (events.Any())
+                {
+                    var firstEvent = events.First();
+                    this.SimulatorEngine.Advance(TimeSpan.FromSeconds(firstEvent - this.SimulatorEngine.TotalTime - 10.0));
+                    this.simulationSpeedIndex = 0;
+                }
+            }
+
             this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
             this.SimulatorEngine.SimulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
         }

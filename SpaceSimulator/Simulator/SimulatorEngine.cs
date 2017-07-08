@@ -510,6 +510,26 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Adds a new crash event
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        /// <param name="timeToImpact">The time to impact</param>
+        private void AddCrashEvent(PhysicsObject physicsObject, double timeToImpact)
+        {
+            //Remove previous crashes for the object
+            var toRemove = this.events
+                .Where(x => x.Object == physicsObject && x.Type == SimulationEventType.Crash)
+                .ToList();
+
+            foreach (var currentEvent in toRemove)
+            {
+                this.events.Remove(currentEvent);
+            }
+
+            this.AddEvent(new SimulationEvent(SimulationEventType.Crash, physicsObject, this.totalTime + timeToImpact));
+        }
+
+        /// <summary>
         /// Handles events
         /// </summary>
         private void HandleEvents()
@@ -605,7 +625,7 @@ namespace SpaceSimulator.Simulator
                         var timeToImpact = OrbitCalculators.TimeToImpact(OrbitPosition.CalculateOrbitPosition(object1));
                         if (timeToImpact != null)
                         {
-                            this.AddEvent(new SimulationEvent(SimulationEventType.Crash, object1, this.totalTime + timeToImpact ?? 0));
+                            this.AddCrashEvent(object1, timeToImpact ?? 0);
                         }
                     }
                     else if (minChangeTime != null)
@@ -738,7 +758,7 @@ namespace SpaceSimulator.Simulator
                             var timeToImpact = OrbitCalculators.TimeToImpact(objectOrbitPosition);
                             if (timeToImpact != null)
                             {
-                                this.AddEvent(new SimulationEvent(SimulationEventType.Crash, maneuver.Object, this.totalTime + timeToImpact ?? 0));
+                                this.AddCrashEvent(maneuver.Object, timeToImpact ?? 0);
                                 added = true;
                             }
 
