@@ -51,7 +51,7 @@ namespace SpaceSimulator
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
-            //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             //var orbitCamera = (OrbitCamera)this.CameraManager["OrbitCamera"];
             //orbitCamera.MinRadius = 0.001f;

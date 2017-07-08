@@ -242,7 +242,8 @@ namespace SpaceSimulator.Rendering
         {
             //var width = Vector3.Distance(position, camera.Position) / 200.0f;
             //return MathUtil.Clamp(width, 0.0001f, 100.0f) / 1.5f;
-            return 0.005f * Vector3.Distance(position, camera.Position);
+            var width = 0.005f * Vector3.Distance(position, camera.Position);
+            return width;
         }
 
         /// <summary>

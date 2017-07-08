@@ -188,7 +188,7 @@ namespace SpaceSimulator.Helpers
                     DataFormatter.Format(parameter - primaryBodyRadius, DataUnit.Distance),
                     DataFormatter.Format(parameter - primaryBodyRadius, nonSIDistanceUnit)));
 
-                if (orbit.IsElliptical || orbit.IsHyperbolic)
+                if (orbit.IsBound || orbit.IsHyperbolic)
                 {
                     var semiMajorAxis = orbit.SemiMajorAxis;
                     infoBuilder.AppendLine(string.Format("Semi-major axis: {0} ({1})",
@@ -200,7 +200,7 @@ namespace SpaceSimulator.Helpers
                     DataFormatter.Format(orbit.Periapsis - primaryBodyRadius, DataUnit.Distance),
                     DataFormatter.Format(orbit.Periapsis - primaryBodyRadius, nonSIDistanceUnit)));
 
-                if (orbit.IsElliptical)
+                if (orbit.IsBound)
                 {
                     infoBuilder.AppendLine(string.Format("Apoapsis: {0} ({1})",
                         DataFormatter.Format(orbit.Apoapsis - primaryBodyRadius, DataUnit.Distance),
@@ -224,7 +224,7 @@ namespace SpaceSimulator.Helpers
                     infoBuilder.AppendLine("Flight path angle: " + DataFormatter.Format(physicsObject.FlightPathAngle, DataUnit.Angle));
                 }
     
-                if (orbit.IsElliptical)
+                if (orbit.IsBound)
                 {
                     infoBuilder.AppendLine("Eccentric anomaly: " + DataFormatter.Format(orbitPosition.EccentricAnomaly, DataUnit.Angle));
                 }
@@ -249,7 +249,7 @@ namespace SpaceSimulator.Helpers
                     infoBuilder.AppendLine("Angle to prograde: " + DataFormatter.Format(angleToPrograde, DataUnit.Angle));
                 }
 
-                if (orbit.IsElliptical)
+                if (orbit.IsBound)
                 {
                     infoBuilder.AppendLine("Period: " + DataFormatter.Format(orbit.Period, DataUnit.Time, 0));
 

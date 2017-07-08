@@ -42,7 +42,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                if (this.Orbit.IsElliptical)
+                if (this.Orbit.IsBound)
                 {
                     return OrbitFormulas.EccentricAnomaly(this.Orbit.Eccentricity, this.TrueAnomaly);
                 }
@@ -156,7 +156,7 @@ namespace SpaceSimulator.Physics
         /// <param name="trueAnomaly">The true anomaly</param>
         public double TimeToTrueAnomaly(double trueAnomaly)
         {
-            if (this.Orbit.IsElliptical)
+            if (this.Orbit.IsBound)
             {
                 return TimeToTrueAnomalyElliptical(trueAnomaly);
             }
@@ -187,7 +187,7 @@ namespace SpaceSimulator.Physics
         /// </summary>
         public double TimeToApoapsis()
         {
-            if (this.Orbit.IsElliptical)
+            if (this.Orbit.IsBound)
             {
                 return TimeToTrueAnomalyElliptical(Math.PI);
             }
@@ -420,7 +420,7 @@ namespace SpaceSimulator.Physics
                 args.Add(DataFormatter.Format(this.Orbit.Periapsis, DataUnit.Distance));
                 args.Add(DataFormatter.Format(this.Orbit.Apoapsis, DataUnit.Distance));
 
-                if (this.Orbit.IsElliptical)
+                if (this.Orbit.IsBound)
                 {
                     args.Add(DataFormatter.Format(this.Orbit.Period, DataUnit.Time));
                 }

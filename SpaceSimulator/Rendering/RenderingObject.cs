@@ -157,7 +157,15 @@ namespace SpaceSimulator.Rendering
         private void CalculateOrbitPositions()
         {
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.PhysicsObject);
-            this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+
+            if (orbitPosition.Orbit.IsRadialParabolic)
+            {
+                this.positions = OrbitPositions.CreateRadialTrajectory(this.PhysicsObject, orbitPosition, true);
+            }
+            else
+            {
+                this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+            }
         }
         
         /// <summary>

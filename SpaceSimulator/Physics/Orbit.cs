@@ -201,13 +201,7 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the periapsis
         /// </summary>
-        public double Periapsis
-        {
-            get
-            {
-                return this.Parameter / (1 + this.Eccentricity);
-            }
-        }
+        public double Periapsis => this.Parameter / (1 + this.Eccentricity);
 
         /// <summary>
         /// Returns the apoapsis
@@ -228,18 +222,12 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the periapsis relative to the surface
         /// </summary>
-        public double RelativePeriapsis
-        {
-            get { return this.Periapsis - this.PrimaryBody.Radius; }
-        }
+        public double RelativePeriapsis => this.Periapsis - this.PrimaryBody.Radius;
 
         /// <summary>
         /// Returns the apoapsis relative to the surface
         /// </summary>
-        public double RelativeApoapsis
-        {
-            get { return this.Apoapsis - this.PrimaryBody.Radius; }
-        }
+        public double RelativeApoapsis => this.Apoapsis - this.PrimaryBody.Radius;
 
         /// <summary>
         /// Returns the semi-major axis
@@ -248,7 +236,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                if (this.IsHyperbolic || this.IsElliptical)
+                if (this.IsHyperbolic || this.IsBound)
                 {
                     var e = this.Eccentricity;
                     return this.Parameter / (1 - e * e);
@@ -263,62 +251,42 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Indicates if the current orbit is circular
         /// </summary>
-        public bool IsCircular
-        {
-            get { return this.Eccentricity <= EccentricityEpsilon; }
-        }
+        public bool IsCircular => this.Eccentricity <= EccentricityEpsilon;
 
         /// <summary>
         /// Indicates if the current orbit is elliptical
         /// </summary>
-        /// <remarks>This also includes circular orbits.</remarks>
-        public bool IsElliptical
-        {
-            get { return this.Eccentricity < 1.0 - EccentricityEpsilon; }
-        }
+        public bool IsElliptical => this.Eccentricity > EccentricityEpsilon && this.Eccentricity < 1.0 - EccentricityEpsilon;
 
         /// <summary>
         /// Indicates if the current orbit is parabolic
         /// </summary>
-        public bool IsParabolic
-        {
-            get { return Math.Abs(this.Eccentricity - 1.0) <= EccentricityEpsilon; }
-        }
+        public bool IsParabolic => Math.Abs(this.Eccentricity - 1.0) <= EccentricityEpsilon;
 
         /// <summary>
         /// Indicates if the current orbit is hyperbolic
         /// </summary>
-        public bool IsHyperbolic
-        {
-            get { return this.Eccentricity > 1.0 + EccentricityEpsilon; }
-        }
+        public bool IsHyperbolic => this.Eccentricity > 1.0 + EccentricityEpsilon;
 
         /// <summary>
         /// Indicates if the current orbit is bound (circular or elliptical)
         /// </summary>
-        public bool IsBound
-        {
-            get { return this.IsElliptical; }
-        }
+        public bool IsBound => this.Eccentricity < 1.0 - EccentricityEpsilon;
 
         /// <summary>
         /// Indicates if the orbit is unbound (parabolic or hyperbolic)
         /// </summary>
-        public bool IsUnbound
-        {
-            get { return !this.IsBound; }
-        }
+        public bool IsUnbound => !this.IsBound;
+
+        /// <summary>
+        /// Indicates if the current orbit is a radial parabolic
+        /// </summary>
+        public bool IsRadialParabolic => this.Parameter <= 1E-5 && this.IsParabolic;
 
         /// <summary>
         /// Returns the period
         /// </double>
-        public double Period
-        {
-            get
-            {
-                return OrbitFormulas.OrbitalPeriod(this.StandardGravitationalParameter, this.SemiMajorAxis);
-            }
-        }
+        public double Period => OrbitFormulas.OrbitalPeriod(this.StandardGravitationalParameter, this.SemiMajorAxis);
 
         /// <summary>
         /// Returns the change-of-basis matrix from the perifocal coordinate system to the geocentric-equatorial
@@ -539,7 +507,7 @@ namespace SpaceSimulator.Physics
                 args.Add(DataFormatter.Format(this.Periapsis, DataUnit.Distance));
                 args.Add(DataFormatter.Format(this.Apoapsis, DataUnit.Distance));
 
-                if (this.IsElliptical)
+                if (this.IsBound)
                 {
                     args.Add(DataFormatter.Format(this.Period, DataUnit.Time));
                 }

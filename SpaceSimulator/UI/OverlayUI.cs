@@ -331,7 +331,7 @@ namespace SpaceSimulator.UI
                 overlayObject.RenderingObject.ShowSphere = !overlayObject.DrawThumbnail;
             }
 
-            if (!physicsObject.IsObjectOfReference)
+            if (!physicsObject.IsObjectOfReference && !physicsObject.ReferenceOrbit.IsRadialParabolic)
             {
                 var orbitScreenPositions = new List<Vector2>();
                 void AddOrbitScreenPosition(double trueAnomaly)

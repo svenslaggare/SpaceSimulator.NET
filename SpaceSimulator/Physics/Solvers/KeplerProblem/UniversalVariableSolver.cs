@@ -32,7 +32,7 @@ namespace SpaceSimulator.Physics.Solvers
             ref double sqrtMu,
             ref double alpha)
         {
-            if (initialOrbit.IsElliptical)
+            if (initialOrbit.IsBound)
             {
                 return (sqrtMu * time) * alpha;
             }
