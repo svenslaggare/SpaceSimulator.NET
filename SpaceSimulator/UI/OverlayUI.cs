@@ -314,8 +314,6 @@ namespace SpaceSimulator.UI
         /// <param name="overlayObject">The overlay object</param>
         private void DetermineOverlayVisiblity(OverlayObject overlayObject)
         {
-            //overlayObject.DrawText = true;
-            //overlayObject.DrawThumbnail = true;
             var inview = overlayObject.DrawDepth <= 1.0 && overlayObject.DrawDepth >= 0.0;
             overlayObject.DrawText = inview;
             overlayObject.DrawThumbnail = inview;
@@ -372,10 +370,9 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
-        /// Draws the overlay
+        /// Determiens the visibility and draw order
         /// </summary>
-        /// <param name="deviceContext">The device context</param>
-        private void DrawOverlay(DeviceContext deviceContext)
+        private void DetermineVisibilityAndOrder()
         {
             foreach (var overlayObject in this.overlayObjects)
             {
@@ -387,10 +384,22 @@ namespace SpaceSimulator.UI
 
             foreach (var overlayObject in this.overlayObjects)
             {
+                this.DetermineOverlayVisiblity(overlayObject);
+            }
+        }
+
+        /// <summary>
+        /// Draws the overlay
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        private void DrawOverlay(DeviceContext deviceContext)
+        {
+            this.DetermineVisibilityAndOrder();
+
+            foreach (var overlayObject in this.overlayObjects)
+            {
                 var physicsObject = overlayObject.RenderingObject.PhysicsObject;
                 var screenPosition = this.orbitCamera.Project(overlayObject.RenderingObject.DrawPosition(this.orbitCamera), out var depth);
-
-                this.DetermineOverlayVisiblity(overlayObject);
 
                 if (overlayObject.DrawThumbnail && physicsObject.Type != PhysicsObjectType.ArtificialSatellite)
                 {
@@ -438,6 +447,14 @@ namespace SpaceSimulator.UI
             if (this.OrbitCameraIsActive)
             {
                 this.DrawOverlay(deviceContext);
+            }
+            else
+            {
+                foreach (var overlayObject in this.overlayObjects)
+                {
+                    overlayObject.RenderingObject.ShowOrbit = true;
+                    overlayObject.RenderingObject.ShowSphere = true;
+                }
             }
         }
 
