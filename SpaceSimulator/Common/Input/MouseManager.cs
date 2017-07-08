@@ -15,6 +15,8 @@ namespace SpaceSimulator.Common.Input
     {
         private readonly Mouse mouse;
 
+        private bool canReceiveInput = true;
+
         private MouseState mouseState = new MouseState();
         private MouseState prevMouseState = new MouseState();
 
@@ -36,11 +38,14 @@ namespace SpaceSimulator.Common.Input
         }
 
         /// <summary>
-        /// Updates the state
+        /// Updates the mouse manager
         /// </summary>
+        /// <param name="canReceiveInput">Indicates if the manager can receive input</param>
         /// <param name="mousePosition">The position of the mouse</param>
-        public void Update(Vector2 mousePosition)
+        public void Update(bool canReceiveInput, Vector2 mousePosition)
         {
+            this.canReceiveInput = canReceiveInput;
+
             var timeNow = DateTime.UtcNow;
             if (this.IsButtonPressed(System.Windows.Forms.MouseButtons.Left))
             {
@@ -69,6 +74,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="button">The button</param>
         private bool IsButtonDown(MouseState mouseState, System.Windows.Forms.MouseButtons button)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             switch (button)
             {
                 case System.Windows.Forms.MouseButtons.Left:
@@ -97,6 +107,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="button">The button</param>
         public bool IsButtonUp(System.Windows.Forms.MouseButtons button)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             return !this.IsButtonDown(button);
         }
 
@@ -106,6 +121,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="button">The button</param>
         public bool IsButtonPressed(System.Windows.Forms.MouseButtons button)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             return this.IsButtonDown(this.prevMouseState, button) && !this.IsButtonDown(this.mouseState, button);
         }
 
@@ -117,6 +137,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="maxDoubleClickTime">The maximum double click time (in ms)</param>
         public bool IsDoubleClick(System.Windows.Forms.MouseButtons button, double minDoubleClickTime = 0.0, double maxDoubleClickTime = 200.0)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             var timeSinceClick = new TimeSpan();
             switch (button)
             {

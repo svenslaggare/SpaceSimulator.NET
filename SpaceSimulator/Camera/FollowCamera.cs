@@ -19,6 +19,11 @@ namespace SpaceSimulator.Camera
         private Vector3d followNormal = Vector3d.Up;
 
         /// <summary>
+        /// The follow mode
+        /// </summary>
+        public enum Mode { FollowNormal, FollowRadial, FollowAscent }
+
+        /// <summary>
         /// The follow distance
         /// </summary>
         public double Distance { get; set; } = 4240000.0;

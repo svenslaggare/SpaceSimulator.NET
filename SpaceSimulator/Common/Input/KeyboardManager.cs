@@ -14,6 +14,8 @@ namespace SpaceSimulator.Common.Input
     {
         private readonly Keyboard keyboard;
 
+        private bool canReceiveInput = true;
+
         private KeyboardState keyboardState = new KeyboardState();
         private KeyboardState prevKeyboardState = new KeyboardState();
 
@@ -38,8 +40,11 @@ namespace SpaceSimulator.Common.Input
         /// <summary>
         /// Updates the keyboard manager
         /// </summary>
-        public void Update()
+        /// <param name="canReceiveInput">Indicates if the manager can receive input</param>
+        public void Update(bool canReceiveInput)
         {
+            this.canReceiveInput = canReceiveInput;
+
             this.prevKeyboardState = this.keyboardState;
             this.keyboardState = this.keyboard.GetCurrentState();
             //Console.WriteLine(string.Join(", ", this.keyboardState.PressedKeys));
@@ -51,6 +56,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="key">The key</param>
         public bool IsKeyUp(Key key)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             return !this.keyboardState.IsPressed(key);
         }
 
@@ -60,6 +70,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="key">The key</param>
         public bool IsKeyDown(Key key)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             return this.keyboardState.IsPressed(key);
         }
 
@@ -69,6 +84,11 @@ namespace SpaceSimulator.Common.Input
         /// <param name="key">The key</param>
         public bool IsKeyPressed(Key key)
         {
+            if (!this.canReceiveInput)
+            {
+                return false;
+            }
+
             return !this.prevKeyboardState.IsPressed(key) && this.keyboardState.IsPressed(key);
         }
 

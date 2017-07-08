@@ -23,23 +23,23 @@ namespace SpaceSimulator.Physics.Maneuvers
             var orbit = orbitPosition.Orbit;
             var targetOrbit = targetOrbitPosition.Orbit;
 
-            var r1 = orbit.SemiMajorAxis;
-            var r2 = targetOrbit.SemiMajorAxis;
-            var a1 = orbitPosition.TrueAnomaly;
-            var a2 = targetOrbitPosition.TrueAnomaly;
+            var radius1 = orbit.SemiMajorAxis;
+            var radius2 = targetOrbit.SemiMajorAxis;
+            var trueAnomaly1 = orbitPosition.TrueAnomaly;
+            var trueAnomaly2 = targetOrbitPosition.TrueAnomaly;
 
             //Calculate the required angular alignment
-            var alpha = Math.PI * (1.0 - (1.0 / (2.0 * Math.Sqrt(2))) * Math.Sqrt(Math.Pow(r1 / r2 + 1, 3)));
+            var requiredPhaseAngle = Math.PI * (1.0 - (1.0 / (2.0 * Math.Sqrt(2))) * Math.Sqrt(Math.Pow(radius1 / radius2 + 1, 3)));
 
             //Calculate the time when the alignment is reached
             var deltaAngle = 0.0;
-            if (r2 > r1)
+            if (radius2 > radius1)
             {
-                deltaAngle = a2 - a1;
+                deltaAngle = trueAnomaly2 - trueAnomaly1;
             }
             else
             {
-                deltaAngle = a1 - a2;
+                deltaAngle = trueAnomaly1 - trueAnomaly2;
             }
 
             if (deltaAngle < 0)
@@ -48,25 +48,25 @@ namespace SpaceSimulator.Physics.Maneuvers
             }
 
             var mu = orbit.StandardGravitationalParameter;
-            var w1 = Math.Sqrt(mu / Math.Pow(r1, 3));
-            var w2 = Math.Sqrt(mu / Math.Pow(r2, 3));
-            var angularDeltaSpeed = w1 - w2;
+            var angularSpeed1 = Math.Sqrt(mu / Math.Pow(radius1, 3));
+            var angularSpeed2 = Math.Sqrt(mu / Math.Pow(radius2, 3));
+            var angularDeltaSpeed = angularSpeed1 - angularSpeed2;
 
-            var t = 0.0;
-            if (r2 > r1)
+            var alignmentTime = 0.0;
+            if (radius2 > radius1)
             {
-                t = Math.Abs(deltaAngle - alpha) / Math.Abs(angularDeltaSpeed);
+                alignmentTime = Math.Abs(deltaAngle - requiredPhaseAngle) / Math.Abs(angularDeltaSpeed);
             }
             else
             {
-                t = Math.Abs(deltaAngle + alpha) / Math.Abs(angularDeltaSpeed);
+                alignmentTime = Math.Abs(deltaAngle + requiredPhaseAngle) / Math.Abs(angularDeltaSpeed);
             }
 
-            return t;
+            return alignmentTime;
         }
 
         /// <summary>
-        /// The data for a Hohmann transfer
+        /// Holds data for a Hohmann transfer
         /// </summary>
         public struct HohmannTransferOrbitData
         {
@@ -144,12 +144,9 @@ namespace SpaceSimulator.Physics.Maneuvers
                 throw new ArgumentException("The orbit is not circular (e = " + orbit.Eccentricity + ")");
             }
 
-            var r1 = currentRadius;
-            var r2 = newRadius;
-
             var mu = orbit.StandardGravitationalParameter;
 
-            //Calculate the directions at the two burns, and the time when to apply the first one
+            //Calculate the directions at the two burns and the time when to apply the first one
             var t1 = 0.0;
 
             switch (maneuverTime.Type)
@@ -178,7 +175,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             var dir1 = MathHelpers.Normalized(burnState.Velocity - burnPrimaryState.Velocity);
             var dir2 = -dir1;
 
-            var data = CalculateBurn(mu, r1, r2);
+            var data = CalculateBurn(mu, currentRadius, newRadius);
 
             return OrbitalManeuvers.Sequence(
                 new OrbitalManeuver(simulatorEngine.TotalTime + t1, dir1 * data.FirstBurn),

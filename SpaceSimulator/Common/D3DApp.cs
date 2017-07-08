@@ -433,9 +433,9 @@ namespace SpaceSimulator.Common
         /// </summary>
         /// <param name="elapsed">The elapsed time since the last frame</param>
         public virtual void Update(TimeSpan elapsed)
-        {
-            this.keyboardManager.Update();
-            this.mouseManager.Update(this.MousePosition);
+        {            
+            this.keyboardManager.Update(this.renderForm.Focused);
+            this.mouseManager.Update(this.renderForm.Focused, this.MousePosition);
             this.ActiveCamera.HandleKeyboard(this.keyboardManager.State, elapsed);
             this.ActiveCamera.UpdateViewMatrix();
         }
