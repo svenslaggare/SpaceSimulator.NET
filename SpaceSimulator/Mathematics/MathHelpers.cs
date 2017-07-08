@@ -359,5 +359,31 @@ namespace SpaceSimulator.Mathematics
             currentCopy.Offset(amount);
             return currentCopy;
         }
+
+        /// <summary>
+        /// Computes x mod n
+        /// </summary>
+        /// <param name="x">The x</param>
+        /// <param name="n">The n</param>
+        public static int Mod(int x, int n)
+        {
+            x = x % n;
+            if (x < 0)
+            {
+                x += n;
+            }
+
+            return x;
+        }
+
+        /// <summary>
+        /// Computes (x + 1) mod n
+        /// </summary>
+        /// <param name="x">The x</param>
+        /// <param name="n">The n</param>
+        public static void ModIncrease(ref int x, int n)
+        {
+            x = Mod(x + 1, n);
+        }
     }
 }

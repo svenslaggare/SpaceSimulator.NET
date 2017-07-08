@@ -43,7 +43,7 @@ namespace SpaceSimulator
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-            : base("SpaceSimulator", new OrbitCamera(), "OrbitCamera")
+            : base("SpaceSimulator", new OrbitCamera(0.001f, 10000.0f), "OrbitCamera")
         {
             Console.WriteLine("");
 
@@ -53,16 +53,19 @@ namespace SpaceSimulator
             this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.simulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            var orbitCamera = (OrbitCamera)this.CameraManager["OrbitCamera"];
-            orbitCamera.MinRadius = 0.001f;
-            orbitCamera.MaxRadius = 10000.0f;
+            //var orbitCamera = (OrbitCamera)this.CameraManager["OrbitCamera"];
+            //orbitCamera.MinRadius = 0.001f;
+            //orbitCamera.MaxRadius = 10000.0f;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
                 //DrawBoundingRectangles = true
             };
 
-            this.CameraManager.AddCamera("FollowCamera", new FollowCamera(), true);
+            //this.CameraManager.AddCamera("FollowCamera", new FollowCamera(FollowCamera.Mode.FollowAscent), true);
+            this.CameraManager.AddCamera("FollowCameraNormal", new FollowCamera(FollowCamera.Mode.FollowNormal));
+            this.CameraManager.AddCamera("FollowCameraRadial", new FollowCamera(FollowCamera.Mode.FollowRadial));
+            this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
         }

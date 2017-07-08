@@ -32,11 +32,15 @@ namespace SpaceSimulator.Camera
         /// <summary>
         /// Creates a new orbit camera
         /// </summary>
-        public OrbitCamera()
+        /// <param name="minRadius">The minimum radius</param>
+        /// <param name="maxRadius">The maximum radius</param>
+        public OrbitCamera(float minRadius, float maxRadius)
 		{
             this.theta = 1.5f * MathUtil.Pi;
             this.phi = 0.1f * MathUtil.Pi;
-            this.radius = 200;
+            this.minRadius = minRadius;
+            this.maxRadius = maxRadius;
+            this.radius = minRadius;
         }
 
         /// <summary>

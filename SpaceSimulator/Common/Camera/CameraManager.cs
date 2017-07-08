@@ -12,11 +12,17 @@ namespace SpaceSimulator.Common.Camera
     public sealed class CameraManager
     {
         private readonly IDictionary<string, BaseCamera> cameras = new Dictionary<string, BaseCamera>();
+        private readonly List<string> cameraOrders = new List<string>();
 
         /// <summary>
         /// The active camera
         /// </summary>
         public BaseCamera ActiveCamera { get; private set; }
+
+        /// <summary>
+        /// The name of the active camera
+        /// </summary>
+        public string ActiveCameraName { get; private set; }
 
         /// <summary>
         /// Creates a new camera manager
@@ -32,6 +38,11 @@ namespace SpaceSimulator.Common.Camera
         public IEnumerable<BaseCamera> Cameras => this.cameras.Values;
 
         /// <summary>
+        /// Returns the names of the cameras
+        /// </summary>
+        public IReadOnlyList<string> CameraNames => this.cameraOrders.AsReadOnly();
+
+        /// <summary>
         /// Adds the given camera
         /// </summary>
         /// <param name="name">The name of the camera</param>
@@ -40,10 +51,12 @@ namespace SpaceSimulator.Common.Camera
         public void AddCamera(string name, BaseCamera camera, bool setActive = false)
         {
             this.cameras.Add(name, camera);
+            this.cameraOrders.Add(name);
 
             if (setActive)
             {
                 this.ActiveCamera = camera;
+                this.ActiveCameraName = name;
             }
         }
 
@@ -52,11 +65,14 @@ namespace SpaceSimulator.Common.Camera
         /// </summary>
         /// <param name="name">The name of the camera</param>
         /// <exception cref="KeyNotFoundException">If the camera does not exist</exception>
-        public void SetActiveCamera(string name)
+        /// <returns>The active camera</returns>
+        public BaseCamera SetActiveCamera(string name)
         {
             if (this.cameras.TryGetValue(name, out var camera))
             {
                 this.ActiveCamera = camera;
+                this.ActiveCameraName = name;
+                return this.ActiveCamera;
             }
             else
             {

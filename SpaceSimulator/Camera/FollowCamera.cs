@@ -24,9 +24,23 @@ namespace SpaceSimulator.Camera
         public enum Mode { FollowNormal, FollowRadial, FollowAscent }
 
         /// <summary>
+        /// The follow mode
+        /// </summary>
+        public Mode FollowMode { get; }
+
+        /// <summary>
         /// The follow distance
         /// </summary>
         public double Distance { get; set; } = 4240000.0;
+
+        /// <summary>
+        /// Creates a new follow camera
+        /// </summary>
+        /// <param name="followMode">The follow mode</param>
+        public FollowCamera(Mode followMode)
+        {
+            this.FollowMode = followMode;
+        }
 
         public override void UpdateViewMatrix()
         {
@@ -47,7 +61,6 @@ namespace SpaceSimulator.Camera
         public override void HandleMouseScroll(int delta)
         {
             base.HandleMouseScroll(delta);
-            //this.Distance += delta * 1E3;
             this.Distance += -delta * this.Distance * 0.001;
         }
 
@@ -58,23 +71,42 @@ namespace SpaceSimulator.Camera
             var state = physicsObject.State;
             state.MakeRelative(physicsObject.PrimaryBody.State);
 
-            this.followForward = state.Prograde;
-
-            if (state.Prograde.Equals(state.Radial))
+            switch (this.FollowMode)
             {
-                var pseudoRadial = MathHelpers.Normalized(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationY(Math.PI / 2)));
-                var pseudoNormal = Vector3d.Cross(state.Prograde, pseudoRadial);
-                var sphereNormal = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude);
-                var sphereTangent = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude + Math.PI / 2);
+                case Mode.FollowNormal:
+                    this.followForward = state.Prograde;
+                    this.followNormal = state.Normal;
+                    break;
+                case Mode.FollowRadial:
+                    this.followForward = state.Prograde;
+                    this.followNormal = state.Radial;
+                    break;
+                case Mode.FollowAscent:
+                    //var pseudoRadial = MathHelpers.Normalized(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+                    //var pseudoNormal = Vector3d.Cross(state.Prograde, pseudoRadial);
+                    var sphereNormal = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude);
+                    var sphereTangent = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude + Math.PI / 2);
 
-                this.followNormal = sphereNormal;
-                this.followForward = sphereTangent;
+                    this.followNormal = sphereNormal;
+                    this.followForward = sphereTangent;
+                    break;
             }
-            else
-            {
-                this.followNormal = state.Radial;
-                //this.followNormal = state.Normal;
-            }
+
+            //if (state.Prograde.Equals(state.Radial))
+            //{
+            //    var pseudoRadial = MathHelpers.Normalized(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+            //    var pseudoNormal = Vector3d.Cross(state.Prograde, pseudoRadial);
+            //    var sphereNormal = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude);
+            //    var sphereTangent = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude + Math.PI / 2);
+
+            //    this.followNormal = sphereNormal;
+            //    this.followForward = sphereTangent;
+            //}
+            //else
+            //{
+            //    this.followNormal = state.Radial;
+            //    //this.followNormal = state.Normal;
+            //}
         }
 
         public override bool CanSetFocus(PhysicsObject physicsObject)

@@ -26,6 +26,8 @@ namespace SpaceSimulator.UI
 
         private PhysicsObject focusObject;
         private int focusObjectIndex = 0;
+
+        private int cameraIndex = 0;
         
         /// <summary>
         /// Creates a new camera UI component
@@ -105,6 +107,28 @@ namespace SpaceSimulator.UI
             return true;
         }
 
+        /// <summary>
+        /// Sets a valid focus object based on the given camera
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        private void SetValidFocus(SpaceCamera camera)
+        {
+            for (int i = 0; i < this.SimulatorEngine.Objects.Count; i++)
+            {
+                var objectIndex = MathHelpers.Mod(this.focusObjectIndex + i, this.SimulatorEngine.Objects.Count);
+                var currentObject = this.SimulatorEngine.Objects[objectIndex];
+
+                if (this.CanSetFocus(currentObject))
+                {
+                    this.focusObjectIndex = objectIndex;
+                    this.focusObject = currentObject;
+                    break;
+                }
+            }
+
+            camera.SetFocus(this.focusObject);
+        }
+
         public override void Update(TimeSpan elapsed)
         {
             this.focusObject = UIComponentHelpers.SelectObjectUpAndDown(
@@ -121,25 +145,26 @@ namespace SpaceSimulator.UI
                 //this.SetScaleFactorFromFocusObject();
                 this.orbitCamera.Radius = this.GetStartRadius();
             }
+
+            if (this.KeyboardManager.IsKeyPressed(SharpDX.DirectInput.Key.C))
+            {
+                MathHelpers.ModIncrease(ref this.cameraIndex, this.cameraManager.CameraNames.Count);
+                var spaceCamera = this.cameraManager.SetActiveCamera(this.cameraManager.CameraNames[this.cameraIndex]) as SpaceCamera;
+                this.SetValidFocus(spaceCamera);
+            }
         }
 
         public override void AfterSimulationUpdate()
         {
             var spaceCamera = this.cameraManager.ActiveCamera as SpaceCamera;
-            //spaceCamera.Focus = this.focusObject.Position;
             spaceCamera.SetFocus(this.focusObject);
-
-            //if (spaceCamera is FollowCamera followCamera)
-            //{
-            //    followCamera.SetFocus(this.focusObject);
-            //}
         }
 
         public override void Draw(DeviceContext deviceContext)
         {
             this.TextColorBrush.DrawText(
                 deviceContext,
-                "Focused object: " + this.focusObject.Name,
+                $"Focused object: {this.focusObject.Name} ({this.cameraManager.ActiveCameraName})",
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 43)));
         }
