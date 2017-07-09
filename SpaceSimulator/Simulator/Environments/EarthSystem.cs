@@ -102,7 +102,14 @@ namespace SpaceSimulator.Simulator.Environments
                 "Satellite 1",
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
+                new OrbitPosition(
+                    Physics.Orbit.New(
+                        earth,
+                        //semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3,
+                        semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
+                        //longitudeOfAscendingNode: 45.0 * MathUtild.Deg2Rad,
+                        inclination: 85.0 * MathUtild.Deg2Rad),
+                    0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             //var orbitPosition2 = new OrbitPosition(

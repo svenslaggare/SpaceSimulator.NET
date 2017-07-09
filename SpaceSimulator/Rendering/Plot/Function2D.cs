@@ -61,8 +61,7 @@ namespace SpaceSimulator.Rendering.Plot
         /// <param name="height">The height of the plot</param>
         /// <param name="labelAxisX">The label for the x-axis</param>
         /// <param name="labelAxisY">The label for the y-axis</param>
-        /// <param name="splitIntoMultipleParts">Indicates if the function should be split into multiple parts</param>
-        /// <param name="splitPart">Determines how the parts should be split</param>
+        /// <param name="splitIntoParts">Determines how the values should be split into parts</param>
         /// <param name="minPosition">The minimum position. Defaults to auto.</param>
         /// <param name="maxPosition">The maximum position. Defaults to auto.</param>
         public Function2D(
@@ -74,8 +73,7 @@ namespace SpaceSimulator.Rendering.Plot
             int height,
             string labelAxisX = "",
             string labelAxisY = "",
-            bool splitIntoMultipleParts = false,
-            Func<double, double, bool> splitPart = null,
+            Func<IList<Vector2>, IEnumerable<IList<Vector2>>> splitIntoParts = null,
             Vector2? minPosition = null,
             Vector2? maxPosition = null)
         {
@@ -124,34 +122,12 @@ namespace SpaceSimulator.Rendering.Plot
             this.renderingManager2D = renderingManager2D;
             this.linePathGeometry = this.renderingManager2D.CreatePathGeometry(geometrySink =>
             {
-                if (splitIntoMultipleParts)
+                if (splitIntoParts != null)
                 {
-                    var i = 0;
-                    while (i < values.Count)
+                    foreach (var part in splitIntoParts(values))
                     {
-                        geometrySink.BeginFigure(TransformPoint(values[i]), FigureBegin.Filled);
-                        var prev = values[i];
-                        var end = values.Count;
-
-                        for (int j = i + 1; j < values.Count; j++)
-                        {
-                            var value = values[j];
-                            var diffX = value.X - prev.X;
-                            var diffY = value.Y - prev.Y;
-
-                            if (splitPart(diffX, diffY))
-                            {
-                                end = j;
-                                break;
-                            }
-
-                            prev = value;
-                        }
-
-                        //Console.WriteLine($"{i}-{end}");
-                        geometrySink.AddLines(values.GetRange(i, end - i).Select(point => TransformPoint(point)).ToArray());
-                        i += end - i;
-
+                        geometrySink.BeginFigure(TransformPoint(part[0]), FigureBegin.Filled);
+                        geometrySink.AddLines(part.Select(point => TransformPoint(point)).ToArray());
                         geometrySink.EndFigure(FigureEnd.Open);
                     }
                 }

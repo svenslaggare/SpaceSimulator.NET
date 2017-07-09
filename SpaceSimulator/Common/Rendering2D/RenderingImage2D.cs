@@ -34,7 +34,7 @@ namespace SpaceSimulator.Common.Rendering2D
         public RenderingImage2D(string fileName)
         {
             // Loads from file using System.Drawing.Image
-            using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(fileName))
+            using (var bitmap = new System.Drawing.Bitmap(fileName))
             {
                 var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
                 this.bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(

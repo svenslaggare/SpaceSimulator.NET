@@ -23,6 +23,8 @@ namespace SpaceSimulator.Rendering.Plot
         private readonly PhysicsObject physicsObject;
 
         private Function2D plot;
+        private readonly int numOrbits = 2;
+
         private readonly IRenderingBrush currentPositionBrush;
         private RenderingImage2D primaryBodyImage;
 
@@ -51,6 +53,7 @@ namespace SpaceSimulator.Rendering.Plot
 
             this.currentPositionBrush = this.renderingManager2D.CreateSolidColorBrush(Color.Red);
             this.primaryBodyImage = this.renderingManager2D.LoadImage("Content/Textures/Planets/Earth.jpg");
+
             //this.projectedOrbitSphere = new Sphere(
             //    graphicsDevice,
             //    1.0f,
@@ -90,30 +93,24 @@ namespace SpaceSimulator.Rendering.Plot
         }
 
         /// <summary>
-        /// Creates the plot
+        /// Determines when a part of values should be split
         /// </summary>
-        private void CreatePlot()
+        /// <param name="prev">The previous value</param>
+        /// <param name="value">The next value</param>
+        private bool SplitPart(Vector2 prev, Vector2 value)
         {
-            this.plot = new Function2D(
-                this.renderingManager2D,
-                this.CalculateTrackPositions(2),
-                this.Position,
-                Color.Red,
-                400,
-                200,
-                labelAxisX: "Longitude",
-                labelAxisY: "Latitude",
-                splitIntoMultipleParts: true,
-                splitPart: (diffX, diffY) => Math.Abs(diffX) > MathHelpers.Deg2Rad * 10.0f,
-                minPosition: new Vector2(-180.0f, -90.0f) * MathHelpers.Deg2Rad,
-                maxPosition: new Vector2(180.0f, 90.0f) * MathHelpers.Deg2Rad)
-            {
-                DrawBackground = false
-            };
+            var diffX = value.X - prev.X;
+            var diffY = value.Y - prev.Y;
+            return Math.Abs(diffX) > MathHelpers.Deg2Rad * 10.0f;
+        }
 
-            this.lastTrackCreated = physicsObject.State.Time;
-            this.trackOrbitVersion = this.physicsObject.OrbitVersion;
-            this.lastTrackCreatedTime = DateTime.UtcNow;
+        /// <summary>
+        /// Splits the given values into parts
+        /// </summary>
+        /// <param name="values">The values</param>
+        private IEnumerable<IList<Vector2>> SplitIntoParts(IList<Vector2> values)
+        {
+            return PlotHelpers.SplitIntoParts(values, this.SplitPart).Take(this.numOrbits);
         }
 
         /// <summary>
@@ -123,11 +120,11 @@ namespace SpaceSimulator.Rendering.Plot
         private IList<Vector2> CalculateTrackPositions(int numOrbits)
         {
             var primaryBody = this.physicsObject.PrimaryBody;
-            var primaryRotation = primaryBody.Rotation;
-            var values = new List<Vector2>();
+            //var primaryRotation = primaryBody.Rotation;
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
             var orbit = orbitPosition.Orbit;
 
+            var values = new List<Vector2>();
             //for (int i = 0; i < numOrbits; i++)
             //{
             //    var prevTimeSincePeriapsis = 0.0;
@@ -152,9 +149,15 @@ namespace SpaceSimulator.Rendering.Plot
 
             var deltaTime = 100.0;
             var keplerProblemSolver = new Physics.Solvers.KeplerProblemUniversalVariableSolver();
-            for (double t = 0.0; t <= orbit.Period * numOrbits; t += deltaTime)
+            var startPrimaryRotation = primaryBody.Rotation;
+
+            var pastValues = new List<Vector2>();
+
+            //for (double t = 0.0; t <= orbit.Period * numOrbits; t += deltaTime)
+            for (double t = -orbit.Period; t <= orbit.Period * numOrbits; t += deltaTime)
             {
-                primaryRotation = Physics.Solvers.SolverHelpers.CalculateRotation(primaryBody.RotationalPeriod, primaryRotation, deltaTime);
+                //primaryRotation = Physics.Solvers.SolverHelpers.CalculateRotation(primaryBody.RotationalPeriod, primaryRotation, deltaTime);
+                var primaryRotation = MathHelpers.ClampAngle(startPrimaryRotation + primaryBody.RotationalSpeed() * t);
                 var nextState = Physics.Solvers.SolverHelpers.AfterTime(
                     keplerProblemSolver,
                     this.physicsObject,
@@ -163,10 +166,49 @@ namespace SpaceSimulator.Rendering.Plot
                     t);
 
                 Physics.OrbitHelpers.GetCoordinates(primaryBody, primaryRotation, nextState.Position, out var latitude, out var longitude);
-                values.Add(new Vector2((float)longitude, (float)latitude));
+                var projectedPosition = new Vector2((float)longitude, (float)latitude);
+
+                if (t < 0)
+                {
+                    pastValues.Add(projectedPosition);
+                }
+                else
+                {
+                    values.Add(projectedPosition);
+                }
             }
 
+            pastValues = (List<Vector2>)PlotHelpers.SplitIntoParts(pastValues, this.SplitPart).Last();
+            pastValues.AddRange(values);
+            values = pastValues;
+
             return values;
+        }
+
+        /// <summary>
+        /// Creates the plot
+        /// </summary>
+        private void CreatePlot()
+        {
+            this.plot = new Function2D(
+                this.renderingManager2D,
+                this.CalculateTrackPositions(this.numOrbits),
+                this.Position,
+                Color.Red,
+                400,
+                200,
+                labelAxisX: "Longitude",
+                labelAxisY: "Latitude",
+                splitIntoParts: this.SplitIntoParts,
+                minPosition: new Vector2(-180.0f, -90.0f) * MathHelpers.Deg2Rad,
+                maxPosition: new Vector2(180.0f, 90.0f) * MathHelpers.Deg2Rad)
+            {
+                DrawBackground = false
+            };
+
+            this.lastTrackCreated = physicsObject.State.Time;
+            this.trackOrbitVersion = this.physicsObject.OrbitVersion;
+            this.lastTrackCreatedTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -185,7 +227,7 @@ namespace SpaceSimulator.Rendering.Plot
                 || this.trackOrbitVersion != this.physicsObject.OrbitVersion)
                 && DateTime.UtcNow - this.lastTrackCreatedTime >= this.trackRefreshRate)
             {
-                Console.WriteLine("Updated ground track.");
+                //Console.WriteLine("Updated ground track.");
                 this.CreatePlot();
             }
 
@@ -250,7 +292,6 @@ namespace SpaceSimulator.Rendering.Plot
         {
             this.plot.Dispose();
             this.currentPositionBrush.Dispose();
-            //this.projectedOrbitSphere.Dispose();
         }
     }
 }
