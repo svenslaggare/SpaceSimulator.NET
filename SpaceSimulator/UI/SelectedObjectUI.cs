@@ -8,8 +8,10 @@ using SharpDX.Direct2D1;
 using SpaceSimulator.Common;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Rendering2D;
+using SpaceSimulator.Common.UI;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Rendering.Plot;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.UI
@@ -20,6 +22,7 @@ namespace SpaceSimulator.UI
     public class SelectedObjectUI : UIComponent
     {
         private int selectedObjectIndex;
+        private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
 
         /// <summary>
         /// Creates a new selected object UI component
@@ -90,12 +93,38 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Draws the ground track
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        private void DrawGroundTrack(DeviceContext deviceContext)
+        {
+            if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite
+                && this.SelectedObject.ReferenceOrbit.IsBound)
+            {
+                if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
+                {
+                    groundTrack = new GroundTrack(this.RenderingManager2D, this.SelectedObject, Vector2.Zero);
+                    this.groundTracks.Add(this.SelectedObject, groundTrack);
+                }
+
+                groundTrack.Position = UIHelpers.CalculateScreenPosition(
+                    this.RenderingManager2D.ScreenRectangle,
+                    new RectangleF(0, 0, groundTrack.Width, groundTrack.Height),
+                    PositionRelationX.Right,
+                    PositionRelationY.Top);
+
+                groundTrack.Draw(deviceContext);
+            }
+        }
+
+        /// <summary>
         /// Updates the component
         /// </summary>
         /// <param name="elapsed">The elapsed time since the last frame</param>
         public override void Draw(DeviceContext deviceContext)
         {
-            //var selectedObject = this.SimulatorEngine.Objects.FirstOrDefault(x => x.Type == PhysicsObjectType.ArtificialSatellite);
+            this.DrawGroundTrack(deviceContext);
+
             var selectedObjectOrbitPosition = new OrbitPosition();
 
             if (this.SelectedObject.PrimaryBody != null)
@@ -135,6 +164,16 @@ namespace SpaceSimulator.UI
                 selectedObjectText,
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 90)));
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            foreach (var groundTrack in this.groundTracks.Values)
+            {
+                groundTrack.Dispose();
+            }
         }
     }
 }

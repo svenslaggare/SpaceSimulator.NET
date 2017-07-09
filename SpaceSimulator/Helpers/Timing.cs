@@ -24,6 +24,14 @@ namespace SpaceSimulator.Helpers
             this.stringFormat = stringFormat;
         }
 
+        /// <summary>
+        /// Creates a new timing
+        /// </summary>
+        public static Timing New()
+        {
+            return new Timing("{0}");
+        }
+
         public void Dispose()
         {
             Console.WriteLine(string.Format(this.stringFormat, (DateTime.UtcNow - this.startTime)));

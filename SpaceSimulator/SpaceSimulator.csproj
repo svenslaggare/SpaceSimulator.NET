@@ -109,6 +109,7 @@
     <Compile Include="Common\Models\GeometryGenerator.cs" />
     <Compile Include="Common\Models\ModelLoader.cs" />
     <Compile Include="Common\Input\KeyboardManager.cs" />
+    <Compile Include="Common\Rendering2D\Rendering2DHelpers.cs" />
     <Compile Include="Common\Rendering2D\RenderingBrushes.cs" />
     <Compile Include="Common\Rendering2D\RenderingImage2D.cs" />
     <Compile Include="Common\Rendering2D\RenderingManager2D.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Mathematics\Vector2d.cs" />
     <Compile Include="Physics\Maneuvers\PlanetaryTransfer.cs" />
     <Compile Include="Physics\TimeConstants.cs" />
+    <Compile Include="Rendering\Plot\GroundTrack.cs" />
     <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Simulator\Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />

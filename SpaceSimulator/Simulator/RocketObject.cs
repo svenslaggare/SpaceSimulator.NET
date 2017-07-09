@@ -205,7 +205,7 @@ namespace SpaceSimulator.Simulator
                 this.ReferencePrimaryBodyState = primaryBodyState;
                 this.ReferenceState = state;
                 this.ReferenceOrbit = Orbit.CalculateOrbit(this.PrimaryBody, ref primaryBodyState, ref state);
-                this.orbitChanged = true;
+                this.OrbitChanged();
 
                 this.updateOrbit = false;
             }

@@ -78,5 +78,24 @@ namespace SpaceSimulator.Helpers
 
             return (first, second);
         }
+
+        /// <summary>
+        /// Returns a range from the current list
+        /// </summary>
+        /// <typeparam name="T">The type of the element</typeparam>
+        /// <param name="list">The list</param>
+        /// <param name="index">The start index</param>
+        /// <param name="count">The number of items in the range</param>
+        public static IList<T> GetRange<T>(this IList<T> list, int index, int count)
+        {
+            var range = new List<T>();
+
+            for (int i = index; i < index + count; i++)
+            {
+                range.Add(list[i]);
+            }
+
+            return range;
+        }
     }
 }

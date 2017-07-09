@@ -157,7 +157,7 @@ namespace SpaceSimulator.Physics
         /// <param name="eccentricity">The eccentricity of the orbit</param>
         /// <param name="period">The period of the orbit</param>
         /// <param name="distance">The distance</param>
-        public static double AngularVelocity(double semiMajorAxis, double eccentricity, double period, double distance)
+        public static double AngularSpeed(double semiMajorAxis, double eccentricity, double period, double distance)
         {
             if (eccentricity < 1E-6)
             {

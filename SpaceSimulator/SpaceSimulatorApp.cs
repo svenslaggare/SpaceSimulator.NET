@@ -18,6 +18,7 @@ using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.UI;
+using SpaceSimulator.Rendering.Plot;
 
 namespace SpaceSimulator
 {
@@ -52,10 +53,6 @@ namespace SpaceSimulator
 
             this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
-
-            //var orbitCamera = (OrbitCamera)this.CameraManager["OrbitCamera"];
-            //orbitCamera.MinRadius = 0.001f;
-            //orbitCamera.MaxRadius = 10000.0f;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -161,31 +158,6 @@ namespace SpaceSimulator
             //    values.Add(new Vector2((float)altitude, (float)earthAtmosphericModel.DensityOfAir(altitude)));
             //}
             //this.plot2D = new Plot2D(this.RenderingManager2D, values, Color.Red, 500, 375, labelAxisX: "Altitude", labelAxisY: "Density of air");
-
-            //var satellit1 = this.simulatorEngine.Objects[2];
-            //var satellit2 = this.simulatorEngine.Objects[3];
-            //var satellite1Orbit = Physics.OrbitPosition.CalculateOrbitPosition(satellit1);
-            //var satellite2Orbit = Physics.OrbitPosition.CalculateOrbitPosition(satellit2);
-            //var synodicPeriod = Physics.OrbitFormulas.SynodicPeriod(satellite1Orbit.Orbit.Period, satellite2Orbit.Orbit.Period);
-            //var possibleLaunches = InterceptManeuver.Intercept(
-            //    this.simulatorEngine,
-            //    satellit1.PrimaryBody,
-            //    satellit1,
-            //    satellit1.State,
-            //    satellite1Orbit,
-            //    satellit2,
-            //    satellite2Orbit,
-            //    600,
-            //    10000,
-            //    0,
-            //    8.0 * 60.0 * 60.0,
-            //    out var optimtalDeltaV,
-            //    out var optimalLaunchTime,
-            //    out var optimalInterceptTime,
-            //    60.0,
-            //    true);
-
-            //this.deltaVChart = PlotHeatmap.CreateDeltaVChart(this.RenderingManager2D, possibleLaunches);
         }
 
         protected override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)

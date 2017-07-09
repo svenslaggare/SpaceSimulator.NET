@@ -12,6 +12,16 @@ namespace SpaceSimulator.Mathematics
     /// </summary>
     public static class MathHelpers
     {
+        /// <summary>
+        /// Degrees-to-radians conversion constant
+        /// </summary>
+        public const float Deg2Rad = 0.0174532924f;
+
+        /// <summary>
+        /// Radians-to-degrees conversion constant 
+        /// </summary>
+        public const float Rad2Deg = 57.29578f;
+
         private static readonly double stumpffFunctionZeroLimit = 1E-3;
 
         /// <summary>

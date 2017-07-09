@@ -38,6 +38,7 @@ namespace SpaceSimulator.Common.Rendering2D
     {
         private readonly RenderForm renderForm;
         private readonly IList<IRenderingResource2D> resources = new List<IRenderingResource2D>();
+        private readonly IDictionary<string, RenderingImage2D> cachedImages = new Dictionary<string, RenderingImage2D>();
 
         /// <summary>
         /// The font factory
@@ -82,22 +83,59 @@ namespace SpaceSimulator.Common.Rendering2D
         /// Adds the given resource to list of resources managed by this class
         /// </summary>
         /// <param name="resource">The resource</param>
-        /// <remarks>This resource is managed by this class, and is disposed when the class is disposed.</remarks>
         public void AddResource(IRenderingResource2D resource)
         {
             this.resources.Add(resource);
         }
 
         /// <summary>
+        /// Removes the given resource and disposes it
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        public void RemoveResource(IRenderingResource2D resource)
+        {
+            if (this.resources.Remove(resource))
+            {
+                if (resource is RenderingImage2D image)
+                {
+                    foreach (var cachedImage in this.cachedImages)
+                    {
+                        if (cachedImage.Value == image)
+                        {
+                            this.cachedImages.Remove(cachedImage.Key);
+                            break; 
+                        }
+                    }
+
+                    resource.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads the given image
         /// </summary>
         /// <param name="fileName">The name of the file to load</param>
+        /// <param name="cache">Indicates if the image should be cached</param>
         /// <returns>The loaded image</returns>
-        /// <remarks>This image is managed by this class, and is disposed when the class is disposed.</remarks>
-        public RenderingImage2D LoadImage(string fileName)
+        public RenderingImage2D LoadImage(string fileName, bool cache = true)
         {
+            if (cache)
+            {
+                if (this.cachedImages.TryGetValue(fileName, out var cachedImage))
+                {
+                    return cachedImage;
+                }
+            }
+
             var image = new RenderingImage2D(fileName);
             this.resources.Add(image);
+
+            if (cache)
+            {
+                this.cachedImages.Add(fileName, image);
+            }
+
             return image;
         }
 

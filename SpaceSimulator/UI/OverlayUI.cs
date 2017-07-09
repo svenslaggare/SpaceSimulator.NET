@@ -83,12 +83,12 @@ namespace SpaceSimulator.UI
             /// <summary>
             /// Indicates if the text is being drawn
             /// </summary>
-            public bool DrawText { get; set; }
+            public bool DrawText { get; set; } = true;
 
             /// <summary>
             /// Indicates if the thumbnail is being drawn
             /// </summary>
-            public bool DrawThumbnail { get; set; }
+            public bool DrawThumbnail { get; set; } = true;
 
             /// <summary>
             /// The draw depth

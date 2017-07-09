@@ -110,30 +110,29 @@ namespace SpaceSimulator.Simulator.Environments
             //        earth,
             //        parameter: 3.0 * Simulator.Data.SolarSystemBodies.Earth.Radius,
             //        eccentricity: 0.2,
-            //        inclination: 30 * MathUtild.Deg2Rad),
+            //        inclination: 45 * MathUtild.Deg2Rad),
             //    87.2 * MathUtild.Deg2Rad);
-            //var orbitPosition2 = new OrbitPosition(
-            //  Physics.Orbit.New(
-            //      earth,
-            //      parameter: 1E-6,
-            //      eccentricity: 1.0,
-            //      inclination: 0.0 * MathUtild.Deg2Rad),
-            //  80.0 * MathUtild.Deg2Rad);
+            var orbitPosition2 = new OrbitPosition(
+              Physics.Orbit.New(
+                  earth,
+                  parameter: earth.Radius + 300E3,
+                  inclination: 45.0 * MathUtild.Deg2Rad),
+              0.0);
 
-            //var object2 = simulatorEngine.AddSatelliteInOrbit(
-            //    "Satellite 2",
-            //    1000,
-            //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-            //    orbitPosition2);
-
-            var sphereNormal = OrbitHelpers.SphereNormal(earth, 0.0, 0.0);
-            var object2 = simulatorEngine.AddSatellite(
-                earth,
+            var object2 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 2",
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                earth.Position + sphereNormal * 1E8,
-                -sphereNormal * 3000.0);
+                orbitPosition2);
+
+            //var sphereNormal = OrbitHelpers.SphereNormal(earth, 0.0, 0.0);
+            //var object2 = simulatorEngine.AddSatellite(
+            //    earth,
+            //    "Satellite 2",
+            //    1000,
+            //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
+            //    earth.Position + sphereNormal * 1E8,
+            //    -sphereNormal * 3000.0);
             renderingObjects.Add(new RenderingObject(graphicsDevice, object2, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddObject(

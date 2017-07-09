@@ -826,6 +826,11 @@ namespace SpaceSimulator.UI
 
                         if (possibleDepartureBurns.Count > 0)
                         {
+                            if (this.deltaVChart != null)
+                            {
+                                this.deltaVChart.ReleaseResources();
+                            }
+
                             this.showDeltaVChart = true;
                             this.deltaVChart = Heatmap.CreateDeltaVChart(this.RenderingManager2D, new Vector2(400, 50), possibleDepartureBurns);
                         }

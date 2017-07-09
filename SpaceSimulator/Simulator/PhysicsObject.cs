@@ -38,6 +38,7 @@ namespace SpaceSimulator.Simulator
         protected ObjectState nextState;
 
         protected bool orbitChanged = false;
+        protected int orbitVersion = 0;
 
         /// <summary>
         /// The name of the object
@@ -299,6 +300,11 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Returns the current orbit version
+        /// </summary>
+        public int OrbitVersion => this.orbitVersion;
+
+        /// <summary>
         /// Sets the next state
         /// </summary>
         /// <param name="nextState">The next state</param>
@@ -319,6 +325,15 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Marks that the orbit has changed
+        /// </summary>
+        protected void OrbitChanged()
+        {
+            this.orbitChanged = true;
+            this.orbitVersion++;
+        }
+
+        /// <summary>
         /// Applies the burn
         /// </summary>
         /// <param name="totalTime">The total time</param>
@@ -333,7 +348,7 @@ namespace SpaceSimulator.Simulator
             this.ReferencePrimaryBodyState = this.PrimaryBody.state;
 
             this.UsedDeltaV += deltaV.Length();
-            this.orbitChanged = true;
+            this.OrbitChanged();
         }
 
         /// <summary>
@@ -346,7 +361,7 @@ namespace SpaceSimulator.Simulator
             this.ReferenceState = this.state;
             this.ReferenceOrbit = Orbit.CalculateOrbit(primaryBody, this.state);
             this.ReferencePrimaryBodyState = primaryBody.state;
-            this.orbitChanged = true;
+            this.OrbitChanged();
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace SpaceSimulator.Common.Rendering2D
             {
                 var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
                 this.bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(
-                    Format.R8G8B8A8_UNorm,
+                    Format.B8G8R8A8_UNorm,
                     SharpDX.Direct2D1.AlphaMode.Premultiplied));
                 this.Size = new Size2(bitmap.Width, bitmap.Height);
 
@@ -47,23 +47,28 @@ namespace SpaceSimulator.Common.Rendering2D
                 this.dataStream = new DataStream(bitmap.Height * stride, true, true);
 
                 // Lock System.Drawing.Bitmap
-                var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 // Convert all pixels 
-                for (int y = 0; y < bitmap.Height; y++)
-                {
-                    int offset = bitmapData.Stride * y;
-                    for (int x = 0; x < bitmap.Width; x++)
-                    {
-                        // Not optimized 
-                        byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        int rgba = R | (G << 8) | (B << 16) | (A << 24);
-                        this.dataStream.Write(rgba);
-                    }
-                }
+                var width = bitmap.Width;
+                var height = bitmap.Height;
+
+                //for (int y = 0; y < height; y++)
+                //{
+                //    int offset = bitmapData.Stride * y;
+                //    for (int x = 0; x < width; x++)
+                //    {
+                //        // Not optimized 
+                //        byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                //        byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                //        byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                //        byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                //        int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                //        this.dataStream.Write(rgba);
+                //    }
+                //}
+
+                Utilities.CopyMemory(this.dataStream.DataPointer, bitmapData.Scan0, width * height * sizeof(int));
 
                 bitmap.UnlockBits(bitmapData);
             }

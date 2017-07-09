@@ -432,5 +432,13 @@ namespace SpaceSimulator.Rendering.Plot
                 }
             }
         }
+
+        /// <summary>
+        /// Releases the resources managed by the <see cref="RenderingManager2D"/> class
+        /// </summary>
+        public void ReleaseResources()
+        {
+            this.renderingManager2D.RemoveResource(this.heatmapImage);
+        }
     }
 }

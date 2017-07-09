@@ -132,16 +132,51 @@ namespace SpaceSimulator.Physics
         /// Computes the coordinates for the given object at the given primary body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
+        /// <param name="primaryRotation">The current rotation of the primary body</param>
+        /// <param name="position">The position of the object</param>
+        /// <param name="latitude">The latitude (in radians)</param>
+        /// <param name="longitude">The longitude (in radians)</param>
+        public static void GetCoordinates(IPhysicsObject primaryBody, double primaryRotation, Vector3d position, out double latitude, out double longitude)
+        {
+            var inverseRotationalTransform = Matrix3x3d.RotationAxis(primaryBody.AxisOfRotation, -primaryRotation);
+            GetSphericalCoordinates(
+                inverseRotationalTransform * (position - primaryBody.State.Position),
+                out latitude,
+                out longitude);
+            latitude = Math.PI / 2.0 - latitude;
+        }
+
+        /// <summary>
+        /// Computes the coordinates for the given object at the given primary body
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
         /// <param name="position">The position of the object</param>
         /// <param name="latitude">The latitude (in radians)</param>
         /// <param name="longitude">The longitude (in radians)</param>
         public static void GetCoordinates(IPhysicsObject primaryBody, Vector3d position, out double latitude, out double longitude)
         {
-            GetSphericalCoordinates(
-                primaryBody.GetInverseRotationalTransform() * (position - primaryBody.State.Position),
-                out latitude,
-                out longitude);
-            latitude = Math.PI / 2.0 - latitude;
+            //GetSphericalCoordinates(
+            //    primaryBody.GetInverseRotationalTransform() * (position - primaryBody.State.Position),
+            //    out latitude,
+            //    out longitude);
+            //latitude = Math.PI / 2.0 - latitude;
+            GetCoordinates(primaryBody, primaryBody.State.Rotation, position, out latitude, out longitude);
+        }
+
+        /// <summary>
+        /// Computes the cartesian coordinates from the given latitide and longitude
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="primaryRotation">The rotation of the primary body</param>
+        /// <param name="latitude">The latitude (in radians)</param>
+        /// <param name="longitude">The longitude (in radians)</param>
+        /// <param name="elevation">The elevation, defaults to the radius of the primary body</param>
+        public static Vector3d FromCoordinates(IPrimaryBodyObject primaryBody, double primaryRotation, double latitude, double longitude, double? elevation = null)
+        {
+            var rotationalTransform = Matrix3x3d.RotationAxis(primaryBody.AxisOfRotation, primaryRotation);
+            return primaryBody.State.Position
+                   + primaryBody.GetRotationalTransform()
+                   * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
         }
 
         /// <summary>
@@ -153,11 +188,12 @@ namespace SpaceSimulator.Physics
         /// <param name="elevation">The elevation, defaults to the radius of the primary body</param>
         public static Vector3d FromCoordinates(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
-            return primaryBody.State.Position
-                   + primaryBody.GetRotationalTransform()
-                   * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
+            return FromCoordinates(primaryBody, primaryBody.State.Rotation, latitude, longitude, elevation);
+            //return primaryBody.State.Position
+            //       + primaryBody.GetRotationalTransform()
+            //       * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
         }
-
+        
         /// <summary>
         /// Computes the normal for a sphere at the given latitude, longitude and elevation
         /// </summary>

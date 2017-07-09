@@ -294,26 +294,29 @@ namespace SpaceSimulator.Physics
                 }
             }
 
-            if (nonEquatorial)
+            if (!isCircular)
             {
-                argumentOfPeriapsis = Math.Acos(Vector3d.Dot(n, e) / (n.Length() * e.Length()));
-                if (e.Z < 0 && argumentOfPeriapsis != 0)
+                if (nonEquatorial)
                 {
-                    argumentOfPeriapsis = 2 * Math.PI - argumentOfPeriapsis;
+                    argumentOfPeriapsis = Math.Acos(Vector3d.Dot(n, e) / (n.Length() * e.Length()));
+                    if (e.Z < 0 && argumentOfPeriapsis != 0)
+                    {
+                        argumentOfPeriapsis = 2 * Math.PI - argumentOfPeriapsis;
+                    }
                 }
-            }
-            else if (!isCircular)
-            {
-                argumentOfPeriapsis = Math.Atan2(e.Y, e.X);
-                if (Vector3d.Cross(r, v).Z < 0)
+                else
                 {
-                    argumentOfPeriapsis = 2.0 * Math.PI - argumentOfPeriapsis;
-                }
+                    argumentOfPeriapsis = Math.Atan2(e.Y, e.X);
+                    if (Vector3d.Cross(r, v).Z < 0)
+                    {
+                        argumentOfPeriapsis = 2.0 * Math.PI - argumentOfPeriapsis;
+                    }
 
-                //Probably bug why we get negative angle
-                if (argumentOfPeriapsis < 0)
-                {
-                    argumentOfPeriapsis += 2.0 * Math.PI;
+                    //Probably bug why we get negative angle
+                    if (argumentOfPeriapsis < 0)
+                    {
+                        argumentOfPeriapsis += 2.0 * Math.PI;
+                    }
                 }
             }
 

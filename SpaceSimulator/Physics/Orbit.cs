@@ -295,21 +295,21 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                var omega = this.LongitudeOfAscendingNode;
+                var longitudeOfAscendingNode = this.LongitudeOfAscendingNode;
                 var argumentOfPeriapsis = this.ArgumentOfPeriapsis;
 
-                if (double.IsNaN(omega))
+                if (double.IsNaN(longitudeOfAscendingNode))
                 {
-                    omega = 0;
+                    longitudeOfAscendingNode = 0;
                 }
 
-                if (double.IsNaN(argumentOfPeriapsis))
+                if (double.IsNaN(argumentOfPeriapsis) || this.IsCircular)
                 {
                     argumentOfPeriapsis = 0;
                 }
 
-                var cosOmega = Math.Cos(omega);
-                var sinOmega = Math.Sin(omega);
+                var cosOmega = Math.Cos(longitudeOfAscendingNode);
+                var sinOmega = Math.Sin(longitudeOfAscendingNode);
                 var cosArgumentOfPeriapsis = Math.Cos(argumentOfPeriapsis);
                 var sinArgumentOfPeriapsis = Math.Sin(argumentOfPeriapsis);
                 var cosInclination = Math.Cos(this.Inclination);
