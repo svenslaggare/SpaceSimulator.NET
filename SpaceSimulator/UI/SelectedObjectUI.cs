@@ -25,6 +25,10 @@ namespace SpaceSimulator.UI
         private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
         private readonly bool showGroundTracks = false;
 
+        private OrbitCalculators.ApproachData closestApproachData;
+        private DateTime lastClosestApproachUpdate;
+        private readonly TimeSpan closestApproachUpdateTime = TimeSpan.FromSeconds(0.75);
+
         /// <summary>
         /// Creates a new selected object UI component
         /// </summary>
@@ -71,6 +75,30 @@ namespace SpaceSimulator.UI
                     break;
                 }
             }
+
+            this.lastClosestApproachUpdate = new DateTime();
+        }
+
+        /// <summary>
+        /// Computes the closest approach
+        /// </summary>
+        private void ComputeClosestApproach()
+        {
+            if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite
+                && this.SelectedObject.Target != null
+                && this.SelectedObject.PrimaryBody == this.SelectedObject.Target.PrimaryBody)
+            {
+                if (DateTime.UtcNow - this.lastClosestApproachUpdate >= this.closestApproachUpdateTime)
+                {
+                    this.closestApproachData = OrbitCalculators.ClosestApproach(
+                        this.SimulatorEngine.KeplerProblemSolver,
+                        this.SelectedObject,
+                        OrbitPosition.CalculateOrbitPosition(this.SelectedObject),
+                        this.SelectedObject.Target,
+                        OrbitPosition.CalculateOrbitPosition(this.SelectedObject.Target));
+                    this.lastClosestApproachUpdate = DateTime.UtcNow;
+                }
+            }
         }
 
         /// <summary>
@@ -90,7 +118,10 @@ namespace SpaceSimulator.UI
             if (changed)
             {
                 this.SimulatorContainer.SelectedObject = newSelectedObject;
+                this.lastClosestApproachUpdate = new DateTime();
             }
+
+            this.ComputeClosestApproach();
         }
 
         /// <summary>
@@ -162,7 +193,8 @@ namespace SpaceSimulator.UI
                     target,
                     target.State,
                     targetOrbitPosition,
-                    calculateClosestApproach: false);
+                    calculateClosestApproach: true,
+                    closestApproach: this.closestApproachData);
             }
 
             this.TextColorBrush.DrawText(

@@ -31,7 +31,8 @@ namespace SpaceSimulator.Simulator
     public enum SimulationEventType
     {
         SphereOfInfluenceChange,
-        Crash
+        Crash,
+        Internal
     }
 
     /// <summary>
@@ -173,12 +174,12 @@ namespace SpaceSimulator.Simulator
         private readonly IDictionary<PhysicsSimulationMode, IOrbitSimulator> orbitSimulators = new Dictionary<PhysicsSimulationMode, IOrbitSimulator>();
         private IOrbitSimulator currentOrbitSimulator;
 
-        private readonly IList<SimulationEvent> events = new List<SimulationEvent>();
+        private readonly List<SimulationEvent> events = new List<SimulationEvent>();
         private readonly IList<SimulationEvent> executedEvents = new List<SimulationEvent>();
         private readonly IDictionary<PhysicsObject, SimulationEvent> soiChanges = new Dictionary<PhysicsObject, SimulationEvent>();
         private bool addedEvent = false;
 
-        private readonly IList<SimulationManeuever> maneuvers = new List<SimulationManeuever>();
+        private readonly List<SimulationManeuever> maneuvers = new List<SimulationManeuever>();
         private readonly IList<SimulationManeuever> executedManeuvers = new List<SimulationManeuever>();
         private readonly IDictionary<PhysicsObject, double> sphereOfInfluences = new Dictionary<PhysicsObject, double>();
         private readonly double maneuverTimeEpsilon = 1E-6;
@@ -295,7 +296,7 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the scheduled maneuvers
         /// </summary>
-        public IList<SimulationManeuever> Maneuvers
+        public IReadOnlyList<SimulationManeuever> Maneuvers
         {
             get { return this.maneuvers; }
         }
@@ -303,7 +304,7 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the events
         /// </summary>
-        public IList<SimulationEvent> Events
+        public IReadOnlyList<SimulationEvent> Events
         {
             get { return this.events; }
         }
@@ -572,6 +573,32 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Calculates a closest approach event
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        private bool AddClosestApproachEvent(PhysicsObject physicsObject)
+        {
+            if (physicsObject.Type == PhysicsObjectType.ArtificialSatellite
+                && physicsObject.Target != null
+                && physicsObject.PrimaryBody == physicsObject.Target.PrimaryBody)
+            {
+                var closestApproach = OrbitCalculators.ClosestApproach(
+                    this.keplerProblemSolver,
+                    physicsObject,
+                    OrbitPosition.CalculateOrbitPosition(physicsObject),
+                    physicsObject.Target,
+                    OrbitPosition.CalculateOrbitPosition(physicsObject.Target),
+                    deltaTime: 9000);
+
+                this.events.Add(new SimulationEvent(SimulationEventType.Internal, physicsObject, closestApproach.Time));
+                //Console.WriteLine("Closest approach: " + DataFormatter.Format(closestApproach.Distance, DataUnit.Distance));
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Changes the sphere of influences
         /// </summary>
         private void ChangeSOI()
@@ -627,6 +654,8 @@ namespace SpaceSimulator.Simulator
                         {
                             this.AddCrashEvent(object1, timeToImpact ?? 0);
                         }
+
+                        this.AddClosestApproachEvent(object1);
                     }
                     else if (minChangeTime != null)
                     {
@@ -759,6 +788,26 @@ namespace SpaceSimulator.Simulator
                             if (timeToImpact != null)
                             {
                                 this.AddCrashEvent(maneuver.Object, timeToImpact ?? 0);
+                                added = true;
+                            }
+
+                            //If we have a target, calculate a closest approach and add as internal event
+                            //if (maneuver.Object.Type == PhysicsObjectType.ArtificialSatellite
+                            //    && maneuver.Object.Target != null
+                            //    && maneuver.Object.PrimaryBody == maneuver.Object.Target.PrimaryBody)
+                            //{
+                            //    var closestApproach = OrbitCalculators.ClosestApproach(
+                            //        this.keplerProblemSolver,
+                            //        maneuver.Object,
+                            //        objectOrbitPosition,
+                            //        maneuver.Object.Target,
+                            //        OrbitPosition.CalculateOrbitPosition(maneuver.Object.Target));
+
+                            //    this.events.Add(new SimulationEvent(SimulationEventType.Internal, maneuver.Object, closestApproach.Time));
+                            //    Console.WriteLine("Closest approach: " + DataFormatter.Format(closestApproach.Distance, DataUnit.Distance));
+                            //}
+                            if (this.AddClosestApproachEvent(maneuver.Object))
+                            {
                                 added = true;
                             }
 

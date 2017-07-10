@@ -11,7 +11,7 @@ namespace SpaceSimulator.Physics.Solvers
     public interface IKeplerProblemSolver
     {
         /// <summary>
-        /// Returns the state at the given time
+        /// Returns the state after the given time
         /// </summary>
         /// <param name="physicsObject">The object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
@@ -34,7 +34,7 @@ namespace SpaceSimulator.Physics.Solvers
     public static class IKeplerProblemSolverExtensions
     {
         /// <summary>
-        /// Returns the state at the given time
+        /// Returns the state after the given time
         /// </summary>
         /// <param name="solver">The solver</param>
         /// <param name="physicsObject">The physics object</param>
@@ -61,7 +61,7 @@ namespace SpaceSimulator.Physics.Solvers
         }
 
         /// <summary>
-        /// Returns the state at the given time
+        /// Returns the state after the given time
         /// </summary>
         /// <param name="solver">The solver</param>
         /// <param name="physicsObject">The physics object</param>
@@ -90,7 +90,7 @@ namespace SpaceSimulator.Physics.Solvers
         }
 
         /// <summary>
-        /// Returns the state at the given time
+        /// Returns the state after the given time
         /// </summary>
         /// <param name="solver">The solver</param>
         /// <param name="physicsObject">The physics object</param>

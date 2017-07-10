@@ -65,7 +65,7 @@ namespace SpaceSimulator.UI
             {
                 var events = this.SimulatorEngine.Maneuvers
                     .Select(x => x.Maneuver.ManeuverTime)
-                    .Union(this.SimulatorEngine.Events.Select(x => x.Time))
+                    .Union(this.SimulatorEngine.Events.Where(x => x.Type != SimulationEventType.Internal).Select(x => x.Time))
                     .OrderBy(x => x);
 
                 if (events.Any())

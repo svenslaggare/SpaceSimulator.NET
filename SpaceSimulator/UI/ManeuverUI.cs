@@ -995,7 +995,7 @@ namespace SpaceSimulator.UI
                 }
             }
 
-            foreach (var currentEvent in this.SimulatorEngine.Events)
+            foreach (var currentEvent in this.SimulatorEngine.Events.Where(x => x.Type != SimulationEventType.Internal))
             {
                 var timeLeft = currentEvent.Time - this.SimulatorEngine.TotalTime;
                 var mainString = currentEvent.Object.Name + ": " + currentEvent.Type + " - time left: " + DataFormatter.Format(timeLeft, DataUnit.Time, 0);

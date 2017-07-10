@@ -160,7 +160,16 @@ namespace SpaceSimulator.Rendering
 
             if (orbitPosition.Orbit.IsRadialParabolic)
             {
-                this.positions = OrbitPositions.CreateRadialTrajectory(this.PhysicsObject, orbitPosition, true);
+                this.positions = OrbitPositions.CreateRadialTrajectory(this.PhysicsObject, orbitPosition);
+            }
+            else if (orbitPosition.Orbit.IsHyperbolic && Math.Abs(orbitPosition.Orbit.Eccentricity - 1.0) <= 1E-2)
+            {
+                var timeToCrash = OrbitCalculators.TimeToImpact(orbitPosition);
+                this.positions = OrbitPositions.CreateForUnbound(
+                    new KeplerProblemUniversalVariableSolver(),
+                    this.PhysicsObject,
+                    orbitPosition.Orbit,
+                    Math.Min(timeToCrash ?? 0.5 * TimeConstants.OneDay, 3.0 * TimeConstants.OneDay));
             }
             else
             {

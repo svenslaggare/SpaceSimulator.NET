@@ -124,7 +124,6 @@ namespace SpaceSimulator.Physics
                 t += stepRate * deltaTime;
                 prevDistance = dist;
             }
-            //Debug.Log((DateTime.UtcNow - startTime) + ": " + DataFormatter.Format(deltaTime, DataUnit.Time));
 
             return new ApproachData()
             {

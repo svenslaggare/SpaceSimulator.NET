@@ -53,48 +53,11 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="physicsObject">The physics object</param>
         /// <param name="orbitPosition">The position in the orbit</param>
-        /// <param name="relative">Indicates if the positions are relative</param>
-        public static IList<Orbit.Point> CreateRadialTrajectory(PhysicsObject physicsObject, OrbitPosition orbitPosition, bool relative)
+        public static IList<Orbit.Point> CreateRadialTrajectory(PhysicsObject physicsObject, OrbitPosition orbitPosition)
         {
             var orbitPositions = new List<Orbit.Point>();
 
-            //var keplerProblemSolver = new KeplerProblemUniversalVariableSolver();
-            //var initialState = physicsObject.State;
-            //var maxTime = 2.0 * TimeConstants.OneDay;
-
             var primaryBody = physicsObject.PrimaryBody;
-            //var impactTime = 1000.0;
-            //var altitude = primaryBody.Altitude(physicsObject.Position);
-
-            //if (altitude >= 1E3)
-            //{
-            //    impactTime = Math.Sqrt((2.0 * Math.Pow(altitude, 3.0)) / (9.0 * primaryBody.StandardGravitationalParameter));
-            //}
-
-            //var previousDistance = 0.0;
-            //var deltaTime = 600.0;
-            //for (double t = -maxTime * 0.0; t <= impactTime + deltaTime; t += deltaTime)
-            //{
-            //    var state = SolverHelpers.AfterTime(
-            //        keplerProblemSolver,
-            //        physicsObject,
-            //        initialState,
-            //        orbitPosition.Orbit,
-            //        Math.Min(t, impactTime),
-            //        relative: relative);
-            //    orbitPositions.Add(new Orbit.Point(state.Position, 0.0));
-            //    //Console.WriteLine(state.Position.Length());
-
-            //    var distance = state.Position.Length();
-            //    var deltaDistance = distance - previousDistance;
-            //    previousDistance = distance;
-
-            //    //if (state.Position.Length() < physicsObject.PrimaryBody.Radius)
-            //    //{
-            //    //    break;
-            //    //}
-            //}
-
             var radius = physicsObject.State.Position - primaryBody.State.Position;
             var maxDistance = 1E12;
 
@@ -108,7 +71,50 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Creates orbit positions for a bound orbit
+        /// Creates orbit positions for a unbound orbit for the given amount of time
+        /// </summary>
+        /// <param name="keplerProblemSolver">The kepler problem solver</param>
+        /// <param name="physicsObject">The physics object</param>
+        /// <param name="orbit">The orbit of the object</param>
+        /// <param name="duration">The duration</param>
+        /// <param name="deltaTime">The time step</param>
+        public static IList<Orbit.Point> CreateForUnbound(
+            IKeplerProblemSolver keplerProblemSolver,
+            PhysicsObject physicsObject,
+            Physics.Orbit orbit,
+            double duration,
+            double deltaTime = 100.0)
+        {
+            var orbitPositions = new List<Orbit.Point>();
+
+            var initialState = physicsObject.State;
+            var initialPrimaryBodyState = physicsObject.PrimaryBody.State;
+
+            for (double t = 0; t <= duration; t += deltaTime)
+            {
+                var nextState = keplerProblemSolver.Solve(
+                    physicsObject,
+                    ref initialPrimaryBodyState,
+                    ref initialState,
+                    orbit,
+                    ref initialPrimaryBodyState,
+                    t);
+
+                var orbitPosition = OrbitPosition.CalculateOrbitPosition(
+                    physicsObject.PrimaryBody,
+                    ref initialPrimaryBodyState,
+                    ref nextState);
+
+                orbitPositions.Add(new Orbit.Point(
+                    nextState.Position - initialPrimaryBodyState.Position,
+                    orbitPosition.TrueAnomaly));
+            }
+
+            return orbitPositions;
+        }
+
+        /// <summary>
+        /// Creates orbit positions for a unbound orbit
         /// </summary>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
@@ -135,12 +141,11 @@ namespace SpaceSimulator.Rendering
 
             var startTrueAnomaly = -theta;
             var stopTrueAnomaly = theta;
-            //if (trueAnomaly.HasValue)
-            //{
-            //    var range = theta / 2.0;
-            //    startTrueAnomaly = trueAnomaly.Value - range;
-            //    stopTrueAnomaly = trueAnomaly.Value + range;
-            //}
+            if (trueAnomaly.HasValue)
+            {
+                startTrueAnomaly = Math.Min(trueAnomaly.Value, startTrueAnomaly);
+                stopTrueAnomaly = Math.Max(trueAnomaly.Value, stopTrueAnomaly);
+            }
 
             for (double currentTrueAnomaly = startTrueAnomaly; currentTrueAnomaly <= stopTrueAnomaly; currentTrueAnomaly += deltaAngle)
             {

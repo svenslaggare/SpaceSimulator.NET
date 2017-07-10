@@ -11,7 +11,7 @@ namespace SpaceSimulator.Physics.Solvers
     /// </summary>
     public sealed class KeplerProblemUniversalVariableSolver : IKeplerProblemSolver
     {
-        private readonly System.Random random = new System.Random();
+        private readonly Random random = new Random();
         private readonly int maxNumIterations = 1500;
         private readonly double convergenceEpsilon = 1E-6;
 
@@ -106,7 +106,7 @@ namespace SpaceSimulator.Physics.Solvers
         }
 
         /// <summary>
-        /// Returns the state at the given time
+        /// Returns the state after the given time
         /// </summary>
         /// <param name="physicsObject">The physics object</param>
         /// <param name="initialPrimaryBodyState">The initial state of the primary body</param>
