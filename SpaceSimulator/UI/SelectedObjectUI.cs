@@ -23,7 +23,7 @@ namespace SpaceSimulator.UI
     {
         private int selectedObjectIndex;
         private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
-        private readonly bool showGroundTracks = false;
+        private readonly bool showGroundTracks = true;
 
         private OrbitCalculators.ApproachData closestApproachData;
         private DateTime lastClosestApproachUpdate;
@@ -140,7 +140,13 @@ namespace SpaceSimulator.UI
             {
                 if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
                 {
-                    groundTrack = new GroundTrack(this.RenderingManager2D, this.SimulatorEngine.KeplerProblemSolver, this.SelectedObject, Vector2.Zero);
+                    groundTrack = new GroundTrack(
+                        this.RenderingManager2D,
+                        this.SimulatorEngine.KeplerProblemSolver,
+                        this.SelectedObject,
+                        this.SimulatorContainer.GetRenderingObject(this.SelectedObject.PrimaryBody).TextureName,
+                        Vector2.Zero);
+
                     this.groundTracks.Add(this.SelectedObject, groundTrack);
                 }
 

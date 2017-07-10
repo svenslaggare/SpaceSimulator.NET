@@ -27,6 +27,11 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         public PhysicsObject PhysicsObject { get; }
 
+        /// <summary>
+        /// The path of the texture
+        /// </summary>
+        public string TextureName { get; }
+
         private readonly Color orbitColor;
 
         private IList<Orbit.Point> positions;
@@ -76,6 +81,7 @@ namespace SpaceSimulator.Rendering
             double ringRadius = 0.0)
         {
             this.PhysicsObject = physicsObject;
+            this.TextureName = textureName;
 
             this.orbitColor = orbitColor;
 

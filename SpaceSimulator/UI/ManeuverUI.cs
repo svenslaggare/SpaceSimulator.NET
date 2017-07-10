@@ -954,7 +954,7 @@ namespace SpaceSimulator.UI
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(orbit, 0.0));
-            this.SimulatorContainer.AddRenderingObject(satellite);
+            this.SimulatorContainer.CreateRenderingObject(satellite);
         }
 
         public override void Update(TimeSpan elapsed)

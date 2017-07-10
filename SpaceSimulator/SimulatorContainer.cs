@@ -36,6 +36,8 @@ namespace SpaceSimulator
         /// </summary>
         public IList<RenderingObject> RenderingObjects { get; }
 
+        private readonly IDictionary<PhysicsObject, RenderingObject> physicsToRendering = new Dictionary<PhysicsObject, RenderingObject>();
+
         /// <summary>
         /// Creates a new simulator engine
         /// </summary>
@@ -47,13 +49,18 @@ namespace SpaceSimulator
             this.SimulatorEngine = simulatorEngine;
             this.RenderingObjects = renderingObjects;
 
+            foreach (var renderingObject in renderingObjects)
+            {
+                this.physicsToRendering.Add(renderingObject.PhysicsObject, renderingObject);
+            }
+
             if (createRenderingObject != null)
             {
                 this.createRenderingObject = createRenderingObject;
 
                 this.SimulatorEngine.ObjectAdded += (sender, newObject) =>
                 {
-                    this.RenderingObjects.Add(this.createRenderingObject(newObject));
+                    this.AddRenderingObject(this.createRenderingObject(newObject));
                 };
             }
         }
@@ -108,15 +115,39 @@ namespace SpaceSimulator
         }
 
         /// <summary>
-        /// Adds a rendering object for the given object
+        /// Returns the rendering object for the given physics object
         /// </summary>
         /// <param name="physicsObject">The physics object</param>
-        public void AddRenderingObject(PhysicsObject physicsObject)
+        /// <returns>The rendering object or null</returns>
+        public RenderingObject GetRenderingObject(PhysicsObject physicsObject)
+        {
+            if (this.physicsToRendering.TryGetValue(physicsObject, out var renderingObject))
+            {
+                return renderingObject;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Adds the given rendering object
+        /// </summary>
+        /// <param name="renderingObject"></param>
+        private void AddRenderingObject(RenderingObject renderingObject)
+        {
+            this.RenderingObjects.Add(renderingObject);
+            this.physicsToRendering.Add(renderingObject.PhysicsObject, renderingObject);
+        }
+
+        /// <summary>
+        /// Creates and add a rendering object for the given object
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public void CreateRenderingObject(PhysicsObject physicsObject)
         {
             if (this.createRenderingObject != null)
             {
-                var renderingObject = this.createRenderingObject(physicsObject);
-                this.RenderingObjects.Add(renderingObject);
+                this.AddRenderingObject(this.createRenderingObject(physicsObject));
             }
         }
     }

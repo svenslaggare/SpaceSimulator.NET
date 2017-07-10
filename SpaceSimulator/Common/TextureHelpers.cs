@@ -15,13 +15,12 @@ namespace SpaceSimulator.Common
 	public static class TextureHelpers
 	{
         /// <summary>
-        /// Loads a texture from a file
+        /// Loads a texture from a bitmap
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="fileName">The file to load</param>
-        public static Texture2D FromFile(Device graphicsDevice, string fileName)
+        /// <param name="bitmap">The bitmap</param>
+        public static Texture2D FromBitmap(Device graphicsDevice, System.Drawing.Bitmap bitmap)
         {
-            var bitmap = new System.Drawing.Bitmap(fileName);
             var bitmapFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
             var bitmapRectangle = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
 
@@ -48,6 +47,19 @@ namespace SpaceSimulator.Common
 
             bitmap.UnlockBits(data);
             return texture;
+        }
+
+        /// <summary>
+        /// Loads a texture from a file
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="fileName">The path of the file</param>
+        public static Texture2D FromFile(Device graphicsDevice, string fileName)
+        {
+            using (var bitmap = new System.Drawing.Bitmap(fileName))
+            {
+                return FromBitmap(graphicsDevice, bitmap);
+            }
         }
 
         /// <summary>

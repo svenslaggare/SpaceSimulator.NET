@@ -46,8 +46,14 @@ namespace SpaceSimulator.Rendering.Plot
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keplerProblemSolver">Solver for the kepler problem</param>
         /// <param name="physicsObject">The object to track</param>
+        /// <param name="primaryBodyTexture">The texture for the primary body</param>
         /// <param name="position">The position of the object</param>
-        public GroundTrack(RenderingManager2D renderingManager2D, IKeplerProblemSolver keplerProblemSolver, PhysicsObject physicsObject, Vector2 position)
+        public GroundTrack(
+            RenderingManager2D renderingManager2D,
+            IKeplerProblemSolver keplerProblemSolver,
+            PhysicsObject physicsObject,
+            string primaryBodyTexture,
+            Vector2 position)
         {
             this.renderingManager2D = renderingManager2D;
             this.keplerProblemSolver = keplerProblemSolver;
@@ -58,7 +64,8 @@ namespace SpaceSimulator.Rendering.Plot
             this.CreatePlot();
 
             this.currentPositionBrush = this.renderingManager2D.CreateSolidColorBrush(Color.Red);
-            this.primaryBodyImage = this.renderingManager2D.LoadImage("Content/Textures/Planets/Earth.jpg");
+            //this.primaryBodyImage = this.renderingManager2D.LoadImage("Content/Textures/Planets/Earth.jpg");
+            this.primaryBodyImage = this.renderingManager2D.LoadImage(primaryBodyTexture);
 
             //this.projectedOrbitSphere = new Sphere(
             //    graphicsDevice,
@@ -126,7 +133,6 @@ namespace SpaceSimulator.Rendering.Plot
         private IList<Vector2> CalculateTrackPositions(int numOrbits)
         {
             var primaryBody = this.physicsObject.PrimaryBody;
-            //var primaryRotation = primaryBody.Rotation;
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.physicsObject);
             var orbit = orbitPosition.Orbit;
 
@@ -161,11 +167,10 @@ namespace SpaceSimulator.Rendering.Plot
             //for (double t = 0.0; t <= orbit.Period * numOrbits; t += deltaTime)
             for (double t = -orbit.Period; t <= orbit.Period * numOrbits; t += deltaTime)
             {
-                //primaryRotation = Physics.Solvers.SolverHelpers.CalculateRotation(primaryBody.RotationalPeriod, primaryRotation, deltaTime);
                 var primaryRotation = MathHelpers.ClampAngle(startPrimaryRotation + primaryBody.RotationalSpeed() * t);
-                var nextState = Physics.Solvers.SolverHelpers.AfterTime(
-                    this.keplerProblemSolver,
+                var nextState = this.keplerProblemSolver.Solve(
                     this.physicsObject,
+                    primaryBody.State,
                     this.physicsObject.State,
                     orbit,
                     t);
