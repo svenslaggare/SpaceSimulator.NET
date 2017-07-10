@@ -59,7 +59,7 @@ namespace SpaceSimulator.Simulator.Environments
                 SolarSystemBody body,
                 Color color,
                 string textureName,
-                float baseRotationY = 0.0f,
+                float baseRotationY = 180.0f * MathHelpers.Deg2Rad,
                 Color? ringColor = null,
                 double ringRadius = 0)
             {
@@ -95,10 +95,10 @@ namespace SpaceSimulator.Simulator.Environments
 
             AddPlanet(sun, "Mercury", Simulator.Data.SolarSystemBodies.Mercury, Color.Gray, baseDir + "Mercury.png");
             AddPlanet(sun, "Venus", Simulator.Data.SolarSystemBodies.Venus, new Color(255, 89, 0, 255), baseDir + "Venus2.jpg");
-            var earth = AddPlanet(sun, "Earth", Simulator.Data.SolarSystemBodies.Earth, Color.Green, baseDir + "Earth.jpg", baseRotationY: MathUtil.DegreesToRadians(180.0f));
+            var earth = AddPlanet(sun, "Earth", Simulator.Data.SolarSystemBodies.Earth, Color.Green, baseDir + "Earth.jpg");
             AddPlanet(earth, "Moon", Simulator.Data.SolarSystemBodies.Moon, Color.Magenta, baseDir + "Moon.jpg");
             var mars = AddPlanet(sun, "Mars", Simulator.Data.SolarSystemBodies.Mars, Color.Red, baseDir + "Mars4.png");
-            AddPlanet(sun, "Jupiter", Simulator.Data.SolarSystemBodies.Jupiter, new Color(255, 106, 0, 255), baseDir + "Jupiter.jpg");
+            var jupiter = AddPlanet(sun, "Jupiter", Simulator.Data.SolarSystemBodies.Jupiter, new Color(255, 106, 0, 255), baseDir + "Jupiter.jpg");
             var saturn = AddPlanet(
                 sun,
                 "Saturn",
@@ -116,7 +116,7 @@ namespace SpaceSimulator.Simulator.Environments
                 "Satellite 1",
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(Physics.Orbit.New(earth, semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3), 0.0));
+                new OrbitPosition(Physics.Orbit.New(jupiter, semiMajorAxis: jupiter.Radius + 300E3), 0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddSatellite(
