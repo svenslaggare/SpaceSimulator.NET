@@ -48,10 +48,10 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            //this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
+            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.uiManager = new UIManager(this.RenderingManager2D)

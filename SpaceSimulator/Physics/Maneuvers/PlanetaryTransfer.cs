@@ -30,9 +30,9 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// </summary>
         public IList<InterceptManeuver.PossibleLaunch> PossibleDepartureBurns { get; private set; } = new List<InterceptManeuver.PossibleLaunch>();
 
-        private double heliocentricTransferBurn;
         private double injectionToDepatureOrbitTime;
-        private double coastTime;
+        private double heliocentricTransferBurn;
+        private double heliocentricTransferBurnCoastTime;
 
         private ObjectState leaveSOIState;
         private double timeToLeaveSOI;
@@ -108,7 +108,8 @@ namespace SpaceSimulator.Physics.Maneuvers
                 this.TargetOrbit.SemiMajorAxis).CoastTime);
 
             var synodicPeriod = OrbitFormulas.SynodicPeriod(this.CurrentPlanetOrbit.Period, this.TargetOrbit.Period);
-            this.PossibleDepartureBurns = InterceptManeuver.Intercept(
+
+            var helicentricIntercept = new InterceptManeuver(
                 this.simulatorEngine,
                 this.sun,
                 this.currentPlanet,
@@ -120,13 +121,14 @@ namespace SpaceSimulator.Physics.Maneuvers
                 hohmannCoastTime * maxCoastRatio,
                 0,
                 MiscHelpers.RoundToDays(synodicPeriod) * maxLaunchTime,
-                out var heliocentricTransferBurnVector,
-                out this.injectionToDepatureOrbitTime,
-                out this.coastTime,
                 deltaTime,
-                true);
+                listPossibleLaunches: true);
+            var optimalIntercept = helicentricIntercept.Compute();
 
-            this.heliocentricTransferBurn = heliocentricTransferBurnVector.Length();
+            this.PossibleDepartureBurns = helicentricIntercept.PossibleIntercepts;
+            this.injectionToDepatureOrbitTime = optimalIntercept.StartTime;
+            this.heliocentricTransferBurnCoastTime = optimalIntercept.Duration;
+            this.heliocentricTransferBurn = optimalIntercept.DeltaVelocity.Length();
         }
 
         /// <summary>
@@ -142,7 +144,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 this.sun.StandardGravitationalParameter,
                 this.CurrentPlanetOrbit.SemiMajorAxis,
                 this.TargetOrbit.SemiMajorAxis);
-            this.coastTime = heliocentricTransferBurn.CoastTime;
+            this.heliocentricTransferBurnCoastTime = heliocentricTransferBurn.CoastTime;
             this.heliocentricTransferBurn = heliocentricTransferBurn.FirstBurn;
         }
 
@@ -155,7 +157,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         public void SetHeliocentricTransferOrbit(double injectionToDepatureOrbitTime, double coastTime, double heliocentricTransferBurn)
         {
             this.injectionToDepatureOrbitTime = injectionToDepatureOrbitTime;
-            this.coastTime = coastTime;
+            this.heliocentricTransferBurnCoastTime = coastTime;
             this.heliocentricTransferBurn = heliocentricTransferBurn;
         }
 
@@ -304,7 +306,7 @@ namespace SpaceSimulator.Physics.Maneuvers
             double maxLaunchTime = 0.5,
             double deltaTime = 0.5 * TimeConstants.OneDay)
         {
-            InterceptManeuver.Intercept(
+            var midcourseIntercept = new InterceptManeuver(
                 this.simulatorEngine,
                 this.sun,
                 this.physicsObject,
@@ -312,16 +314,16 @@ namespace SpaceSimulator.Physics.Maneuvers
                 this.bestHeliocentricOrbitPosition,
                 this.target,
                 this.targetOrbitPositionAtSOILeave,
-                MiscHelpers.RoundToDays(coastTime) * minCoastRatio,
-                MiscHelpers.RoundToDays(coastTime) * maxCoastRatio,
+                MiscHelpers.RoundToDays(this.heliocentricTransferBurnCoastTime) * minCoastRatio,
+                MiscHelpers.RoundToDays(this.heliocentricTransferBurnCoastTime) * maxCoastRatio,
                 0,
-                MiscHelpers.RoundToDays(coastTime) * maxLaunchTime,
-                out this.midcourseBurnDeltaV,
-                out this.midcourseBurnTime,
-                out var midcourseCoastTime,
+                MiscHelpers.RoundToDays(this.heliocentricTransferBurnCoastTime) * maxLaunchTime,
                 deltaTime,
-                false,
+                listPossibleLaunches: false,
                 allowedDeltaV: 150);
+            var midcourseManeuver = midcourseIntercept.Compute();
+            this.midcourseBurnDeltaV = midcourseManeuver.DeltaVelocity;
+            this.midcourseBurnTime = midcourseManeuver.StartTime;
         }
 
         /// <summary>

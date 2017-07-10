@@ -23,6 +23,7 @@ namespace SpaceSimulator.UI
     {
         private int selectedObjectIndex;
         private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
+        private readonly bool showGroundTracks = false;
 
         /// <summary>
         /// Creates a new selected object UI component
@@ -98,12 +99,17 @@ namespace SpaceSimulator.UI
         /// <param name="deviceContext">The device context</param>
         private void DrawGroundTrack(DeviceContext deviceContext)
         {
+            if (!this.showGroundTracks)
+            {
+                return;
+            }
+
             if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite
                 && this.SelectedObject.ReferenceOrbit.IsBound)
             {
                 if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
                 {
-                    groundTrack = new GroundTrack(this.RenderingManager2D, this.SelectedObject, Vector2.Zero);
+                    groundTrack = new GroundTrack(this.RenderingManager2D, this.SimulatorEngine.KeplerProblemSolver, this.SelectedObject, Vector2.Zero);
                     this.groundTracks.Add(this.SelectedObject, groundTrack);
                 }
 

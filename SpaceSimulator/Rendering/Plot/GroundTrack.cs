@@ -10,6 +10,7 @@ using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Solvers;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.Rendering.Plot
@@ -20,6 +21,8 @@ namespace SpaceSimulator.Rendering.Plot
     public sealed class GroundTrack : IDisposable
     {
         private readonly RenderingManager2D renderingManager2D;
+        private readonly IKeplerProblemSolver keplerProblemSolver;
+
         private readonly PhysicsObject physicsObject;
 
         private Function2D plot;
@@ -41,11 +44,14 @@ namespace SpaceSimulator.Rendering.Plot
         /// Creates a new ground track of the given object
         /// </summary>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
+        /// <param name="keplerProblemSolver">Solver for the kepler problem</param>
         /// <param name="physicsObject">The object to track</param>
         /// <param name="position">The position of the object</param>
-        public GroundTrack(RenderingManager2D renderingManager2D, PhysicsObject physicsObject, Vector2 position)
+        public GroundTrack(RenderingManager2D renderingManager2D, IKeplerProblemSolver keplerProblemSolver, PhysicsObject physicsObject, Vector2 position)
         {
             this.renderingManager2D = renderingManager2D;
+            this.keplerProblemSolver = keplerProblemSolver;
+
             this.physicsObject = physicsObject;
 
             this.position = position;
@@ -148,7 +154,6 @@ namespace SpaceSimulator.Rendering.Plot
             //}
 
             var deltaTime = 100.0;
-            var keplerProblemSolver = new Physics.Solvers.KeplerProblemUniversalVariableSolver();
             var startPrimaryRotation = primaryBody.Rotation;
 
             var pastValues = new List<Vector2>();
@@ -159,7 +164,7 @@ namespace SpaceSimulator.Rendering.Plot
                 //primaryRotation = Physics.Solvers.SolverHelpers.CalculateRotation(primaryBody.RotationalPeriod, primaryRotation, deltaTime);
                 var primaryRotation = MathHelpers.ClampAngle(startPrimaryRotation + primaryBody.RotationalSpeed() * t);
                 var nextState = Physics.Solvers.SolverHelpers.AfterTime(
-                    keplerProblemSolver,
+                    this.keplerProblemSolver,
                     this.physicsObject,
                     this.physicsObject.State,
                     orbit,

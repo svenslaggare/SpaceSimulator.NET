@@ -132,7 +132,9 @@
     <Compile Include="Helpers\Timing.cs" />
     <Compile Include="Mathematics\StatisticsHelpers.cs" />
     <Compile Include="Mathematics\Vector2d.cs" />
+    <Compile Include="Physics\Maneuvers\InterceptManeuver.cs" />
     <Compile Include="Physics\Maneuvers\PlanetaryTransfer.cs" />
+    <Compile Include="Physics\Orbits.cs" />
     <Compile Include="Physics\TimeConstants.cs" />
     <Compile Include="Rendering\Plot\GroundTrack.cs" />
     <Compile Include="Rendering\Plot\Heatmap.cs" />
@@ -161,7 +163,6 @@
     <Compile Include="Physics\ISimulatorEngine.cs" />
     <Compile Include="Physics\Maneuvers\BasicManeuver.cs" />
     <Compile Include="Physics\Maneuvers\HohmannTransferOrbit.cs" />
-    <Compile Include="Physics\Maneuvers\InterceptManeuver.cs" />
     <Compile Include="Physics\Maneuvers\InterplanetaryManeuver.cs" />
     <Compile Include="Physics\Maneuvers\OrbitManeuver.cs" />
     <Compile Include="Physics\Maneuvers\RendevouzManeuver.cs" />

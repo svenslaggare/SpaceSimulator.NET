@@ -105,10 +105,10 @@ namespace SpaceSimulator.Simulator.Environments
                 new OrbitPosition(
                     Physics.Orbit.New(
                         earth,
-                        //semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3,
-                        semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
+                        semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3,
+                        //semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
                         //longitudeOfAscendingNode: 45.0 * MathUtild.Deg2Rad,
-                        inclination: 85.0 * MathUtild.Deg2Rad),
+                        inclination: 0.0 * MathUtild.Deg2Rad),
                     0.0));
             renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 

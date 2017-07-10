@@ -10,10 +10,32 @@ using SpaceSimulator.Physics.Solvers;
 namespace SpaceSimulator.Physics.Maneuvers
 {
     /// <summary>
-    /// Contains method for calculating intercepts
+    /// Calculate intercepts between objects
     /// </summary>
-    public static class InterceptManeuver
+    public class InterceptManeuver
     {
+        private readonly ISimulatorEngine simulatorEngine;
+
+        private readonly IPrimaryBodyObject primaryBody;
+        private readonly Orbit primaryBodyOrbit;
+
+        private readonly IPhysicsObject physicsObject;
+        private readonly ObjectState objectState;
+        private readonly OrbitPosition objectOrbitPosition;
+
+        private readonly IPhysicsObject target;
+        private readonly OrbitPosition targetOrbitPosition;
+
+        private readonly double minInterceptTime;
+        private readonly double maxInterceptTime;
+        private readonly double minLaunchTime;
+        private readonly double maxLaunchTime;
+        private readonly double? allowedDeltaV;
+
+        private readonly double deltaTime;
+
+        private readonly bool listPossibleLaunches;
+
         /// <summary>
         /// Represents a possible launch
         /// </summary>
@@ -57,31 +79,108 @@ namespace SpaceSimulator.Physics.Maneuvers
         }
 
         /// <summary>
-        /// Indicates if the given launch is valid
+        /// The possible intercepts
         /// </summary>
-        private static bool IsValidLaunch(
+        public IList<PossibleLaunch> PossibleIntercepts { get; private set; } = new List<PossibleLaunch>();
+
+        private readonly double maxImpactCheckTime = 1000.0;
+        private readonly double impactCheckDeltaTime = 100.0;
+
+        /// <summary>
+        /// Creates a new intercept between the given objects
+        /// </summary>
+        /// <param name="simulatorEngine">The simulation engine</param>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="physicsObject">The physics object</param>
+        /// <param name="state">The state of the object</param>
+        /// <param name="orbitPosition">The orbit of the object</param>
+        /// <param name="target">The target object</param>
+        /// <param name="targetOrbitPosition">The target orbit</param>
+        /// <param name="minInterceptDuration">The minimum intercept duration</param>
+        /// <param name="maxInterceptDuration">The maximum intercept duration</param>
+        /// <param name="minLaunchTime">The minimum launch time</param>
+        /// <param name="maxLaunchTime">The maximum launch time</param>
+        /// <param name="listPossibleLaunches">Indicates if all the possible launches are returned</param>
+        /// <param name="deltaTime">The delta time for the search</param>
+        /// <param name="allowedDeltaV">Allowed delta V (quits the search if an orbit with less than this value is found)</param>
+        public InterceptManeuver(
             ISimulatorEngine simulatorEngine,
             IPrimaryBodyObject primaryBody,
             IPhysicsObject physicsObject,
-            ref ObjectState launchState,
-            ref ObjectState primaryLaunchState,
-            double impactCheckDeltaTime,
-            double maxImpactCheckTime,
-            bool stationary)
+            ObjectState state,
+            OrbitPosition orbitPosition,
+            IPhysicsObject target,
+            OrbitPosition targetOrbitPosition,
+            double minInterceptDuration,
+            double maxInterceptDuration,
+            double minLaunchTime,
+            double maxLaunchTime,
+            double deltaTime,
+            bool listPossibleLaunches,
+            double? allowedDeltaV = null)
+        {
+            this.simulatorEngine = simulatorEngine;
+
+            this.primaryBody = primaryBody;
+            this.primaryBodyOrbit = new Orbit();
+            if (!this.primaryBody.IsObjectOfReference)
+            {
+                this.primaryBodyOrbit = Orbit.CalculateOrbit(this.primaryBody);
+            }
+
+            this.physicsObject = physicsObject;
+            this.objectState = state;
+            this.objectOrbitPosition = orbitPosition;
+
+            this.target = target;
+            this.targetOrbitPosition = targetOrbitPosition;
+
+            this.minInterceptTime = minInterceptDuration;
+            this.maxInterceptTime = maxInterceptDuration;
+            this.minLaunchTime = minLaunchTime;
+            this.maxLaunchTime = maxLaunchTime;
+            this.allowedDeltaV = allowedDeltaV;
+
+            this.deltaTime = deltaTime;
+
+            this.listPossibleLaunches = listPossibleLaunches;
+        }
+
+        /// <summary>
+        /// Indicates if the object is stationary
+        /// </summary>
+        private bool IsStationary => this.objectState.HasImpacted;
+
+        /// <summary>
+        /// The target orbit
+        /// </summary>
+        private Orbit Orbit => this.objectOrbitPosition.Orbit;
+
+        /// <summary>
+        /// The target orbit
+        /// </summary>
+        private Orbit TargetOrbit => this.targetOrbitPosition.Orbit;
+
+        /// <summary>
+        /// Indicates if the given launch is valid
+        /// </summary>
+        /// <param name="launchState">The launch state</param>
+        /// <param name="primaryLaunchState">The state of the primary at launch</param>
+        private bool IsValidLaunch(ref ObjectState launchState, ref ObjectState primaryLaunchState)
         {
             if (MathHelpers.IsNaN(launchState.Velocity))
             {
                 return false;
             }
 
-            if (!stationary)
+            if (!this.IsStationary)
             {
                 return true;
             }
 
-            var launchOrbit = Orbit.CalculateOrbit(primaryBody, ref primaryLaunchState, ref launchState);
+            var launchOrbit = Orbit.CalculateOrbit(this.primaryBody, ref primaryLaunchState, ref launchState);
 
-            for (double t = 0.0; t <= maxImpactCheckTime; t += impactCheckDeltaTime)
+            for (double t = 0.0; t <= this.maxImpactCheckTime; t += this.impactCheckDeltaTime)
             {
                 var nextState = simulatorEngine.KeplerProblemSolver.Solve(
                     physicsObject,
@@ -90,7 +189,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                     launchOrbit,
                     t);
 
-                if (CollisionHelpers.SphereIntersection(primaryLaunchState.Position, primaryBody.Radius, nextState.Position, 10))
+                if (CollisionHelpers.SphereIntersection(primaryLaunchState.Position, this.primaryBody.Radius, nextState.Position, 10))
                 {
                     return false;
                 }
@@ -102,73 +201,84 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// <summary>
         /// Calculates the intercept
         /// </summary>
-        private static Vector3d? CalculateIntercept(
-            ISimulatorEngine simulatorEngine,
-            IPhysicsObject primaryBody,
+        /// <param name="primaryBodyStateAtLaunch">The state of the primary body at launch</param>
+        /// <param name="primaryBodyStateInitial">The initial state of the primary body</param>
+        /// <param name="objectLaunchState">The state of the object at launch</param>
+        /// <param name="targetLaunchState">The state of the target at launch</param>
+        /// <param name="launchTime">The launch time</param>
+        /// <param name="interceptDuration">The duration of the intercept</param>
+        private Vector3d? CalculateIntercept(
             ObjectState primaryBodyStateInitial,
             ObjectState primaryBodyStateAtLaunch,
-            Orbit primaryBodyOrbit,
-            IPhysicsObject target,
-            Orbit targetOrbit,
-            ObjectState s1,
             ObjectState objectLaunchState,
+            ObjectState targetLaunchState,
             double launchTime,
-            double interceptTime,
-            Func<ObjectState, ObjectState, bool> validLaunch)
+            double interceptDuration)
         {
             try
             {
                 var primaryBodyStateAtIntercept = new ObjectState();
-                if (!primaryBody.IsObjectOfReference)
+                if (!this.primaryBody.IsObjectOfReference)
                 {
-                    primaryBodyStateAtIntercept = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody,
-                        primaryBody.PrimaryBody.State,
+                    primaryBodyStateAtIntercept = this.simulatorEngine.KeplerProblemSolver.Solve(
+                        this.primaryBody,
+                        this.primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
-                        primaryBodyOrbit,
-                        launchTime + interceptTime);
+                        this.primaryBodyOrbit,
+                        launchTime + interceptDuration);
                 }
 
-                var targetInterceptState = simulatorEngine.KeplerProblemSolver.Solve(
+                var targetInterceptState = this.simulatorEngine.KeplerProblemSolver.Solve(
                     target,
                     ref primaryBodyStateAtLaunch,
-                    ref s1,
-                    targetOrbit,
+                    ref targetLaunchState,
+                    this.TargetOrbit,
                     ref primaryBodyStateAtIntercept,
-                    interceptTime);
+                    interceptDuration);
 
-                var res1 = simulatorEngine.GaussProblemSolver.Solve(
-                    primaryBody,
+                var solution1 = simulatorEngine.GaussProblemSolver.Solve(
+                    this.primaryBody,
                     primaryBodyStateAtLaunch,
                     primaryBodyStateAtIntercept,
                     objectLaunchState.Position,
                     targetInterceptState.Position,
-                    interceptTime,
+                    interceptDuration,
                     shortWay: true);
 
-                var res2 = simulatorEngine.GaussProblemSolver.Solve(
-                   primaryBody,
-                   primaryBodyStateAtLaunch,
-                   primaryBodyStateAtIntercept,
-                   objectLaunchState.Position,
-                   targetInterceptState.Position,
-                   interceptTime,
-                   shortWay: false);
+                var solution2 = simulatorEngine.GaussProblemSolver.Solve(
+                    this.primaryBody,
+                    primaryBodyStateAtLaunch,
+                    primaryBodyStateAtIntercept,
+                    objectLaunchState.Position,
+                    targetInterceptState.Position,
+                    interceptDuration,
+                    shortWay: false);
 
                 bool valid = true;
-                var deltaV1 = res1.Velocity1 - objectLaunchState.Velocity;
-                var deltaV2 = res2.Velocity1 - objectLaunchState.Velocity;
+                var deltaV1 = solution1.Velocity1 - objectLaunchState.Velocity;
+                var deltaV2 = solution2.Velocity1 - objectLaunchState.Velocity;
                 var deltaV = Vector3d.Zero;
 
-                if (deltaV1.Length() < deltaV2.Length()
-                    && validLaunch(new ObjectState(objectLaunchState.Time, objectLaunchState.Position, res1.Velocity1, Vector3d.Zero), primaryBodyStateAtLaunch))
+                var solution1State = new ObjectState(
+                    objectLaunchState.Time,
+                    objectLaunchState.Position,
+                    solution1.Velocity1,
+                    Vector3d.Zero);
+
+                var solution2State = new ObjectState(
+                    objectLaunchState.Time,
+                    objectLaunchState.Position,
+                    solution2.Velocity1,
+                    Vector3d.Zero);
+
+                if (deltaV1.Length() < deltaV2.Length() && this.IsValidLaunch(ref solution1State, ref primaryBodyStateAtLaunch))
                 {
                     deltaV = deltaV1;
                 }
                 else
                 {
                     deltaV = deltaV2;
-                    valid = validLaunch(new ObjectState(objectLaunchState.Time, objectLaunchState.Position, res2.Velocity1, Vector3d.Zero), primaryBodyStateAtLaunch);
+                    valid = this.IsValidLaunch(ref solution2State, ref primaryBodyStateAtLaunch);
                 }
 
                 if (valid)
@@ -185,93 +295,28 @@ namespace SpaceSimulator.Physics.Maneuvers
         }
 
         /// <summary>
-        /// Computes the optimal intercept (in terms of deltaV) to the current target orbit
+        /// Computes the optimal intercept (in terms of deltaV)
         /// </summary>
-        /// <param name="simulatorEngine">The simulation engine</param>
-        /// <param name="primaryBody">The primary body</param>
-        /// <param name="physicsObject">The physics object</param>
-        /// <param name="state">The state of the object</param>
-        /// <param name="orbitPosition">The orbit of the object</param>
-        /// <param name="target">The target object</param>
-        /// <param name="targetOrbitPosition">The target orbit</param>
-        /// <param name="minInterceptTime">The minimum intercept time</param>
-        /// <param name="maxInterceptTime">The maximum intercept time</param>
-        /// <param name="minLaunchTime">The minimum launch time</param>
-        /// <param name="maxLaunchTime">The maximum launch time</param>
-        /// <param name="optimalDeltaV">The optimal delta V</param>
-        /// <param name="optimalLaunchTime">The time to apply the optimal maneuver</param>
-        /// <param name="optimalInterceptTime">The intercept for the optimal maneuver</param>
-        /// <param name="listPossibleLaunches">Indicates if all the possible launches are returned</param>
-        /// <param name="deltaTime">The delta time for the search</param>
-        /// <param name="allowedDeltaV">Allowed delta V (quits the search if an orbit with less than this value is found)</param>
-        /// <returns>The possible launches, or null if listPossibleLaunches = false</returns>
-        /// <remarks>This method does not execute the maneuver, only plans it.</remarks>
-        public static IList<PossibleLaunch> Intercept(
-            ISimulatorEngine simulatorEngine,
-            IPrimaryBodyObject primaryBody,
-            IPhysicsObject physicsObject,
-            ObjectState state,
-            OrbitPosition orbitPosition,
-            IPhysicsObject target,
-            OrbitPosition targetOrbitPosition,
-            double minInterceptTime, double maxInterceptTime, double minLaunchTime, double maxLaunchTime,
-            out Vector3d optimalDeltaV, out double optimalLaunchTime, out double optimalInterceptTime,
-            double deltaTime, bool listPossibleLaunches,
-            double? allowedDeltaV = null)
+        public PossibleLaunch Compute()
         {
-            var orbit = orbitPosition.Orbit;
-            var targetOrbit = targetOrbitPosition.Orbit;
-
-            var stationary = state.HasImpacted;
-            var maxImpactCheckTime = 1000.0;
-            var impactCheckDeltaTime = 100.0;
-
-            var bestDeltaV = new Vector3d(double.MaxValue, double.MaxValue, double.MaxValue);
-            var bestLaunchTime = 0.0;
-            var bestInterceptTime = 0.0;
+            var bestLaunch = new PossibleLaunch(0.0, 0.0, new Vector3d(double.MaxValue));
             var foundValid = false;
 
             var targetInitial = targetOrbitPosition.CalculateState();
-            var objectInitial = state;
-            var objectOrbit = orbit;
+            var objectInitial = objectState;
 
-            var primaryBodyOrbit = new Orbit();
-            if (!primaryBody.IsObjectOfReference)
-            {
-                primaryBodyOrbit = Orbit.CalculateOrbit(primaryBody);
-            }
-
-            IList<PossibleLaunch> possibleLaunches = null;
-            if (listPossibleLaunches)
-            {
-                possibleLaunches = new List<PossibleLaunch>();
-            }
-
-            Func<ObjectState, ObjectState, bool> validLaunch = (primaryLaunchState, launchState) =>
-            {
-                return IsValidLaunch(
-                    simulatorEngine,
-                    primaryBody,
-                    physicsObject,
-                    ref launchState,
-                    ref primaryLaunchState,
-                    impactCheckDeltaTime,
-                    maxImpactCheckTime,
-                    stationary);
-            };
-
-            var primaryBodyStateInitial = primaryBody.State;
-            for (var launchTime = minLaunchTime; launchTime <= maxLaunchTime; launchTime += deltaTime)
+            var primaryBodyStateInitial = this.primaryBody.State;
+            for (var launchTime = this.minLaunchTime; launchTime <= this.maxLaunchTime; launchTime += this.deltaTime)
             {
                 //Calculate the launch state
                 var primaryBodyStateAtLaunch = new ObjectState();
-                if (!primaryBody.IsObjectOfReference)
+                if (!this.primaryBody.IsObjectOfReference)
                 {
                     primaryBodyStateAtLaunch = simulatorEngine.KeplerProblemSolver.Solve(
-                        primaryBody,
-                        primaryBody.PrimaryBody.State,
+                        this.primaryBody,
+                        this.primaryBody.PrimaryBody.State,
                         primaryBodyStateInitial,
-                        primaryBodyOrbit,
+                        this.primaryBodyOrbit,
                         launchTime);
                 }
 
@@ -279,7 +324,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                     physicsObject,
                     ref primaryBodyStateInitial,
                     ref objectInitial,
-                    objectOrbit,
+                    this.Orbit,
                     ref primaryBodyStateAtLaunch,
                     launchTime);
 
@@ -287,65 +332,74 @@ namespace SpaceSimulator.Physics.Maneuvers
                     target,
                     ref primaryBodyStateInitial,
                     ref targetInitial,
-                    targetOrbit,
+                    this.TargetOrbit,
                     ref primaryBodyStateAtLaunch,
                     launchTime);
 
                 //Calculate the intercept state
-                for (var interceptTime = minInterceptTime; interceptTime <= maxInterceptTime; interceptTime += deltaTime)
+                for (var interceptDuration = this.minInterceptTime; interceptDuration <= this.maxInterceptTime; interceptDuration += this.deltaTime)
                 {
-                    var deltaV = CalculateIntercept(
-                        simulatorEngine,
-                        primaryBody,
+                    var deltaV = this.CalculateIntercept(
                         primaryBodyStateInitial,
                         primaryBodyStateAtLaunch,
-                        primaryBodyOrbit,
-                        target,
-                        targetOrbit,
-                        targetLaunchState,
                         objectLaunchState,
+                        targetLaunchState,
                         launchTime,
-                        interceptTime,
-                        validLaunch);
+                        interceptDuration);
 
                     if (deltaV != null)
                     {
-                        if (listPossibleLaunches)
+                        var launch = new PossibleLaunch(launchTime, interceptDuration, deltaV.Value);
+
+                        if (this.listPossibleLaunches)
                         {
-                            possibleLaunches.Add(new PossibleLaunch(launchTime, interceptTime, deltaV.Value));
+                            this.PossibleIntercepts.Add(launch);
                         }
 
-                        if (deltaV.Value.Length() < bestDeltaV.Length())
+                        if (deltaV.Value.Length() < bestLaunch.DeltaVelocity.Length())
                         {
-                            bestDeltaV = deltaV.Value;
-                            bestLaunchTime = launchTime;
-                            bestInterceptTime = interceptTime;
+                            bestLaunch = launch;
                             foundValid = true;
 
-                            if (allowedDeltaV != null && bestDeltaV.Length() <= allowedDeltaV)
+                            if (allowedDeltaV != null && bestLaunch.DeltaVelocity.Length() <= allowedDeltaV)
                             {
-                                goto exit;
+                                return bestLaunch;
                             }
                         }
                     }
                 }
             }
 
-            exit:
             if (foundValid)
             {
-                optimalDeltaV = bestDeltaV;
-                optimalLaunchTime = bestLaunchTime;
-                optimalInterceptTime = bestInterceptTime;
+                return bestLaunch;
             }
             else
             {
-                optimalDeltaV = Vector3d.Zero;
-                optimalLaunchTime = 0;
-                optimalInterceptTime = 0;
+                return new PossibleLaunch();
             }
+        }
 
-            return possibleLaunches;
+        /// <summary>
+        /// Computes the optimal intercept maneuver
+        /// </summary>
+        /// <returns>The intercept or null, if no intercept is possible</returns>
+        public OrbitalManeuvers ComputeManeuver()
+        {
+            var bestLaunch = this.Compute();
+            var foundValid = bestLaunch.DeltaVelocity != Vector3d.Zero;
+
+            if (foundValid)
+            {
+                return OrbitalManeuvers.Sequence(
+                    OrbitalManeuver.Burn(simulatorEngine, physicsObject, bestLaunch.DeltaVelocity, OrbitalManeuverTime.TimeFromNow(bestLaunch.StartTime)),
+                    OrbitalManeuver.Burn(simulatorEngine, physicsObject, Vector3d.Zero, OrbitalManeuverTime.TimeFromNow(bestLaunch.ArrivalTime))
+                );
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -355,8 +409,8 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// <param name="physicsObject">The object to apply for</param>
         /// <param name="target">The target object</param>
         /// <param name="targetOrbitPosition">The target orbit position</param>
-        /// <param name="minInterceptTime">The minimum intercept time</param>
-        /// <param name="maxInterceptTime">The maximum intercept time</param>
+        /// <param name="minInterceptDuration">The minimum intercept duration</param>
+        /// <param name="maxInterceptDuration">The maximum intercept duration</param>
         /// <param name="minLaunchTime">The minimum launch time</param>
         /// <param name="maxLaunchTime">The maximum launch time</param>
         /// <param name="deltaTime">The delta time for the search</param>
@@ -366,41 +420,27 @@ namespace SpaceSimulator.Physics.Maneuvers
             IPhysicsObject physicsObject,
             IPhysicsObject target,
             OrbitPosition targetOrbitPosition,
-            double minInterceptTime, double maxInterceptTime, double minLaunchTime, double maxLaunchTime,
+            double minInterceptDuration,
+            double maxInterceptDuration,
+            double minLaunchTime,
+            double maxLaunchTime,
             double deltaTime = 1.0 * 60.0)
         {
-            var optimalDeltaV = Vector3d.Zero;
-            Intercept(
-                 simulatorEngine,
-                 physicsObject.PrimaryBody,
-                 physicsObject,
-                 physicsObject.State,
-                 OrbitPosition.CalculateOrbitPosition(physicsObject),
-                 target,
-                 targetOrbitPosition,
-                 minInterceptTime,
-                 maxInterceptTime,
-                 minLaunchTime,
-                 maxLaunchTime,
-                 out optimalDeltaV,
-                 out var optimalLaunchTime,
-                 out var optimalInterceptTime,
-                 deltaTime,
-                 listPossibleLaunches: false);
-
-            var foundValid = optimalDeltaV != Vector3d.Zero;
-
-            if (foundValid)
-            {
-                return OrbitalManeuvers.Sequence(
-                    OrbitalManeuver.Burn(simulatorEngine, physicsObject, optimalDeltaV, OrbitalManeuverTime.TimeFromNow(optimalLaunchTime)),
-                    OrbitalManeuver.Burn(simulatorEngine, physicsObject, Vector3d.Zero, OrbitalManeuverTime.TimeFromNow(optimalLaunchTime + optimalInterceptTime))
-                );
-            }
-            else
-            {
-                return null;
-            }
+            var intercept = new InterceptManeuver(
+                simulatorEngine,
+                physicsObject.PrimaryBody,
+                physicsObject,
+                physicsObject.State,
+                OrbitPosition.CalculateOrbitPosition(physicsObject),
+                target,
+                targetOrbitPosition,
+                minInterceptDuration,
+                maxInterceptDuration,
+                minLaunchTime,
+                maxLaunchTime,
+                deltaTime,
+                false);
+            return intercept.ComputeManeuver();
         }
     }
 }
