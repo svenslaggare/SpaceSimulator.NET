@@ -46,13 +46,6 @@ namespace SpaceSimulator.UI
         private readonly UIGroup ascentGroup;
         private readonly TextInputUIObject ascentTargetAltitudeTextInput;
 
-        private readonly UIGroup createObjectGroup;
-        private readonly TextInputUIObject parameterTextInput;
-        private readonly TextInputUIObject eccentricityTextInput;
-        private readonly TextInputUIObject inclinationTextInput;
-        private readonly TextInputUIObject longitudeOfAscendingNodeTextInput;
-        private readonly TextInputUIObject argumentOfPeriapsisTextInput;
-
         private Heatmap deltaVChart;
         private bool showDeltaVChart = false;
 
@@ -76,93 +69,6 @@ namespace SpaceSimulator.UI
         {
             this.uiManager = uiManager;
             this.uiStyle = uiStyle;
-
-            #region MainMenu
-            var numMainMenuElements = 4;
-            var mainMenuSize = new Size2(
-                UIBuilder.DefaultButtonWidth + 30,
-                (int)(UIBuilder.DefaultButtonHeight * numMainMenuElements + 50));
-
-            var mainMenuUIGroup = new UIGroup(
-                this.RenderingManager2D,
-                "ManeuverMainMenu",
-                new Vector2(0, 0),
-                mainMenuSize,
-                PositionRelationX.Right,
-                PositionRelationY.Center);
-            this.uiManager.AddElement(mainMenuUIGroup);
-
-            var mainMenuBackground = new RectangleUIObject(
-                this.RenderingManager2D,
-                "Background",
-                new Vector2(0, 0),
-                new Size2(mainMenuSize.Width + 5, mainMenuSize.Height),
-                this.uiStyle.UIGroupBackgroundBrush,
-                this.uiStyle.ButtonBorderBrush,
-                parent: mainMenuUIGroup);
-            mainMenuUIGroup.AddObject(mainMenuBackground);
-
-            var mainMenuBuilder = this.NewUIBuilder(mainMenuUIGroup);
-            mainMenuBuilder.ResetPosition(5, -30.0f);
-            mainMenuBuilder.PositionRelationX = PositionRelationX.Center;
-
-            mainMenuBuilder.AddButton(
-                "AbortManeuverButton",
-                "Abort maneuver",
-                this.AbortManeuver);
-
-            mainMenuBuilder.AddButton(
-               "ShowManeuversButton",
-               "Show maneuvers",
-               this.ShowManeuvers);
-
-            mainMenuBuilder.AddButton(
-                "ShowAscentButton",
-                "Show ascent",
-                this.ShowAscent);
-
-            mainMenuBuilder.AddButton(
-                "ShowCreateObjectButton",
-                "Show create object",
-                this.ShowCreateObject);
-
-            //posY = 10.0f;
-            //AddButton(
-            //    "AbortManeuverButton",
-            //    new Vector2(0, posY),
-            //    mainMenuPositionRelationX,
-            //    mainMenuPositionRelationY,
-            //    "Abort maneuver",
-            //    this.AbortManeuver,
-            //    mainMenuUIGroup);
-
-            //AddButton(
-            //   "ShowManeuversButton",
-            //   new Vector2(0, posY += deltaY),
-            //   mainMenuPositionRelationX,
-            //   mainMenuPositionRelationY,
-            //   "Show maneuvers",
-            //   this.ShowManeuvers,
-            //   mainMenuUIGroup);
-
-            //AddButton(
-            //    "ShowAscentButton",
-            //    new Vector2(0, posY += deltaY),
-            //    mainMenuPositionRelationX,
-            //    mainMenuPositionRelationY,
-            //    "Show ascent",
-            //    this.ShowAscent,
-            //    mainMenuUIGroup);
-
-            //AddButton(
-            //    "ShowCreateObjectButton",
-            //    new Vector2(0, posY += deltaY),
-            //    mainMenuPositionRelationX,
-            //    mainMenuPositionRelationY,
-            //    "Show create object",
-            //    this.ShowCreateObject,
-            //    mainMenuUIGroup);
-            #endregion
 
             #region Maneuvers
             var maneuverGroupSize = new Size2(380, 350);
@@ -263,7 +169,7 @@ namespace SpaceSimulator.UI
 
             this.ascentGroup = new UIGroup(
                 this.RenderingManager2D,
-                "ManeuverGroup",
+                "AscentGroup",
                 new Vector2(0, 0),
                 ascentGroupSize,
                 PositionRelationX.Center,
@@ -291,56 +197,6 @@ namespace SpaceSimulator.UI
                 "AscentTargetAltitudeTextInput",
                 "300 km",
                 this.CreateExecuteManeuver(this.AscendToOrbit));
-            #endregion
-
-            #region CreateObject
-            var createObjectGroupSize = new Size2(210, 260);
-
-            this.createObjectGroup = new UIGroup(
-                this.RenderingManager2D,
-                "CreateObjectGroup",
-                new Vector2(0, 0),
-                createObjectGroupSize,
-                PositionRelationX.Center,
-                PositionRelationY.Center)
-            {
-                IsVisible = false
-            };
-            this.uiManager.AddElement(this.createObjectGroup);
-
-            var createObjectGroupBackground = new RectangleUIObject(
-                this.RenderingManager2D,
-                "Background",
-                Vector2.Zero,
-                createObjectGroupSize,
-                this.uiStyle.UIGroupBackgroundBrush,
-                this.uiStyle.ButtonBorderBrush,
-                parent: this.createObjectGroup);
-            this.createObjectGroup.AddObject(createObjectGroupBackground);
-
-            var createObjectBuilder = this.NewUIBuilder(this.createObjectGroup);
-            createObjectBuilder.PositionRelationX = PositionRelationX.Right;
-            createObjectBuilder.ResetPosition(10, -25.0f);
-            createObjectBuilder.TextInputWidth = 80;
-
-            this.parameterTextInput = createObjectBuilder.AddTextInput("ParameterTextInput", "");
-            this.eccentricityTextInput = createObjectBuilder.AddTextInput("EccentricityTextInput", "");
-            this.inclinationTextInput = createObjectBuilder.AddTextInput("InclinationTextInput", "");
-            this.longitudeOfAscendingNodeTextInput = createObjectBuilder.AddTextInput("LongitudeOfAscendingNodeTextInput", "");
-            this.argumentOfPeriapsisTextInput = createObjectBuilder.AddTextInput("ArgumentOfPeriapsisTextInput", "");
-
-            createObjectBuilder.PositionRelationX = PositionRelationX.Left;
-            createObjectBuilder.ResetPosition(10, -20.0f);
-            createObjectBuilder.AddText("ParameterText", "Parameter:");
-            createObjectBuilder.AddText("EccentricityText", "Eccentricity:");
-            createObjectBuilder.AddText("InclinationText", "Inclination:");
-            createObjectBuilder.AddText("LongitudeOfAscendingNodeText", "Ω:");
-            createObjectBuilder.AddText("ArgumentOfPeriapsisText", "ω:");
-
-            createObjectBuilder.PositionRelationX = PositionRelationX.Center;
-            createObjectBuilder.PositionRelationY = PositionRelationY.Bottom;
-            createObjectBuilder.ResetPosition(0, -30.0f);
-            createObjectBuilder.AddButton("CreateObject", "Create object", this.CreateObject);
             #endregion
         }
 
@@ -383,143 +239,6 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
-        /// Aborts the most recent maneuver
-        /// </summary>
-        private void AbortManeuver()
-        {
-            if (this.SimulatorEngine.Maneuvers.Count > 0)
-            {
-                this.SimulatorEngine.AbortManeuver(this.SimulatorEngine.Maneuvers.First());
-            }
-        }
-
-        enum ManeuverMenu
-        {
-            Manuevers,
-            Ascent,
-            CreateObject,
-        }
-
-        /// <summary>
-        /// Shows the given menu
-        /// </summary>
-        /// <param name="maneuverMenu">The menu</param>
-        private void ShowMenu(ManeuverMenu maneuverMenu)
-        {
-            switch (maneuverMenu)
-            {
-                case ManeuverMenu.Manuevers:
-                    this.maneuverGroup.IsVisible = !this.maneuverGroup.IsVisible;
-                    this.ascentGroup.IsVisible = false;
-                    this.createObjectGroup.IsVisible = false;
-                    break;
-                case ManeuverMenu.Ascent:
-                    this.maneuverGroup.IsVisible = false;
-                    this.ascentGroup.IsVisible = !this.ascentGroup.IsVisible;
-                    this.createObjectGroup.IsVisible = false;
-                    break;
-                case ManeuverMenu.CreateObject:
-                    this.maneuverGroup.IsVisible = false;
-                    this.ascentGroup.IsVisible = false;
-                    this.createObjectGroup.IsVisible = !this.createObjectGroup.IsVisible;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Shows the maneuvers
-        /// </summary>
-        private void ShowManeuvers()
-        {
-            this.ShowMenu(ManeuverMenu.Manuevers);
-        }
-
-        /// <summary>
-        /// Shows the ascent menu
-        /// </summary>
-        private void ShowAscent()
-        {
-            this.ShowMenu(ManeuverMenu.Ascent);
-        }
-
-        /// <summary>
-        /// Shows the create object menu
-        /// </summary>
-        private void ShowCreateObject()
-        {
-            this.ShowMenu(ManeuverMenu.CreateObject);
-        }
-
-        /// <summary>
-        /// Parses the given double
-        /// </summary>
-        /// <param name="text">The text</param>
-        private double ParseDouble(string text)
-        {
-            return double.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Parses the given distance string
-        /// </summary>
-        /// <param name="text">The string</param>
-        /// <param name="primaryBody">The primary body</param>
-        /// <returns>The distance in meters</returns>
-        private double ParseDistance(string text, NaturalSatelliteObject primaryBody = null)
-        {
-            var numericPart = "";
-            var unitPart = "";
-            foreach (var currentChar in text)
-            {
-                if (char.IsDigit(currentChar) && unitPart == "")
-                {
-                    numericPart += currentChar;
-                }
-
-                if (char.IsLetter(currentChar))
-                {
-                    unitPart += currentChar;
-                }
-            }
-
-            var unitScaleFactor = 1.0;
-            switch (unitPart)
-            {
-                case "er":
-                case "ER":
-                    unitScaleFactor = SolarSystemBodies.Earth.Radius;
-                    break;
-                case "sr":
-                case "SR":
-                    unitScaleFactor = SolarSystemBodies.Sun.Radius;
-                    break;
-                case "au":
-                case "AU":
-                    unitScaleFactor = Constants.AstronomicalUnit;
-                    break;
-                case "km":
-                    unitScaleFactor = 1E3;
-                    break;
-                case "Mm":
-                    unitScaleFactor = 1E6;
-                    break;
-                case "Gm":
-                    unitScaleFactor = 1E9;
-                    break;
-            }
-
-            var offset = 0.0;
-            if (primaryBody != null && primaryBody.Name != "Sun")
-            {
-                offset = primaryBody.Radius;
-            }
-
-            return this.ParseDouble(numericPart) * unitScaleFactor + offset;
-        }
-
-        /// <summary>
         /// Applies thrust
         /// </summary>
         private void ApplyThrust()
@@ -541,7 +260,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         private void ChangePeriapsis()
         {
-            var newPeriapsis = this.ParseDistance(this.changePeriapsisTextInput.Text, this.SelectedObject.PrimaryBody);
+            var newPeriapsis = UIComponentHelpers.ParseDistance(this.changePeriapsisTextInput.Text, this.SelectedObject.PrimaryBody);
             this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
                 BasicManeuver.ChangePeriapsis(
                     this.SimulatorEngine,
@@ -554,7 +273,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         private void ChangeApoapsis()
         {
-            var newApoapsis = this.ParseDistance(this.changeApoapsisTextInput.Text, this.SelectedObject.PrimaryBody);
+            var newApoapsis = UIComponentHelpers.ParseDistance(this.changeApoapsisTextInput.Text, this.SelectedObject.PrimaryBody);
             this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
                 BasicManeuver.ChangeApoapsis(
                     this.SimulatorEngine,
@@ -567,7 +286,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         private void ChangeInclination()
         {
-            var newInclination = double.Parse(this.changeInclinationTextInput.Text, System.Globalization.CultureInfo.InvariantCulture);
+            var newInclination = UIComponentHelpers.ParseDouble(this.changeInclinationTextInput.Text);
             this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
                 BasicManeuver.ChangeInclination(
                     this.SimulatorEngine,
@@ -580,7 +299,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         private void HohmannTransfer()
         {
-            var newRadius = this.ParseDistance(this.hohmannTransferRadiusTextInput.Text, this.SelectedObject.PrimaryBody);
+            var newRadius = UIComponentHelpers.ParseDistance(this.hohmannTransferRadiusTextInput.Text, this.SelectedObject.PrimaryBody);
             var state = this.SelectedObject.State;
             var orbitPosition = OrbitPosition.CalculateOrbitPosition(this.SelectedObject);
 
@@ -810,7 +529,7 @@ namespace SpaceSimulator.UI
         {
             if (this.SelectedObject.HasImpacted && this.SelectedObject is RocketObject rocketObject)
             {
-                var targetAltitude = this.ParseDistance(this.ascentTargetAltitudeTextInput.Text, this.SelectedObject.PrimaryBody);
+                var targetAltitude = UIComponentHelpers.ParseDistance(this.ascentTargetAltitudeTextInput.Text, this.SelectedObject.PrimaryBody);
                 var targetOrbit = Physics.Orbit.New(this.SelectedObject.PrimaryBody, semiMajorAxis: targetAltitude, eccentricity: 0.0);
 
                 //var bestPitchStart = 2E3;
@@ -827,43 +546,6 @@ namespace SpaceSimulator.UI
 
                 rocketObject.StartEngine();
             }
-        }
-
-        /// <summary>
-        /// Creates a new object
-        /// </summary>
-        private void CreateObject()
-        {
-            NaturalSatelliteObject primaryBody = null;
-            if (this.SelectedObject is NaturalSatelliteObject)
-            {
-                primaryBody = (NaturalSatelliteObject)this.SelectedObject;
-            }
-            else
-            {
-                primaryBody = this.SelectedObject.PrimaryBody;
-            }
-
-            var parameter = this.ParseDistance(this.parameterTextInput.Text, this.SelectedObject.PrimaryBody);
-            var eccentricity = this.ParseDouble(this.eccentricityTextInput.Text);
-            var inclination = this.ParseDouble(this.inclinationTextInput.Text) * MathUtild.Deg2Rad;
-            var longitudeOfAscendingNode = this.ParseDouble(this.longitudeOfAscendingNodeTextInput.Text) * MathUtild.Deg2Rad;
-            var argumentOfPeriapsis = this.ParseDouble(this.argumentOfPeriapsisTextInput.Text) * MathUtild.Deg2Rad;
-
-            var orbit = Physics.Orbit.New(
-                primaryBody,
-                parameter: parameter,
-                eccentricity: eccentricity,
-                inclination: inclination,
-                longitudeOfAscendingNode: longitudeOfAscendingNode,
-                argumentOfPeriapsis: argumentOfPeriapsis);
-
-            var satellite = this.SimulatorEngine.AddSatelliteInOrbit(
-                "Satellite",
-                1000,
-                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(orbit, 0.0));
-            this.SimulatorContainer.CreateRenderingObject(satellite);
         }
 
         public override void Update(TimeSpan elapsed)

@@ -126,7 +126,23 @@ namespace SpaceSimulator
                 this.simulatorContainer,
                 (OrbitCamera)this.CameraManager["OrbitCamera"]));
 
+            this.uiComponents.Add(new MainUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer,
+                this.uiManager,
+                this.uiStyle));
+
             this.uiComponents.Add(new ManeuverUI(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.MouseManager,
+                this.simulatorContainer,
+                this.uiManager,
+                this.uiStyle));
+
+            this.uiComponents.Add(new CreateObjectUI(
                 this.RenderingManager2D,
                 this.KeyboardManager,
                 this.MouseManager,

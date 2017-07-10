@@ -216,6 +216,8 @@
     <Compile Include="SpaceSimulatorApp.cs" />
     <Compile Include="SimulatorContainer.cs" />
     <Compile Include="UI\CameraUI.cs" />
+    <Compile Include="UI\CreateObjectUI.cs" />
+    <Compile Include="UI\MainUI.cs" />
     <Compile Include="UI\ManeuverUI.cs" />
     <Compile Include="UI\SelectedObjectUI.cs" />
     <Compile Include="UI\OverlayUI.cs" />

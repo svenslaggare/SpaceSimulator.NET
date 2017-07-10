@@ -44,6 +44,24 @@ namespace SpaceSimulator.Common.UI
         }
 
         /// <summary>
+        /// Finds the first element with the given name
+        /// </summary>
+        /// <param name="name">The name of the element</param>
+        /// <returns>The element or null</returns>
+        public UIElement FindElement(string name)
+        {
+            foreach (var element in this.elements)
+            {
+                if (element.Name == name)
+                {
+                    return element;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Invalidates the UI, forcing all elements to redraw
         /// </summary>
         public void Invalidate()

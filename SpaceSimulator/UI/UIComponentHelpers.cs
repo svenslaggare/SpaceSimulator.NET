@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.DirectInput;
 using SpaceSimulator.Common.Input;
+using SpaceSimulator.Physics;
 using SpaceSimulator.Simulator;
+using SpaceSimulator.Simulator.Data;
 
 namespace SpaceSimulator.UI
 {
@@ -91,6 +93,73 @@ namespace SpaceSimulator.UI
             }
 
             return objects[index];
+        }
+
+        /// <summary>
+        /// Parses the given double
+        /// </summary>
+        /// <param name="text">The text</param>
+        public static double ParseDouble(string text)
+        {
+            return double.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Parses the given distance string
+        /// </summary>
+        /// <param name="text">The string</param>
+        /// <param name="primaryBody">The primary body</param>
+        /// <returns>The distance in meters</returns>
+        public static double ParseDistance(string text, NaturalSatelliteObject primaryBody = null)
+        {
+            var numericPart = "";
+            var unitPart = "";
+            foreach (var currentChar in text)
+            {
+                if (char.IsDigit(currentChar) && unitPart == "")
+                {
+                    numericPart += currentChar;
+                }
+
+                if (char.IsLetter(currentChar))
+                {
+                    unitPart += currentChar;
+                }
+            }
+
+            var unitScaleFactor = 1.0;
+            switch (unitPart)
+            {
+                case "er":
+                case "ER":
+                    unitScaleFactor = SolarSystemBodies.Earth.Radius;
+                    break;
+                case "sr":
+                case "SR":
+                    unitScaleFactor = SolarSystemBodies.Sun.Radius;
+                    break;
+                case "au":
+                case "AU":
+                    unitScaleFactor = Constants.AstronomicalUnit;
+                    break;
+                case "km":
+                    unitScaleFactor = 1E3;
+                    break;
+                case "Mm":
+                    unitScaleFactor = 1E6;
+                    break;
+                case "Gm":
+                    unitScaleFactor = 1E9;
+                    break;
+            }
+
+            var offset = 0.0;
+            if (primaryBody != null && primaryBody.Name != "Sun")
+            {
+                offset = primaryBody.Radius;
+            }
+
+            return ParseDouble(numericPart) * unitScaleFactor + offset;
         }
     }
 }
