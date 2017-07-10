@@ -221,6 +221,7 @@
     <Compile Include="UI\OverlayUI.cs" />
     <Compile Include="UI\SimulatorControlUI.cs" />
     <Compile Include="UI\TimeUI.cs" />
+    <Compile Include="UI\UIBuilder.cs" />
     <Compile Include="UI\UIComponent.cs" />
     <Compile Include="UI\UIComponentHelpers.cs" />
     <Compile Include="UI\UIConstants.cs" />

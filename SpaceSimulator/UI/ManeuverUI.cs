@@ -77,154 +77,11 @@ namespace SpaceSimulator.UI
             this.uiManager = uiManager;
             this.uiStyle = uiStyle;
 
-            var buttonWidth = 155;
-            var buttonHeight = 30;
-
-            var startPosY = -20.0f;
-            var posY = startPosY;
-            var deltaY = 40.0f;
-            var defaultOffsetRight = buttonWidth + 50;
-            var offsetRight = defaultOffsetRight;
-            var defaultInputWidth = 150;
-            var inputWidth = defaultInputWidth;
-            var maneuverObjectsPositionRelationX = PositionRelationX.Right;
-            var maneuverObjectsPositionRelationY = PositionRelationY.Top;
-
-            #region Helpers
-            Vector2 NextPosition(bool button)
-            {
-                return new Vector2(offsetRight + (button ? - 2.5f : 0), posY += deltaY);
-            }
-
-            ButtonUIObject CreateButton(
-                string name,
-                Vector2 position,
-                PositionRelationX positionRelationX,
-                PositionRelationY positionRelationY,
-                string text,
-                UIElement parent = null)
-            {
-                return new ButtonUIObject(
-                    this.RenderingManager2D,
-                    name,
-                    position,
-                    createParent => this.uiStyle.CreateButtonBackground(new Size2(buttonWidth, buttonHeight), parent: createParent),
-                    text,
-                    Color.Yellow,
-                    positionRelationX: positionRelationX,
-                    positionRelationY: positionRelationY,
-                    parent: parent);
-            }
-
-            void AddElement(UIElement parent, UIObject newObject)
-            {
-                if (parent is UIGroup uiGroup)
-                {
-                    uiGroup.AddObject(newObject);
-                }
-                else
-                {
-                    this.uiManager.AddElement(newObject);
-                }
-            }
-
-            void AddButton(
-                string name,
-                Vector2 position,
-                PositionRelationX positionRelationX,
-                PositionRelationY positionRelationY,
-                string text,
-                Action leftMouseClick,
-                UIElement parent)
-            {
-                var button = CreateButton(name, position, positionRelationX, positionRelationY, text, parent);
-                AddElement(parent, button);
-
-                button.LeftMouseButtonClicked += (sender, e) =>
-                {
-                    try
-                    {
-                        if (!this.SimulatorContainer.IsFrozen)
-                        {
-                            leftMouseClick();
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        Console.WriteLine(exception.Message);
-                    }
-                };
-            }
-
-            TextInputUIObject CreateTextInput(
-                string textInputName,
-                string textInputDefaultText,
-                UIElement parent,
-                PositionRelationX positionRelationX = PositionRelationX.Left,
-                PositionRelationY positionRelationY = PositionRelationY.Top)
-            {
-                var textInput = new TextInputUIObject(
-                                    this.RenderingManager2D,
-                                    this.KeyboardManager,
-                                    textInputName,
-                                    NextPosition(false),
-                                    new Size2(inputWidth, buttonHeight),
-                                    positionRelationX: positionRelationX,
-                                    positionRelationY: positionRelationY,
-                                    parent: parent)
-                {
-                    Text = textInputDefaultText
-                };
-
-                AddElement(parent, textInput);
-
-                return textInput;
-            }
-
-            TextInputUIObject AddButtonAndTextInput(string buttonName, string buttonText, string textInputName, string textInputDefaultText, Action leftMouseClick, UIElement parent)
-            {
-                var textInput = CreateTextInput(textInputName, textInputDefaultText, parent, maneuverObjectsPositionRelationX, maneuverObjectsPositionRelationY);
-                AddButton(buttonName, NextPosition(true), maneuverObjectsPositionRelationX, maneuverObjectsPositionRelationY, buttonText, leftMouseClick, parent);
-                return textInput;
-            }
-
-            ListBoxUIObject AddButtonAndListBox(string buttonName, string buttonText, string listName, Action leftMouseClick, UIElement parent)
-            {
-                var listBox = new ListBoxUIObject(
-                    this.RenderingManager2D,
-                    listName,
-                    NextPosition(false),
-                    inputWidth,
-                    new List<ListBoxUIObject.Item>(),
-                    positionRelationX: maneuverObjectsPositionRelationX,
-                    positionRelationY: maneuverObjectsPositionRelationY,
-                    parent: parent);
-                AddElement(parent, listBox);
-
-                AddButton(buttonName, NextPosition(true), maneuverObjectsPositionRelationX, maneuverObjectsPositionRelationY, buttonText, leftMouseClick, parent);
-                return listBox;
-            }
-            
-            void CreateText(string textName, string text, UIElement parent, float posX, float offsetY = 5.0f)
-            {
-                var textObject = new TextUIObject(
-                    this.RenderingManager2D,
-                    textName,
-                    new Vector2(posX, posY + offsetY),
-                    text,
-                    Color.Yellow,
-                    parent: parent);
-                AddElement(parent, textObject);
-            }
-            #endregion
-
             #region MainMenu
-            var mainMenuPositionRelationX = PositionRelationX.Center;
-            var mainMenuPositionRelationY = PositionRelationY.Top;
             var numMainMenuElements = 4;
             var mainMenuSize = new Size2(
-                buttonWidth + 30,
-                (int)(buttonHeight * numMainMenuElements + 50));
+                UIBuilder.DefaultButtonWidth + 30,
+                (int)(UIBuilder.DefaultButtonHeight * numMainMenuElements + 50));
 
             var mainMenuUIGroup = new UIGroup(
                 this.RenderingManager2D,
@@ -245,47 +102,70 @@ namespace SpaceSimulator.UI
                 parent: mainMenuUIGroup);
             mainMenuUIGroup.AddObject(mainMenuBackground);
 
-            posY = 10.0f;
-            AddButton(
+            var mainMenuBuilder = this.NewUIBuilder(mainMenuUIGroup);
+            mainMenuBuilder.ResetPosition(5, -30.0f);
+            mainMenuBuilder.PositionRelationX = PositionRelationX.Center;
+
+            mainMenuBuilder.AddButton(
                 "AbortManeuverButton",
-                new Vector2(0, posY),
-                mainMenuPositionRelationX,
-                mainMenuPositionRelationY,
                 "Abort maneuver",
-                this.AbortManeuver,
-                mainMenuUIGroup);
+                this.AbortManeuver);
 
-            AddButton(
+            mainMenuBuilder.AddButton(
                "ShowManeuversButton",
-               new Vector2(0, posY += deltaY),
-               mainMenuPositionRelationX,
-               mainMenuPositionRelationY,
                "Show maneuvers",
-               this.ShowManeuvers,
-               mainMenuUIGroup);
+               this.ShowManeuvers);
 
-            AddButton(
+            mainMenuBuilder.AddButton(
                 "ShowAscentButton",
-                new Vector2(0, posY += deltaY),
-                mainMenuPositionRelationX,
-                mainMenuPositionRelationY,
                 "Show ascent",
-                this.ShowAscent,
-                mainMenuUIGroup);
+                this.ShowAscent);
 
-            AddButton(
+            mainMenuBuilder.AddButton(
                 "ShowCreateObjectButton",
-                new Vector2(0, posY += deltaY),
-                mainMenuPositionRelationX,
-                mainMenuPositionRelationY,
                 "Show create object",
-                this.ShowCreateObject,
-                mainMenuUIGroup);
+                this.ShowCreateObject);
+
+            //posY = 10.0f;
+            //AddButton(
+            //    "AbortManeuverButton",
+            //    new Vector2(0, posY),
+            //    mainMenuPositionRelationX,
+            //    mainMenuPositionRelationY,
+            //    "Abort maneuver",
+            //    this.AbortManeuver,
+            //    mainMenuUIGroup);
+
+            //AddButton(
+            //   "ShowManeuversButton",
+            //   new Vector2(0, posY += deltaY),
+            //   mainMenuPositionRelationX,
+            //   mainMenuPositionRelationY,
+            //   "Show maneuvers",
+            //   this.ShowManeuvers,
+            //   mainMenuUIGroup);
+
+            //AddButton(
+            //    "ShowAscentButton",
+            //    new Vector2(0, posY += deltaY),
+            //    mainMenuPositionRelationX,
+            //    mainMenuPositionRelationY,
+            //    "Show ascent",
+            //    this.ShowAscent,
+            //    mainMenuUIGroup);
+
+            //AddButton(
+            //    "ShowCreateObjectButton",
+            //    new Vector2(0, posY += deltaY),
+            //    mainMenuPositionRelationX,
+            //    mainMenuPositionRelationY,
+            //    "Show create object",
+            //    this.ShowCreateObject,
+            //    mainMenuUIGroup);
             #endregion
 
             #region Maneuvers
             var maneuverGroupSize = new Size2(380, 350);
-            posY = startPosY;
 
             this.maneuverGroup = new UIGroup(
                 this.RenderingManager2D,
@@ -307,71 +187,67 @@ namespace SpaceSimulator.UI
                 parent: this.maneuverGroup);
             this.maneuverGroup.AddObject(maneuverUIGroupBackground);
 
-            this.thurstAmountTextInput = AddButtonAndTextInput(
+            var maneuverBuilder = this.NewUIBuilder(this.maneuverGroup);
+            maneuverBuilder.PositionRelationX = PositionRelationX.Right;
+            maneuverBuilder.PositionRelationY = PositionRelationY.Top;
+            maneuverBuilder.ResetPosition(205, -20.0f);
+
+            this.thurstAmountTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "ApplyThrustButton",
                 "Apply Thrust",
                 "ThrustAmountTextInput",
                 "100P",
-                this.ApplyThrust,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.ApplyThrust));
 
-            this.changePeriapsisTextInput = AddButtonAndTextInput(
+            this.changePeriapsisTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "ChangePeriapsisButton",
                 "Change periapsis",
                 "ChangePeriapsisTextInput",
                 "0",
-                this.ChangePeriapsis,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.ChangePeriapsis));
 
-            this.changeApoapsisTextInput = AddButtonAndTextInput(
+            this.changeApoapsisTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "ChangeApoapsisButton",
                 "Change apoapsis",
                 "ChangeApoapsisTextInput",
                 "0",
-                this.ChangeApoapsis,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.ChangeApoapsis));
 
-            this.changeInclinationTextInput = AddButtonAndTextInput(
+            this.changeInclinationTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "ChangeInclinationButton",
                 "Change inclination",
                 "ChangeInclinationTextInput",
                 "0",
-                this.ChangeInclination,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.ChangeInclination));
 
-            offsetRight = 20;
-            posY = startPosY;
+            maneuverBuilder.ResetPosition(20, -20);
 
-            this.hohmannTransferRadiusTextInput = AddButtonAndTextInput(
+            this.hohmannTransferRadiusTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "HohmannTransferButton",
                 "Hohmann transfer",
                 "HohmannTransferRadiusTextInput",
                 "0",
-                this.HohmannTransfer,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.HohmannTransfer));
 
-            this.interceptTargetList = AddButtonAndListBox(
+            this.interceptTargetList = maneuverBuilder.AddButtonAndListBox(
                 "InterceptButton",
                 "Intercept",
                 "InterceptTargetList",
-                this.Intercept,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.Intercept));
             this.UpdateInterceptTargetList(this.SelectedObject);
 
-            this.rendevouzTargetList = AddButtonAndListBox(
+            this.rendevouzTargetList = maneuverBuilder.AddButtonAndListBox(
                 "RendevouzButton",
                 "Rendevouz",
                 "RendevouzTargetList",
-                this.Rendevouz,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.Rendevouz));
             this.UpdateRendevouzTargetList(this.SelectedObject);
 
-            this.planetaryRendevouzTargetList = AddButtonAndListBox(
+            this.planetaryRendevouzTargetList = maneuverBuilder.AddButtonAndListBox(
                 "PlanetaryRendevouzButton",
                 "Planetary rendevouz",
                 "RendevouzTargetList",
-                this.PlanetaryRendevouz,
-                this.maneuverGroup);
+                this.CreateExecuteManeuver(this.PlanetaryRendevouz));
             this.UpdatePlanetaryRendevouzTargetList(this.SelectedObject);
 
             this.SimulatorContainer.SelectedObjectChanged += (sender, args) =>
@@ -384,7 +260,6 @@ namespace SpaceSimulator.UI
 
             #region Ascent
             var ascentGroupSize = new Size2(200, 110);
-            posY = startPosY;
 
             this.ascentGroup = new UIGroup(
                 this.RenderingManager2D,
@@ -406,21 +281,20 @@ namespace SpaceSimulator.UI
                 parent: this.ascentGroup);
             this.ascentGroup.AddObject(ascentUIGroupBackground);
 
-            this.ascentTargetAltitudeTextInput = AddButtonAndTextInput(
+            var ascentBuilder = this.NewUIBuilder(this.ascentGroup);
+            ascentBuilder.PositionRelationX = PositionRelationX.Center;
+            ascentBuilder.ResetPosition(0, -20);
+
+            this.ascentTargetAltitudeTextInput = ascentBuilder.AddButtonAndTextInput(
                 "AscendToOrbitButton",
                 "Start ascent",
                 "AscentTargetAltitudeTextInput",
                 "300 km",
-                this.AscendToOrbit,
-                this.ascentGroup);
+                this.CreateExecuteManeuver(this.AscendToOrbit));
             #endregion
 
             #region CreateObject
             var createObjectGroupSize = new Size2(210, 260);
-            posY = startPosY;
-            offsetRight += 90;
-            inputWidth = 80;
-            var offsetLeft = 20.0f;
 
             this.createObjectGroup = new UIGroup(
                 this.RenderingManager2D,
@@ -444,33 +318,68 @@ namespace SpaceSimulator.UI
                 parent: this.createObjectGroup);
             this.createObjectGroup.AddObject(createObjectGroupBackground);
 
-            this.parameterTextInput = CreateTextInput("ParameterTextInput", "", this.createObjectGroup);
-            CreateText("ParameterText", "Parameter:", this.createObjectGroup, offsetLeft);
+            var createObjectBuilder = this.NewUIBuilder(this.createObjectGroup);
+            createObjectBuilder.PositionRelationX = PositionRelationX.Right;
+            createObjectBuilder.ResetPosition(10, -25.0f);
+            createObjectBuilder.TextInputWidth = 80;
 
-            this.eccentricityTextInput = CreateTextInput("EccentricityTextInput", "", this.createObjectGroup);
-            CreateText("EccentricityText", "Eccentricity:", this.createObjectGroup, offsetLeft);
+            this.parameterTextInput = createObjectBuilder.AddTextInput("ParameterTextInput", "");
+            this.eccentricityTextInput = createObjectBuilder.AddTextInput("EccentricityTextInput", "");
+            this.inclinationTextInput = createObjectBuilder.AddTextInput("InclinationTextInput", "");
+            this.longitudeOfAscendingNodeTextInput = createObjectBuilder.AddTextInput("LongitudeOfAscendingNodeTextInput", "");
+            this.argumentOfPeriapsisTextInput = createObjectBuilder.AddTextInput("ArgumentOfPeriapsisTextInput", "");
 
-            this.inclinationTextInput = CreateTextInput("InclinationTextInput", "", this.createObjectGroup);
-            CreateText("InclinationText", "Inclination:", this.createObjectGroup, offsetLeft);
+            createObjectBuilder.PositionRelationX = PositionRelationX.Left;
+            createObjectBuilder.ResetPosition(10, -20.0f);
+            createObjectBuilder.AddText("ParameterText", "Parameter:");
+            createObjectBuilder.AddText("EccentricityText", "Eccentricity:");
+            createObjectBuilder.AddText("InclinationText", "Inclination:");
+            createObjectBuilder.AddText("LongitudeOfAscendingNodeText", "Ω:");
+            createObjectBuilder.AddText("ArgumentOfPeriapsisText", "ω:");
 
-            this.longitudeOfAscendingNodeTextInput = CreateTextInput("LongitudeOfAscendingNodeTextInput", "", this.createObjectGroup);
-            CreateText("LongitudeOfAscendingNodeText", "Ω:", this.createObjectGroup, offsetLeft);
-
-            this.argumentOfPeriapsisTextInput = CreateTextInput("ArgumentOfPeriapsisTextInput", "", this.createObjectGroup);
-            CreateText("ArgumentOfPeriapsisText", "ω:", this.createObjectGroup, offsetLeft);
-
-            AddButton(
-                "CreateObject",
-                new Vector2(0, 10),
-                PositionRelationX.Center,
-                PositionRelationY.Bottom,
-                "Create object",
-                this.CreateObject,
-                this.createObjectGroup);
-
-            offsetRight = defaultOffsetRight;
-            inputWidth = defaultInputWidth;
+            createObjectBuilder.PositionRelationX = PositionRelationX.Center;
+            createObjectBuilder.PositionRelationY = PositionRelationY.Bottom;
+            createObjectBuilder.ResetPosition(0, -30.0f);
+            createObjectBuilder.AddButton("CreateObject", "Create object", this.CreateObject);
             #endregion
+        }
+
+        /// <summary>
+        /// Returns a function that will execute the given maneuver and handle errors
+        /// </summary>
+        /// <param name="maneuver">The maneuver</param>
+        private Action CreateExecuteManeuver(Action maneuver)
+        {
+            return () =>
+            {
+                try
+                {
+                    if (!this.SimulatorContainer.IsFrozen)
+                    {
+                        maneuver();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+            };
+        }
+
+        /// <summary>
+        /// Creates a new UI builder
+        /// </summary>
+        /// <param name="parent">The parent</param>
+        private UIBuilder NewUIBuilder(UIGroup parent)
+        {
+            var builder = new UIBuilder(
+                this.RenderingManager2D,
+                this.KeyboardManager,
+                this.uiManager,
+                this.uiStyle,
+                parent);
+
+            return builder;
         }
 
         /// <summary>
