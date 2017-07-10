@@ -61,6 +61,7 @@ namespace SpaceSimulator.UI
         /// </summary>
         public int TextInputWidth { get; set; } = 150;
 
+        private bool isFirst = true;
         private float currentPositionX = 0;
         private float currentPositionY = 0;
 
@@ -90,6 +91,7 @@ namespace SpaceSimulator.UI
         {
             this.currentPositionX = x;
             this.currentPositionY = y;
+            this.isFirst = true;
         }
 
         /// <summary>
@@ -98,7 +100,17 @@ namespace SpaceSimulator.UI
         /// <param name="isButton">Indicates if button</param>
         private Vector2 NextPosition(bool isButton)
         {
-            return new Vector2(this.currentPositionX + (isButton ? -2.5f : 0), this.currentPositionY += this.DeltaY);
+            if (!this.isFirst)
+            {
+                this.currentPositionY += this.DeltaY;
+            }
+
+            var nextPosition = new Vector2(
+                this.currentPositionX + (isButton ? -2.5f : 0),
+                this.currentPositionY);
+
+            this.isFirst = false;
+            return nextPosition;
         }
 
         /// <summary>

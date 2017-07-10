@@ -85,7 +85,7 @@ namespace SpaceSimulator.UI
                 PositionRelationX = PositionRelationX.Right
             };
 
-            createObjectBuilder.ResetPosition(10, -25.0f);
+            createObjectBuilder.ResetPosition(10, 15);
             createObjectBuilder.TextInputWidth = 80;
 
             this.parameterTextInput = createObjectBuilder.AddTextInput("ParameterTextInput", "0");
@@ -95,7 +95,7 @@ namespace SpaceSimulator.UI
             this.argumentOfPeriapsisTextInput = createObjectBuilder.AddTextInput("ArgumentOfPeriapsisTextInput", "0");
 
             createObjectBuilder.PositionRelationX = PositionRelationX.Left;
-            createObjectBuilder.ResetPosition(10, -20.0f);
+            createObjectBuilder.ResetPosition(10, 15);
             createObjectBuilder.AddText("ParameterText", "Parameter:");
             createObjectBuilder.AddText("EccentricityText", "Eccentricity:");
             createObjectBuilder.AddText("InclinationText", "Inclination:");
@@ -104,7 +104,7 @@ namespace SpaceSimulator.UI
 
             createObjectBuilder.PositionRelationX = PositionRelationX.Center;
             createObjectBuilder.PositionRelationY = PositionRelationY.Bottom;
-            createObjectBuilder.ResetPosition(0, -30.0f);
+            createObjectBuilder.ResetPosition(0, 10);
             createObjectBuilder.AddButton("CreateObject", "Create object", this.CreateObject);
         }
 

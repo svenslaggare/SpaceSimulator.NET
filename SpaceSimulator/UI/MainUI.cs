@@ -75,7 +75,7 @@ namespace SpaceSimulator.UI
                 this.uiStyle,
                 mainMenuUIGroup);
 
-            mainMenuBuilder.ResetPosition(5, -30.0f);
+            mainMenuBuilder.ResetPosition(5, 10);
             mainMenuBuilder.PositionRelationX = PositionRelationX.Center;
 
             mainMenuBuilder.AddButton(

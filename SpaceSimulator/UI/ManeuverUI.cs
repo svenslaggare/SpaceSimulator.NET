@@ -96,7 +96,7 @@ namespace SpaceSimulator.UI
             var maneuverBuilder = this.NewUIBuilder(this.maneuverGroup);
             maneuverBuilder.PositionRelationX = PositionRelationX.Right;
             maneuverBuilder.PositionRelationY = PositionRelationY.Top;
-            maneuverBuilder.ResetPosition(205, -20.0f);
+            maneuverBuilder.ResetPosition(205, 20);
 
             this.thurstAmountTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "ApplyThrustButton",
@@ -126,7 +126,7 @@ namespace SpaceSimulator.UI
                 "0",
                 this.CreateExecuteManeuver(this.ChangeInclination));
 
-            maneuverBuilder.ResetPosition(20, -20);
+            maneuverBuilder.ResetPosition(20, 20);
 
             this.hohmannTransferRadiusTextInput = maneuverBuilder.AddButtonAndTextInput(
                 "HohmannTransferButton",
@@ -189,7 +189,7 @@ namespace SpaceSimulator.UI
 
             var ascentBuilder = this.NewUIBuilder(this.ascentGroup);
             ascentBuilder.PositionRelationX = PositionRelationX.Center;
-            ascentBuilder.ResetPosition(0, -20);
+            ascentBuilder.ResetPosition(0, 20);
 
             this.ascentTargetAltitudeTextInput = ascentBuilder.AddButtonAndTextInput(
                 "AscendToOrbitButton",
