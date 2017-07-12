@@ -87,9 +87,9 @@ namespace SpaceSimulator.Common.Old
 		/// <summary>
 		/// Draws the skies
 		/// </summary>
-		/// <param name="context">The device context</param>
+		/// <param name="deviceContext">The device context</param>
 		/// <param name="camera">The camera</param>
-		public void Draw(DeviceContext context, BaseCamera camera)
+		public void Draw(DeviceContext deviceContext, BaseCamera camera)
 		{
 			//Center Sky about eye in world space
 			var translation = Matrix.Translation(camera.Position);
@@ -100,16 +100,16 @@ namespace SpaceSimulator.Common.Old
 			this.skyEffect.SetCubeMap(this.cubeMapView);
 
 			//Draw
-			context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<SkyVertex>(), 0));
-			context.InputAssembler.SetIndexBuffer(this.indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
-			context.InputAssembler.InputLayout = inputLayout;
-			context.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+			deviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<SkyVertex>(), 0));
+			deviceContext.InputAssembler.SetIndexBuffer(this.indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+			deviceContext.InputAssembler.InputLayout = inputLayout;
+			deviceContext.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
 
 			for (int i = 0; i < this.skyEffect.Technique.Description.PassCount; i++)
 			{
 				var pass = this.skyEffect.Technique.GetPassByIndex(i);
-				pass.Apply(context);
-				context.DrawIndexed(this.indices.Length, 0, 0);
+				pass.Apply(deviceContext);
+				deviceContext.DrawIndexed(this.indices.Length, 0, 0);
 			}
 		}
 

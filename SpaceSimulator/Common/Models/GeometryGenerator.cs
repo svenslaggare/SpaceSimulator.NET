@@ -316,7 +316,8 @@ namespace SpaceSimulator.Common.Models
 		/// <param name="stackCount">The stack count</param>
 		/// <param name="vertices">The created vertices</param>
 		/// <param name="indices">The created indices</param>
-		public static void CreateCylinder(float bottomRadius, float topRadius, float height, int sliceCount, int stackCount,
+		public static void CreateCylinder(
+            float bottomRadius, float topRadius, float height, int sliceCount, int stackCount,
 			out GeometryVertex[] vertices, out int[] indices)
 		{
 			var cylinderVertices = new List<GeometryVertex>();

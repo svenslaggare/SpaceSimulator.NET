@@ -45,15 +45,16 @@ namespace SpaceSimulator.UI
         {
             if (this.SelectedObject == null)
             {
-                for (int i = 0; i < this.SimulatorEngine.Objects.Count; i++)
-                {
-                    var currentObject = this.SimulatorEngine.Objects[i];
-                    if (currentObject.Type == PhysicsObjectType.ArtificialSatellite)
-                    {
-                        this.selectedObjectIndex = i;
-                        break;
-                    }
-                }
+                //for (int i = 0; i < this.SimulatorEngine.Objects.Count; i++)
+                //{
+                //    var currentObject = this.SimulatorEngine.Objects[i];
+                //    if (currentObject.Type == PhysicsObjectType.ArtificialSatellite)
+                //    {
+                //        this.selectedObjectIndex = i;
+                //        break;
+                //    }
+                //}
+                this.selectedObjectIndex = this.SimulatorEngine.Objects.Count - 1;
 
                 this.SimulatorContainer.SelectedObject = this.SimulatorEngine.Objects[this.selectedObjectIndex];
             }

@@ -38,8 +38,25 @@ namespace SpaceSimulator.Physics
         /// <param name="position">The position vector</param>
         public static Vector3d Radial( Vector3d position)
         {
-            //return MathHelpers.Normalized(Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)));
             return MathHelpers.Normalized(position);
+        }
+
+        /// <summary>
+        /// Returns the pseudo radial vector
+        /// </summary>
+        /// <param name="prograde">The prograde vector</param>
+        public static Vector3d PseudoRadial(Vector3d prograde)
+        {
+            return MathHelpers.Normalized(Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+        }
+
+        /// <summary>
+        /// Returns the pseudo normal vector
+        /// </summary>
+        /// <param name="prograde">The prograde vector</param>
+        public static Vector3d PseudoNormal(Vector3d prograde)
+        {
+            return Vector3d.Cross(prograde, PseudoRadial(prograde));
         }
 
         /// <summary>

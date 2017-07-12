@@ -331,6 +331,21 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Returns a matrix that faces the given direction
+        /// </summary>
+        /// <param name="forward">The forward direction</param>
+        /// <param name="up">The up direction</param>
+        /// <param name="right">the right direction</param>
+        public static Matrix FaceDirection(Vector3 forward, Vector3 up, Vector3? right = null)
+        {
+            var matrix = Matrix.Identity;
+            matrix.Forward = forward;
+            matrix.Up = up;
+            matrix.Right = right ?? Vector3.Cross(forward, up);
+            return matrix;
+        }
+
+        /// <summary>
         /// Converts between the given vector types
         /// </summary>
         /// <param name="vector">The vector</param>

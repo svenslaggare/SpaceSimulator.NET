@@ -35,10 +35,13 @@ namespace SpaceSimulator
         private BasicEffect planetNoLightEffect;
         private BasicEffect planetEffect;
         private OrbitEffect orbitEffect;
+        private BasicEffect arrowEffect;
 
         private readonly UIManager uiManager;
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
+
+        private Arrow arrow;
 
         /// <summary>
         /// Creates a new space simulator application
@@ -48,10 +51,10 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
+            //this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
@@ -65,6 +68,8 @@ namespace SpaceSimulator
             this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
+
+            this.arrow = new Arrow(this.GraphicsDevice, 0.25f, 10.0f, 2.0f);
         }
 
         /// <summary>
@@ -88,14 +93,16 @@ namespace SpaceSimulator
         private void CreateEffect()
         {
             this.sunEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "SunTex");
-            this.planetNoLightEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "NoLightTex");
-            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light1Tex");
+            this.planetNoLightEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetNoLightTex");
+            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetTex");
             this.orbitEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "Orbit");
+            this.arrowEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light1");
 
             this.sunEffect.CreateInputLayout(BasicVertex.CreateInput());
             this.planetEffect.CreateInputLayout(BasicVertex.CreateInput());
             this.planetNoLightEffect.CreateInputLayout(BasicVertex.CreateInput());
             this.orbitEffect.CreateInputLayout(Rendering.OrbitVertex.CreateInput());
+            this.arrowEffect.CreateInputLayout(BasicVertex.CreateInput());
         }
 
         /// <summary>
@@ -256,6 +263,23 @@ namespace SpaceSimulator
                     this.orbitEffect,
                     this.SpaceCamera,
                     this.RenderingObjects);
+
+                var selectedObject = this.simulatorContainer.SelectedObject;
+                var position = this.SpaceCamera.ToDrawPosition(selectedObject.Position);
+                var targetPosition = this.SpaceCamera.ToDrawPosition(selectedObject.Position + this.SpaceCamera.FromDraw(1) * selectedObject.State.Prograde);
+                var upPosition = this.SpaceCamera.ToDrawPosition(selectedObject.Position + this.SpaceCamera.FromDraw(1) * selectedObject.State.Normal);
+
+                this.arrow.DrawBasis(
+                    deviceContext,
+                    this.arrowEffect,
+                    this.ActiveCamera,
+                    0.001f * 0.75f,
+                    Matrix.Translation(position),
+                    MathHelpers.Normalized(targetPosition - position),
+                    MathHelpers.Normalized(upPosition - position),
+                    Color.Red,
+                    Color.Blue,
+                    Color.Green);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>

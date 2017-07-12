@@ -429,16 +429,16 @@ namespace SpaceSimulator.Common.Old
 		/// <summary>
 		/// Draws the terrain
 		/// </summary>
-		/// <param name="context">The device context</param>
+		/// <param name="deviceContext">The device context</param>
 		/// <param name="camera">The camera</param>
 		/// <param name="lights">The lights</param>
-		public void Draw(DeviceContext context, BaseCamera camera, DirectionalLight[] lights)
+		public void Draw(DeviceContext deviceContext, BaseCamera camera, DirectionalLight[] lights)
 		{
-			context.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.PatchListWith4ControlPoints;
-			context.InputAssembler.InputLayout = this.inputLayout;
+			deviceContext.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.PatchListWith4ControlPoints;
+			deviceContext.InputAssembler.InputLayout = this.inputLayout;
 
-			context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<TerrainVertex>(), 0));
-			context.InputAssembler.SetIndexBuffer(this.indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+			deviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<TerrainVertex>(), 0));
+			deviceContext.InputAssembler.SetIndexBuffer(this.indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
 
 			var viewProj = camera.View * camera.Projection;
 			var worldPlanes = CameraHelpers.ExtractFrustumPlanes(viewProj);
@@ -468,14 +468,14 @@ namespace SpaceSimulator.Common.Old
 			for (int i = 0; i < this.effect.Technique.Description.PassCount; i++)
 			{
 				var pass = this.effect.Technique.GetPassByIndex(i);
-				pass.Apply(context);
-				context.DrawIndexed(this.numPatchQuadFaces * 4, 0, 0);
+				pass.Apply(deviceContext);
+				deviceContext.DrawIndexed(this.numPatchQuadFaces * 4, 0, 0);
 			}
 
 			//The effect file sets tessellation stages, but it does not disable them.  So do that here
 			//to turn off tessellation.
-			context.HullShader.SetShader(null, null, 0);
-			context.DomainShader.SetShader(null, null, 0);
+			deviceContext.HullShader.SetShader(null, null, 0);
+			deviceContext.DomainShader.SetShader(null, null, 0);
 		}
 
 		/// <summary>
