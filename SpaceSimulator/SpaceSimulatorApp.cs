@@ -280,6 +280,15 @@ namespace SpaceSimulator
                     Color.Red,
                     Color.Blue,
                     Color.Green);
+
+                //this.arrow.DrawDirection(
+                //    deviceContext,
+                //    this.arrowEffect,
+                //    this.ActiveCamera,
+                //    0.001f * 0.75f,
+                //    Matrix.Translation(position),
+                //    Color.Red,
+                //    MathHelpers.Normalized(targetPosition - position));
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>

@@ -141,6 +141,24 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Returns the radial vector
+        /// </summary>
+        /// <param name="forward">The forward vector</param>
+        public static Vector3 Radial(Vector3 forward)
+        {
+            return Normalized(Vector3.Transform(forward, Matrix3x3.RotationY(MathUtil.Pi / 2)));
+        }
+
+        /// <summary>
+        /// Returns the pseudo normal vector
+        /// </summary>
+        /// <param name="forward">The forward vector</param>
+        public static Vector3 Normal(Vector3 forward)
+        {
+            return Vector3.Cross(forward, Radial(forward));
+        }
+
+        /// <summary>
         /// Squares the given value
         /// </summary>
         /// <param name="x">The value</param>

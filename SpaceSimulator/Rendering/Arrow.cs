@@ -169,6 +169,33 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Draws an arrow in the given direction
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="scale">The scale of arrow</param>
+        /// <param name="world">The world matrix</param>
+        /// <param name="color">The color of the arrow</param>
+        /// <param name="direction">The direction</param>
+        public void DrawDirection(
+            DeviceContext deviceContext,
+            BasicEffect effect,
+            BaseCamera camera,
+            float scale,
+            Matrix world,
+            Color color,
+            Vector3 direction)
+        {
+            this.Draw(
+                deviceContext,
+                effect,
+                camera,
+                Matrix.Scaling(scale) * MathHelpers.FaceDirection(direction, MathHelpers.Normal(direction)) * world,
+                color);
+        }
+
+        /// <summary>
         /// Draws the given basis
         /// </summary>
         /// <param name="deviceContext">The device context</param>
