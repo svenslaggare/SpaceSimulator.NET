@@ -60,7 +60,6 @@ namespace SpaceSimulator
                 //DrawBoundingRectangles = true
             };
 
-            //this.CameraManager.AddCamera("FollowCamera", new FollowCamera(FollowCamera.Mode.FollowAscent), true);
             this.CameraManager.AddCamera("FollowCameraNormal", new FollowCamera(FollowCamera.Mode.FollowNormal));
             this.CameraManager.AddCamera("FollowCameraRadial", new FollowCamera(FollowCamera.Mode.FollowRadial));
             this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));

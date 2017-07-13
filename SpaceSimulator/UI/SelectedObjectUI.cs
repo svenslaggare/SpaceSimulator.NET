@@ -233,6 +233,8 @@ namespace SpaceSimulator.UI
             if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite)
             {
                 var state = this.SelectedObject.State;
+                state.MakeRelative(this.SelectedObject.PrimaryBody.State);
+
                 var position = camera.ToDrawPosition(this.SelectedObject.Position);
                 var targetPosition = camera.ToDrawPosition(this.SelectedObject.Position + camera.FromDraw(1) * state.Prograde);
                 var upPosition = camera.ToDrawPosition(this.SelectedObject.Position + camera.FromDraw(1) * state.Normal);
@@ -241,7 +243,8 @@ namespace SpaceSimulator.UI
                     deviceContext,
                     arrowEffect,
                     camera,
-                    0.001f * 0.75f,
+                    //0.001f * 0.75f,
+                    camera.ToDraw(2.5E4),
                     Matrix.Translation(position),
                     MathHelpers.Normalized(targetPosition - position),
                     MathHelpers.Normalized(upPosition - position),
