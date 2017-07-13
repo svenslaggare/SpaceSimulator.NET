@@ -41,8 +41,6 @@ namespace SpaceSimulator
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
 
-        private Arrow arrow;
-
         /// <summary>
         /// Creates a new space simulator application
         /// </summary>
@@ -68,8 +66,6 @@ namespace SpaceSimulator
             this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
-
-            this.arrow = new Arrow(this.GraphicsDevice, 0.25f, 10.0f, 2.0f);
         }
 
         /// <summary>
@@ -120,6 +116,7 @@ namespace SpaceSimulator
                 this.simulatorContainer));
 
             this.uiComponents.Add(new SelectedObjectUI(
+                this.GraphicsDevice,
                 this.RenderingManager2D,
                 this.KeyboardManager,
                 this.MouseManager,
@@ -254,6 +251,7 @@ namespace SpaceSimulator
                 }
             });
 
+            var selectedObjectUI = this.uiComponents.OfType<SelectedObjectUI>().FirstOrDefault();
             this.renderingPasses.Add3D((deviceContext, deviceContext2D) =>
             {
                 RenderingObject.DrawSpheres(
@@ -264,31 +262,7 @@ namespace SpaceSimulator
                     this.SpaceCamera,
                     this.RenderingObjects);
 
-                var selectedObject = this.simulatorContainer.SelectedObject;
-                var position = this.SpaceCamera.ToDrawPosition(selectedObject.Position);
-                var targetPosition = this.SpaceCamera.ToDrawPosition(selectedObject.Position + this.SpaceCamera.FromDraw(1) * selectedObject.State.Prograde);
-                var upPosition = this.SpaceCamera.ToDrawPosition(selectedObject.Position + this.SpaceCamera.FromDraw(1) * selectedObject.State.Normal);
-
-                this.arrow.DrawBasis(
-                    deviceContext,
-                    this.arrowEffect,
-                    this.ActiveCamera,
-                    0.001f * 0.75f,
-                    Matrix.Translation(position),
-                    MathHelpers.Normalized(targetPosition - position),
-                    MathHelpers.Normalized(upPosition - position),
-                    Color.Red,
-                    Color.Blue,
-                    Color.Green);
-
-                //this.arrow.DrawDirection(
-                //    deviceContext,
-                //    this.arrowEffect,
-                //    this.ActiveCamera,
-                //    0.001f * 0.75f,
-                //    Matrix.Translation(position),
-                //    Color.Red,
-                //    MathHelpers.Normalized(targetPosition - position));
+                selectedObjectUI.DrawArrows(deviceContext, this.arrowEffect, this.SpaceCamera);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>
@@ -358,6 +332,7 @@ namespace SpaceSimulator
             this.planetEffect.Dispose();
             this.planetNoLightEffect.Dispose();
             this.orbitEffect.Dispose();
+            this.arrowEffect.Dispose();
 
             foreach (var renderingObject in this.RenderingObjects)
             {

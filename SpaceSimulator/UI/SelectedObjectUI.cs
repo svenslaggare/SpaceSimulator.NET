@@ -5,12 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
+using SpaceSimulator.Camera;
 using SpaceSimulator.Common;
+using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Common.UI;
 using SpaceSimulator.Helpers;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Rendering;
 using SpaceSimulator.Rendering.Plot;
 using SpaceSimulator.Simulator;
 
@@ -22,6 +26,9 @@ namespace SpaceSimulator.UI
     public class SelectedObjectUI : UIComponent
     {
         private int selectedObjectIndex;
+
+        private readonly Arrow arrow;
+
         private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
         private readonly bool showGroundTracks = true;
 
@@ -32,11 +39,13 @@ namespace SpaceSimulator.UI
         /// <summary>
         /// Creates a new selected object UI component
         /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="renderingManager2D">The rendering manager 2D</param>
         /// <param name="keyboardManager">The keyboard manager</param>
         /// <param name="mouseManager">The mouse manager</param>
         /// <param name="simulatorContainer">The simulator container</param>
         public SelectedObjectUI(
+            SharpDX.Direct3D11.Device graphicsDevice,
             RenderingManager2D renderingManager2D,
             KeyboardManager keyboardManager,
             MouseManager mouseManager,
@@ -60,6 +69,8 @@ namespace SpaceSimulator.UI
             }
 
             this.SimulatorContainer.SelectedObjectChanged += SelectedObjectChanged;
+
+            this.arrow = new Arrow(graphicsDevice, 0.25f, 10.0f, 2.0f);
         }
 
         /// <summary>
@@ -177,7 +188,7 @@ namespace SpaceSimulator.UI
             }
             else
             {
-                selectedObjectOrbitPosition = new OrbitPosition(new Orbit(), 0.0);
+                selectedObjectOrbitPosition = new OrbitPosition(new Physics.Orbit(), 0.0);
             }
 
             var selectedObjectText = OrbitTextInformation.FullInformation(
@@ -211,9 +222,39 @@ namespace SpaceSimulator.UI
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 90)));
         }
 
+        /// <summary>
+        /// Draws the arrows
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="arrowEffect">The arrow effect</param>
+        /// <param name="camera">The camera</param>
+        public void DrawArrows(SharpDX.Direct3D11.DeviceContext deviceContext, BasicEffect arrowEffect, SpaceCamera camera)
+        {
+            if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite)
+            {
+                var state = this.SelectedObject.State;
+                var position = camera.ToDrawPosition(this.SelectedObject.Position);
+                var targetPosition = camera.ToDrawPosition(this.SelectedObject.Position + camera.FromDraw(1) * state.Prograde);
+                var upPosition = camera.ToDrawPosition(this.SelectedObject.Position + camera.FromDraw(1) * state.Normal);
+
+                this.arrow.DrawBasis(
+                    deviceContext,
+                    arrowEffect,
+                    camera,
+                    0.001f * 0.75f,
+                    Matrix.Translation(position),
+                    MathHelpers.Normalized(targetPosition - position),
+                    MathHelpers.Normalized(upPosition - position),
+                    Color.Red,
+                    Color.Blue,
+                    Color.Green);
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();
+            this.arrow.Dispose();
 
             foreach (var groundTrack in this.groundTracks.Values)
             {
