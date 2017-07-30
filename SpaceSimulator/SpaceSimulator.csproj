@@ -180,6 +180,7 @@
     <Compile Include="Rendering\Plot\Function2D.cs" />
     <Compile Include="Simulator\ITextOutputWriter.cs" />
     <Compile Include="Simulator\NaturalSatelliteObject.cs" />
+    <Compile Include="Simulator\OrbitSimulators\ForceModel.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
     <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />

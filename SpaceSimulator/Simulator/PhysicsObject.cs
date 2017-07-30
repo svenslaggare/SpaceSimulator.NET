@@ -205,14 +205,6 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// The acceleration
-        /// </summary>
-        public Vector3d Acceleration
-        {
-            get { return this.state.Acceleration; }
-        }
-
-        /// <summary>
         /// The rotation of the object
         /// </summary>
         public double Rotation
@@ -391,9 +383,6 @@ namespace SpaceSimulator.Simulator
                     var newDistance = this.PrimaryBody.Radius + radius + 1;
                     this.state.Position = this.PrimaryBody.nextState.Position + dir * newDistance;
                     this.state.Velocity = Vector3d.Zero;
-                    this.state.Acceleration = OrbitFormulas.GravityAcceleration(
-                        this.PrimaryBody.StandardGravitationalParameter,
-                        dir * newDistance);
                     this.state.HasImpacted = true;
 
                     var referenceState = this.state;
@@ -435,7 +424,6 @@ namespace SpaceSimulator.Simulator
             stringBuilder.Append(" - alt: " + DataFormatter.Format(this.PrimaryBody.Altitude(this.Position), DataUnit.Distance));
             stringBuilder.Append(", r: " + DataFormatter.Format((this.Position - this.PrimaryBody.Position).Length(), DataUnit.Distance));
             stringBuilder.Append(", v: " + DataFormatter.Format(this.Velocity.Length(), DataUnit.Velocity));
-            stringBuilder.Append(", a: " + DataFormatter.Format(this.Acceleration.Length(), DataUnit.Acceleration));
 
             return stringBuilder.ToString();
         }

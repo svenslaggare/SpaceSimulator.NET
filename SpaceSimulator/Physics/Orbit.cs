@@ -357,8 +357,7 @@ namespace SpaceSimulator.Physics
             return new ObjectState(
                 primaryBodyState.Time,
                 radius,
-                velocity,
-                Vector3d.Zero);
+                velocity);
         }
 
         /// <summary>

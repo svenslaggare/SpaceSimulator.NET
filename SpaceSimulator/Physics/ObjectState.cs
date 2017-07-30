@@ -28,11 +28,6 @@ namespace SpaceSimulator.Physics
         public Vector3d Velocity { get; set; }
 
         /// <summary>
-        /// The acceleration
-        /// </summary>
-        public Vector3d Acceleration { get; set; }
-
-        /// <summary>
         /// The rotation
         /// </summary>
         public double Rotation { get; set; }
@@ -48,15 +43,13 @@ namespace SpaceSimulator.Physics
         /// <param name="time">The time</param>
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
-        /// <param name="acceleration">The acceleration</param>
         /// <param name="rotation">The rotation</param>
         /// <param name="impacted">Indicates if the object has impacted the primary body</param>
-        public ObjectState(double time, Vector3d position, Vector3d velocity, Vector3d acceleration, double rotation = 0.0, bool impacted = false)
+        public ObjectState(double time, Vector3d position, Vector3d velocity, double rotation = 0.0, bool impacted = false)
         {
             this.Time = time;
             this.Position = position;
             this.Velocity = velocity;
-            this.Acceleration = acceleration;
             this.Rotation = rotation;
             this.HasImpacted = impacted;
         }
@@ -76,7 +69,7 @@ namespace SpaceSimulator.Physics
         {
             get
             {
-                return OrbitHelpers.Normal(this.Position, this.Prograde);
+                return OrbitHelpers.Normal(this.Prograde, this.Radial);
             }
         }
 
@@ -104,18 +97,13 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
-        /// <param name="acceleration">The acceleration</param>
         /// <returns>The modified state</returns>
-        public ObjectState Add(
-            Vector3d position = new Vector3d(),
-            Vector3d velocity = new Vector3d(),
-            Vector3d acceleration = new Vector3d())
+        public ObjectState Add(Vector3d position = new Vector3d(), Vector3d velocity = new Vector3d())
         {
             return new ObjectState(
                 this.Time,
                 this.Position + position,
                 this.Velocity + velocity,
-                this.Acceleration + acceleration,
                 this.Rotation,
                 this.HasImpacted);
         }

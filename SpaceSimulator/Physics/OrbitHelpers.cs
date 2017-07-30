@@ -25,18 +25,18 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the normal vector
         /// </summary>
-        /// <param name="position">The position vector</param>
         /// <param name="prograde">The prograde vector</param>
-        public static Vector3d Normal(Vector3d position, Vector3d prograde)
+        /// <param name="radial">The radial vector</param>
+        public static Vector3d Normal(Vector3d prograde, Vector3d radial)
         {
-            return MathHelpers.Normalized(Vector3d.Cross(prograde, Radial(position)));
+            return MathHelpers.Normalized(Vector3d.Cross(prograde, radial));
         }
 
         /// <summary>
         /// Returns the radial vector
         /// </summary>
         /// <param name="position">The position vector</param>
-        public static Vector3d Radial( Vector3d position)
+        public static Vector3d Radial(Vector3d position)
         {
             return MathHelpers.Normalized(position);
         }
@@ -109,7 +109,7 @@ namespace SpaceSimulator.Physics
             var progradeAngle = MathHelpers.AngleBetween(
                 primaryBodyVelocity,
                 positionVector,
-                Normal(primaryBodyPosition, Prograde(primaryBodyVelocity)));
+                Normal(Prograde(primaryBodyVelocity), Radial(primaryBodyPosition)));
 
             if (progradeAngle < 0)
             {

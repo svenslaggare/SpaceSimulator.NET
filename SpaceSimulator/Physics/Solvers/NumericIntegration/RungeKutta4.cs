@@ -53,11 +53,9 @@ namespace SpaceSimulator.Physics.Solvers
             var state = new ObjectState(
                 initial.Time + deltaTime,
                 initial.Position + derivative.Velocity * deltaTime,
-                initial.Velocity + derivative.Acceleration * deltaTime,
-                derivative.Acceleration);
+                initial.Velocity + derivative.Acceleration * deltaTime);
 
-            var acceleration = calculateAcceleration(totalTime, ref state);
-            return new DerivativeState(state.Velocity, acceleration);
+            return new DerivativeState(state.Velocity, calculateAcceleration(totalTime, ref state));
         }
 
         /// <summary>
@@ -81,7 +79,6 @@ namespace SpaceSimulator.Physics.Solvers
             {
                 var primaryBodyState = primaryBody.State;
                 primaryBodyState.Velocity = Vector3d.Zero;
-                primaryBodyState.Acceleration = Vector3d.Zero;
                 primaryBodyState.Position = Vector3d.Zero;
 
                 return SolverHelpers.MoveImpactedObject(
@@ -103,7 +100,6 @@ namespace SpaceSimulator.Physics.Solvers
             state.Time += deltaTime;
             state.Position += velocity * deltaTime;
             state.Velocity += acceleration * deltaTime;
-            state.Acceleration = acceleration;
             state.Rotation = SolverHelpers.CalculateRotation(physicsObject.RotationalPeriod, state.Rotation, deltaTime);
             return state;
         }

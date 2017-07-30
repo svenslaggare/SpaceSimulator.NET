@@ -166,6 +166,8 @@ namespace SpaceSimulator.Simulator
         private double timeStep = 0.02;
         private readonly IList<double> subTimeIntervals = new List<double>();
 
+        private readonly IForceModel forceModel = new DefaultForceModel();
+
         private readonly INumericIntegrator numericIntegrator = new RungeKutta4Integrator();
         private readonly IKeplerProblemSolver keplerProblemSolver = new KeplerProblemUniversalVariableSolver();
         private readonly IGaussProblemSolver gaussProblemSolver = new GaussProblemUniversalVariableSolver();
@@ -210,35 +212,30 @@ namespace SpaceSimulator.Simulator
                 this.AddObject(current);
             }
 
-            this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator));
+            this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator, this.forceModel));
             this.orbitSimulators.Add(PhysicsSimulationMode.KeplerProblemUniversalVariable, new TwoBodySimulator(this.keplerProblemSolver));
             this.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
         }
 
         /// <summary>
+        /// Returns the force model
+        /// </summary>
+        public IForceModel ForceModel => this.forceModel;
+
+        /// <summary>
         /// Returns the numeric integrator
         /// </summary>
-        public INumericIntegrator NumericIntegrator
-        {
-            get { return this.numericIntegrator; }
-        }
+        public INumericIntegrator NumericIntegrator => this.numericIntegrator;
 
         /// <summary>
         /// Returns the kepler problem solver
         /// </summary>
-        public IKeplerProblemSolver KeplerProblemSolver
-        {
-            get { return this.keplerProblemSolver; }
-        }
+        public IKeplerProblemSolver KeplerProblemSolver => this.keplerProblemSolver;
 
         /// <summary>
         /// Returns the gauss problem solver
         /// </summary>
-        public IGaussProblemSolver GaussProblemSolver
-        {
-            get { return this.gaussProblemSolver; }
-        }
-
+        public IGaussProblemSolver GaussProblemSolver => this.gaussProblemSolver;
 
         /// <summary>
         /// The simulation mode
@@ -399,7 +396,7 @@ namespace SpaceSimulator.Simulator
             Vector3d position,
             Vector3d velocity)
         {
-            var initialState = new ObjectState(this.totalTime, position, velocity, Vector3d.Zero);
+            var initialState = new ObjectState(this.totalTime, position, velocity);
 
             var newObject = new SatelliteObject(
                 name,
@@ -457,7 +454,7 @@ namespace SpaceSimulator.Simulator
             Vector3d position,
             Vector3d velocity)
         {
-            var initialState = new ObjectState(this.totalTime, position, velocity, Vector3d.Zero);
+            var initialState = new ObjectState(this.totalTime, position, velocity);
 
             var newObject = new RocketObject(
                 name,

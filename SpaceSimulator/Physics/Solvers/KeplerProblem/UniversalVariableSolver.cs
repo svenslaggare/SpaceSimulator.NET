@@ -175,7 +175,6 @@ namespace SpaceSimulator.Physics.Solvers
                 initialState.Time + time,
                 primaryBodyStateAtTime.Position + r,
                 primaryBodyStateAtTime.Velocity + v,
-                OrbitFormulas.GravityAcceleration(mu, r),
                 rotation);
         }
     }
