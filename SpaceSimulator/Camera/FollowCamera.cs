@@ -89,24 +89,10 @@ namespace SpaceSimulator.Camera
 
                     this.followNormal = sphereNormal;
                     this.followForward = sphereTangent;
+                    //this.followNormal = pseudoNormal;
+                    //this.followForward = state.Prograde;
                     break;
             }
-
-            //if (state.Prograde.Equals(state.Radial))
-            //{
-            //    var pseudoRadial = MathHelpers.Normalized(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationY(Math.PI / 2)));
-            //    var pseudoNormal = Vector3d.Cross(state.Prograde, pseudoRadial);
-            //    var sphereNormal = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude);
-            //    var sphereTangent = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude + Math.PI / 2);
-
-            //    this.followNormal = sphereNormal;
-            //    this.followForward = sphereTangent;
-            //}
-            //else
-            //{
-            //    this.followNormal = state.Radial;
-            //    //this.followNormal = state.Normal;
-            //}
         }
 
         public override bool CanSetFocus(PhysicsObject physicsObject)

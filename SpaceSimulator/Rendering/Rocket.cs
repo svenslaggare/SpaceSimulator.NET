@@ -145,65 +145,6 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Draws the rocket
-        /// </summary>
-        /// <param name="deviceContext">The device context</param>
-        /// <param name="effect">The effect</param>
-        /// <param name="camera">The camera</param>
-        /// <param name="world">The world matrix</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, Matrix world)
-        {
-            //Set object constants
-            var color = Color.Gray;
-            effect.SetMaterial(new Material()
-            {
-                Ambient = color.ToVector4() * 0.25f,
-                Diffuse = color.ToVector4(),
-                Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
-            });
-
-            effect.SetEyePosition(camera.Position);
-            this.directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
-            effect.SetDirectionalLights(this.directionalLights);
-
-            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
-
-            var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
-            var offsetRotationWorld = rotation * world;
-
-            this.DrawPart(
-                deviceContext,
-                effect,
-                this.noseConeVertexBufferBinding,
-                this.noseConeIndexBuffer,
-                this.noseConeIndices.Length,
-                camera,
-                Matrix.Translation(Vector3.Up * this.baseHeight * 0.5f)
-                * Matrix.Translation(Vector3.Up * this.noseConeHeight * 0.5f)
-                * offsetRotationWorld);
-
-            this.DrawPart(
-                deviceContext,
-                effect,
-                this.baseVertexBufferBinding,
-                this.baseIndexBuffer,
-                this.baseIndices.Length,
-                camera,
-                offsetRotationWorld);
-
-            this.DrawPart(
-                deviceContext,
-                effect,
-                this.engineVertexBufferBinding,
-                this.engineIndexBuffer,
-                this.engineIndices.Length,
-                camera,
-                Matrix.Translation(Vector3.Down * this.baseHeight * 0.5f)
-                * Matrix.Translation(Vector3.Down * this.engineHeight * 0.5f)
-                * offsetRotationWorld);
-        }
-
-        /// <summary>
         /// Draws the given rocket object
         /// </summary>
         /// <param name="deviceContext">The device context</param>
@@ -220,28 +161,21 @@ namespace SpaceSimulator.Rendering
             //    MathHelpers.Normalized(targetPosition - position),
             //    MathHelpers.Normalized(upPosition - position));
             var forward = (targetPosition - position).Normalized();
-            var facing = MathHelpers.FaceDirection(forward, MathHelpers.Normal(forward));
+            var facing = MathHelpers.FaceDirection(forward);
 
             var scale = 0.01f;
             var world =
-                facing
-                * Matrix.Scaling(scale)
+                Matrix.Scaling(scale)
+                * facing
                 * Matrix.Translation(camera.ToDrawPosition(rocketObject.Position));
+            var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
 
+            //Draw thrust arrow
             var arrowScale = camera.ToDraw(2.5E4);
             var thrustDirection = MathHelpers.ToFloat(rocketObject.EngineAcceleration().Normalized());
 
-            var engineStartPosition = position - forward * scale * 0.5f * (this.baseHeight + this.engineHeight + 0.2f);
+            var engineStartPosition = position - forward * scale * 0.5f * (this.baseHeight + this.engineHeight * 1 + 0.2f * 1);
             var engineTargetPosition = engineStartPosition - thrustDirection * arrowScale * (this.arrow.BaseHeight + this.arrow.HeadHeight);
-
-            //this.arrow.DrawDirection(
-            //    deviceContext,
-            //    effect,
-            //    camera,
-            //    arrowScale,
-            //    Matrix.Translation(position - forward * scale * 0.5f * (this.baseHeight + this.engineHeight)),
-            //    Color.Yellow,
-            //    -thrustDirection);
 
             this.arrow.DrawDirection(
                 deviceContext,
@@ -250,9 +184,55 @@ namespace SpaceSimulator.Rendering
                 arrowScale,
                 Matrix.Translation(engineTargetPosition),
                 Color.Yellow,
-                thrustDirection);
+                (engineStartPosition - engineTargetPosition).Normalized());
 
-            this.Draw(deviceContext, effect, camera, world);
+            //Draw rocket
+            var color = Color.Gray;
+            effect.SetMaterial(new Material()
+            {
+                Ambient = color.ToVector4() * 0.25f,
+                Diffuse = color.ToVector4(),
+                Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
+            });
+
+            effect.SetEyePosition(camera.Position);
+            this.directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
+            effect.SetDirectionalLights(this.directionalLights);
+            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
+
+            this.DrawPart(
+                deviceContext,
+                effect,
+                this.noseConeVertexBufferBinding,
+                this.noseConeIndexBuffer,
+                this.noseConeIndices.Length,
+                camera,
+                rotation
+                * Matrix.Translation(-Vector3.ForwardLH * 0.5f * (this.baseHeight + this.noseConeHeight))
+                * world);
+
+            this.DrawPart(
+                deviceContext,
+                effect,
+                this.baseVertexBufferBinding,
+                this.baseIndexBuffer,
+                this.baseIndices.Length,
+                camera,
+                rotation * world);
+
+            this.DrawPart(
+                deviceContext,
+                effect,
+                this.engineVertexBufferBinding,
+                this.engineIndexBuffer,
+                this.engineIndices.Length,
+                camera,
+                rotation
+                * Matrix.Translation(Vector3.ForwardLH * 0.5f * this.engineHeight)
+                * MathHelpers.FaceDirection(thrustDirection.IsZero ? forward : thrustDirection)
+                * Matrix.Translation(-forward * 0.5f * (this.baseHeight))
+                * Matrix.Scaling(scale)
+                * Matrix.Translation(camera.ToDrawPosition(rocketObject.Position)));
         }
 
         public void Dispose()

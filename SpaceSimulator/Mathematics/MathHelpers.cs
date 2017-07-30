@@ -234,6 +234,21 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Returns the angle between the vectors u and v
+        /// </summary>
+        /// <param name="u">The first vector</param>
+        /// <param name="v">The second vector</param>
+        public static float AngleBetween(Vector3 u, Vector3 v)
+        {
+            if (u == v)
+            {
+                return 0;
+            }
+
+            return (float)Math.Atan2(Vector3.Cross(u, v).Length(), Vector3.Dot(u, v));
+        }
+
+        /// <summary>
         /// Returns the angle between the vectors u and v, with the sign determined by the normal to the plane of u and v
         /// </summary>
         /// <param name="u">The first vector</param>
@@ -361,6 +376,15 @@ namespace SpaceSimulator.Mathematics
             matrix.Up = up;
             matrix.Right = right ?? Vector3.Cross(forward, up);
             return matrix;
+        }
+
+        /// <summary>
+        /// Returns a matrix that faces the given direction
+        /// </summary>
+        /// <param name="forward">The forward direction</param>
+        public static Matrix FaceDirection(Vector3 forward)
+        {
+            return FaceDirection(forward, Normal(forward));
         }
 
         /// <summary>
