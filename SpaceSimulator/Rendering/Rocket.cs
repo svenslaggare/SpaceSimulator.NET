@@ -87,13 +87,9 @@ namespace SpaceSimulator.Rendering
         /// <param name="rocketObject">The rocket object</param>
         public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject)
         {
+            //Compute transformations
             var position = camera.ToDrawPosition(rocketObject.Position);
             var targetPosition = camera.ToDrawPosition(rocketObject.Position + camera.FromDraw(1) * rocketObject.State.Prograde);
-            var upPosition = camera.ToDrawPosition(rocketObject.Position + camera.FromDraw(1) * rocketObject.State.Normal);
-
-            //var facing = MathHelpers.FaceDirection(
-            //    MathHelpers.Normalized(targetPosition - position),
-            //    MathHelpers.Normalized(upPosition - position));
             var forward = (targetPosition - position).Normalized();
             var facing = MathHelpers.FaceDirection(forward);
 

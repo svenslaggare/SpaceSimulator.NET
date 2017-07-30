@@ -57,40 +57,22 @@ namespace SpaceSimulator.Physics
         /// <summary>
         /// Returns the prograde vector
         /// </summary>
-        public Vector3d Prograde
-        {
-            get { return OrbitHelpers.Prograde(this.Velocity); }
-        }
-
-        /// <summary>
-        /// Returns the normal vector
-        /// </summary>
-        public Vector3d Normal
-        {
-            get
-            {
-                return OrbitHelpers.Normal(this.Prograde, this.Radial);
-            }
-        }
-
-        /// <summary>
-        /// Returns the radial vector
-        /// </summary>
-        public Vector3d Radial
-        {
-            get
-            {
-                return OrbitHelpers.Radial(this.Position);
-            }
-        }
+        public Vector3d Prograde => OrbitHelpers.Prograde(this.Velocity);
 
         /// <summary>
         /// Returns the retrograde vector
         /// </summary>
-        public Vector3d Retrograde
-        {
-            get { return -this.Prograde; }
-        }
+        public Vector3d Retrograde => -this.Prograde;
+
+        /// <summary>
+        /// Returns the normal vector
+        /// </summary>
+        public Vector3d Normal => OrbitHelpers.Normal(this.Prograde, this.Radial);
+
+        /// <summary>
+        /// Returns the radial vector
+        /// </summary>
+        public Vector3d Radial => OrbitHelpers.Radial(this.Position);
 
         /// <summary>
         /// Adds the given values to the current state, returning a new state

@@ -28,8 +28,7 @@ namespace SpaceSimulator.Rendering
         public PhysicsObject PhysicsObject { get; }
 
         private readonly Color orbitColor;
-
-        private IList<Orbit.Point> positions;
+        private IList<Orbit.Point> orbitPositions;
         private readonly Orbit renderingOrbit;
 
         /// <summary>
@@ -91,7 +90,7 @@ namespace SpaceSimulator.Rendering
                 this.CalculateOrbitPositions();
                 this.renderingOrbit = new Orbit(
                     graphicsDevice,
-                    this.positions,
+                    this.orbitPositions,
                     orbitColor,
                     drawRelativeToFocus);
             }
@@ -188,12 +187,12 @@ namespace SpaceSimulator.Rendering
 
             if (orbitPosition.Orbit.IsRadialParabolic)
             {
-                this.positions = OrbitPositions.CreateRadialTrajectory(this.PhysicsObject, orbitPosition);
+                this.orbitPositions = OrbitPositions.CreateRadialTrajectory(this.PhysicsObject, orbitPosition);
             }
             else if (orbitPosition.Orbit.IsHyperbolic && Math.Abs(orbitPosition.Orbit.Eccentricity - 1.0) <= 1E-2)
             {
                 var timeToCrash = OrbitCalculators.TimeToImpact(orbitPosition);
-                this.positions = OrbitPositions.CreateForUnbound(
+                this.orbitPositions = OrbitPositions.CreateForUnbound(
                     new KeplerProblemUniversalVariableSolver(),
                     this.PhysicsObject,
                     orbitPosition.Orbit,
@@ -201,7 +200,7 @@ namespace SpaceSimulator.Rendering
             }
             else
             {
-                this.positions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
+                this.orbitPositions = OrbitPositions.Create(orbitPosition.Orbit, true, trueAnomaly: orbitPosition.TrueAnomaly);
             }
         }
         
@@ -360,7 +359,7 @@ namespace SpaceSimulator.Rendering
                 if (DateTime.UtcNow - this.lastOrbitUpdate >= this.orbitUpdateTime)
                 {
                     this.CalculateOrbitPositions();
-                    this.renderingOrbit.Update(this.positions);
+                    this.renderingOrbit.Update(this.orbitPositions);
                     this.updateOrbit = false;
                     this.lastOrbitUpdate = DateTime.UtcNow;
                 }
