@@ -84,7 +84,7 @@ namespace SpaceSimulator.Simulator.Environments
                     newObject,
                     color,
                     textureName,
-                    baseRotationY: baseRotationY,
+                    baseTransform: Matrix.RotationY(baseRotationY),
                     ringColor: ringColor,
                     ringRadius: ringRadius));
                 return newObject;

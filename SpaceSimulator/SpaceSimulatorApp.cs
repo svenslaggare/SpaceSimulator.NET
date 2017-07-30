@@ -257,11 +257,17 @@ namespace SpaceSimulator
             var selectedObjectUI = this.uiComponents.OfType<SelectedObjectUI>().FirstOrDefault();
             this.renderingPasses.Add3D((deviceContext, deviceContext2D) =>
             {
-                RenderingObject.DrawSpheres(
+                RenderingObject.DrawPlanets(
                     deviceContext,
                     this.sunEffect,
                     this.planetEffect,
                     this.orbitEffect,
+                    this.SpaceCamera,
+                    this.RenderingObjects);
+
+                RenderingObject.DrawObjects(
+                    deviceContext,
+                    this.arrowEffect,
                     this.SpaceCamera,
                     this.RenderingObjects);
 

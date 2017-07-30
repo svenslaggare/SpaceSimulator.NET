@@ -46,7 +46,7 @@ namespace SpaceSimulator.Simulator.Environments
                 earth,
                 Color.Yellow,
                 baseDir + "Earth.jpg",
-                MathUtil.DegreesToRadians(180.0f));
+                Matrix.RotationY(MathUtil.DegreesToRadians(180.0f)));
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>() { earthRenderingObject };

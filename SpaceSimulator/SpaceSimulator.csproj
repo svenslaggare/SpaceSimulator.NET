@@ -138,6 +138,7 @@
     <Compile Include="Physics\TimeConstants.cs" />
     <Compile Include="Rendering\Arrow.cs" />
     <Compile Include="Rendering\Cylinder.cs" />
+    <Compile Include="Rendering\IPhysicsObjectModel.cs" />
     <Compile Include="Rendering\Plot\GroundTrack.cs" />
     <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Rendering\Plot\PlotHelpers.cs" />

@@ -19,7 +19,7 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Draws a rocket
     /// </summary>
-    public sealed class Rocket : IDisposable
+    public sealed class Rocket : IDisposable, IPhysicsObjectModel
     {
         private readonly Device graphicsDevice;
 
@@ -161,6 +161,21 @@ namespace SpaceSimulator.Rendering
                 * Matrix.Translation(-forward * 0.5f * (this.mainBodyHeight))
                 * Matrix.Scaling(scale)
                 * Matrix.Translation(camera.ToDrawPosition(rocketObject.Position)));
+        }
+
+        /// <summary>
+        /// Draws the given object
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="physicsObject">The physics object</param>
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, PhysicsObject physicsObject)
+        {
+            if (physicsObject is RocketObject rocketObject)
+            {
+                this.Draw(deviceContext, effect, camera, rocketObject);
+            }
         }
 
         public void Dispose()

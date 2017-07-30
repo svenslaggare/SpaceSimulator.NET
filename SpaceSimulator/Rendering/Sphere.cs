@@ -16,13 +16,14 @@ using SpaceSimulator.Common.Models;
 using SpaceSimulator.Mathematics;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
+using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.Rendering
 {
     /// <summary>
     /// Represents a rendering of a sphere (planet, moon, etc.)
     /// </summary>
-    public sealed class Sphere : IDisposable
+    public sealed class Sphere : IDisposable, IPhysicsObjectModel
     {
         private readonly BasicVertex[] vertices;
         private readonly int[] indices;
@@ -37,13 +38,19 @@ namespace SpaceSimulator.Rendering
         private readonly Material material;
 
         /// <summary>
+        /// The transform before world transform<
+        /// </summary>
+        public Matrix Transform { get; }
+
+        /// <summary>
         /// Creates a new spehre
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="radius">The radius of the sphere</param>
         /// <param name="textureFile">The path of the texture to use</param>
         /// <param name="material">The material</param>
-        public Sphere(Device graphicsDevice, float radius, string textureFile, Material material)
+        /// <param name="transform">Transform before world transform</param>
+        public Sphere(Device graphicsDevice, float radius, string textureFile, Material material, Matrix transform)
         {
             GeometryGenerator.CreateSphere(radius, 50, 50, out var sphereVertices, out this.indices);
             this.vertices = new BasicVertex[sphereVertices.Length];
@@ -75,6 +82,8 @@ namespace SpaceSimulator.Rendering
             this.texture = TextureHelpers.FromFile(graphicsDevice, textureFile);
             this.textureView = new ShaderResourceView(graphicsDevice, this.texture);
             this.material = material;
+
+            this.Transform = transform;
         }
 
         /// <summary>
@@ -103,6 +112,55 @@ namespace SpaceSimulator.Rendering
             //Draw
             pass.Apply(deviceContext);
             deviceContext.DrawIndexed(this.indices.Length, 0, 0);
+        }
+
+        /// <summary>
+        /// Returns the scaling matrix
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        /// <param name="physicsObject">The object</param>
+        private Matrix ScalingMatrix(SpaceCamera camera, PhysicsObject physicsObject)
+        {
+            var size = 0.0f;
+            if (physicsObject is NaturalSatelliteObject naturalObject)
+            {
+                size = camera.ToDraw(naturalObject.Radius);
+            }
+            else
+            {
+                size = camera.ToDraw(Simulator.Data.SolarSystemBodies.Earth.Radius * 0.01);
+            }
+
+            return Matrix.Scaling(size);
+        }
+
+        /// <summary>
+        /// Draws the given object
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="physicsObject">The physics object</param>
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, PhysicsObject physicsObject)
+        {
+            effect.SetEyePosition(camera.Position);
+            effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
+            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
+
+            var world = 
+                this.ScalingMatrix(camera, physicsObject)
+                //* Matrix.RotationY(this.baseRotationY - (float)this.PhysicsObject.Rotation)
+                * Matrix.Translation(camera.ToDrawPosition(physicsObject.Position));
+
+            foreach (var pass in effect.Passes)
+            {
+                this.Draw(
+                    deviceContext,
+                    effect,
+                    pass,
+                    camera,
+                    world);
+            }
         }
 
         public void Dispose()

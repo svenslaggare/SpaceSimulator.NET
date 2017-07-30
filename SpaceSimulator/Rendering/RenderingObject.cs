@@ -49,8 +49,6 @@ namespace SpaceSimulator.Rendering
         private DateTime lastOrbitUpdate = new DateTime();
         private bool updateOrbit = false;
 
-        private readonly float baseRotationY;
-
         /// <summary>
         /// Indicates if the sphere should be drawn
         /// </summary>
@@ -68,7 +66,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="physicsObject">The physics object to render</param>
         /// <param name="orbitColor">The color of the orbit</param>
         /// <param name="textureName">The name of the texture for the sphere model</param>
-        /// <param name="baseRotationY">The base rotation in the Y-axis</param>
+        /// <param name="baseTransform">The base transform</param>
         /// <param name="ringColor">The color of the rings</param>
         /// <param name="ringRadius">The radius of the rings</param>
         public RenderingObject(
@@ -76,7 +74,7 @@ namespace SpaceSimulator.Rendering
             PhysicsObject physicsObject,
             Color orbitColor,
             string textureName,
-            float baseRotationY = 0.0f,
+            Matrix? baseTransform = null,
             Color? ringColor = null,
             double ringRadius = 0.0)
         {
@@ -109,15 +107,18 @@ namespace SpaceSimulator.Rendering
                     drawRelativeToFocus);
             }
 
-            this.renderingSphere = new Sphere(graphicsDevice, 1.0f, textureName, defaultMaterial);
+            this.renderingSphere = new Sphere(
+                graphicsDevice, 
+                1.0f, 
+                textureName,
+                defaultMaterial, 
+                baseTransform ?? Matrix.Identity);
 
             this.nextManeuverRenderingOrbit = new Rendering.Orbit(
                 graphicsDevice,
                 new List<Rendering.Orbit.Point>(),
                 new Color(124, 117, 6),
                 drawRelativeToFocus);
-
-            this.baseRotationY = baseRotationY;
 
             if (ringColor.HasValue && physicsObject is NaturalSatelliteObject naturalSatelliteObject)
             {
@@ -231,7 +232,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="planetEffect">The planet effect</param>
         /// <param name="pass">The effect pass</param>
         /// <param name="camera">The camera</param>
-        /// <param name="position">The position to draw at.</param>
+        /// <param name="position">The position to draw at</param>
         public void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, EffectPass pass, SpaceCamera camera, Vector3? position = null)
         {
             this.renderingSphere.Draw(
@@ -240,7 +241,8 @@ namespace SpaceSimulator.Rendering
                 pass,
                 camera,
                 this.ScalingMatrix(camera)
-                * Matrix.RotationY(this.baseRotationY - (float)this.PhysicsObject.Rotation)
+                * this.renderingSphere.Transform
+                * Matrix.RotationY(-(float)this.PhysicsObject.Rotation)
                 * Matrix.Translation(position ?? this.DrawPosition(camera)));
         }
 
@@ -412,7 +414,7 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Draws spheres for the given rendering objects
+        /// Draws planets
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="sunEffect">The sun effect</param>
@@ -420,7 +422,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="ringEffect">The ring effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="objects">The objects</param>
-        public static void DrawSpheres(
+        public static void DrawPlanets(
             DeviceContext deviceContext,
             BasicEffect sunEffect,
             BasicEffect planetEffect,
@@ -448,7 +450,8 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)
             {
-                foreach (var currentObject in objects.Where(x => !x.PhysicsObject.IsObjectOfReference && x.ShowSphere))
+                //foreach (var currentObject in objects.Where(obj => !obj.PhysicsObject.IsObjectOfReference && obj.ShowSphere))
+                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.NaturalSatellite && obj.ShowSphere))
                 {
                     currentObject.DrawSphere(deviceContext, planetEffect, pass, camera);
                 }
@@ -458,12 +461,38 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = ringEffect.InputLayout;
             foreach (var pass in ringEffect.Passes)
             {
-                foreach (var currentObject in objects.Where(x => x.ShowSphere))
+                foreach (var currentObject in objects.Where(obj => obj.ShowSphere))
                 {
                     if (currentObject.renderingOrbit != null)
                     {
                         currentObject.DrawRings(deviceContext, ringEffect, pass, camera);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws the given artificial objects
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="objects">The objects</param>
+        public static void DrawObjects(
+            DeviceContext deviceContext,
+            BasicEffect effect,
+            SpaceCamera camera,
+            IList<RenderingObject> objects)
+        {
+            effect.SetEyePosition(camera.Position);
+            effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
+
+            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
+            foreach (var pass in effect.Passes)
+            {
+                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.ArtificialSatellite && obj.ShowSphere))
+                {
+                    currentObject.DrawSphere(deviceContext, effect, pass, camera);
                 }
             }
         }
