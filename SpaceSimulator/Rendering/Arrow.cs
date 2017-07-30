@@ -31,17 +31,8 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         public float HeadHeight { get; }
 
-        private readonly BasicVertex[] baseVertices;
-        private readonly Buffer baseVertexBuffer;
-        private readonly VertexBufferBinding baseVertexBufferBinding;
-        private readonly int[] baseIndices;
-        private readonly Buffer baseIndexBuffer;
-
-        private readonly BasicVertex[] headVertices;
-        private readonly Buffer headVertexBuffer;
-        private readonly VertexBufferBinding headVertexBufferBinding;
-        private readonly int[] headIndices;
-        private readonly Buffer headIndexBuffer;
+        private readonly Cylinder arrowBase;
+        private readonly Cylinder arrowHead;
 
         private readonly DirectionalLight[] directionalLights;
 
@@ -58,8 +49,8 @@ namespace SpaceSimulator.Rendering
             this.BaseHeight = baseHeight;
             this.HeadHeight = headHeight;
 
-            (this.baseVertices, this.baseVertexBuffer, this.baseVertexBufferBinding, this.baseIndices, this.baseIndexBuffer) = this.CreateGeometry(radius, radius, baseHeight);
-            (this.headVertices, this.headVertexBuffer, this.headVertexBufferBinding, this.headIndices, this.headIndexBuffer) = this.CreateGeometry(radius * 2.0f, 0, headHeight);
+            this.arrowBase = new Cylinder(graphicsDevice, radius, radius, baseHeight);
+            this.arrowHead = new Cylinder(graphicsDevice, radius * 2.0f, 0, headHeight);
 
             this.directionalLights = new DirectionalLight[]
             {
@@ -71,61 +62,6 @@ namespace SpaceSimulator.Rendering
                     Direction = Vector3.Up
                 }
             };
-        }
-
-        /// <summary>
-        /// Creates the geometry
-        /// </summary>
-        private (BasicVertex[], Buffer, VertexBufferBinding, int[], Buffer) CreateGeometry(float bottomRadius, float topRadius, float height)
-        {
-            GeometryGenerator.CreateCylinder(bottomRadius, topRadius, height, 50, 50, out var geometryVertices, out var indices);
-            var vertices = geometryVertices.Select(vertex => new BasicVertex()
-            {
-                Position = vertex.Position,
-                Normal = vertex.Normal,
-                TextureCoordinates = vertex.TextureCoordinates
-            }).ToArray();
-
-            var vertexBuffer = Buffer.Create(
-                graphicsDevice,
-                BindFlags.VertexBuffer,
-                vertices);
-
-            var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<BasicVertex>(), 0);
-
-            var indexBuffer = Buffer.Create(
-                graphicsDevice,
-                BindFlags.IndexBuffer,
-                indices);
-
-            return (vertices, vertexBuffer, vertexBufferBinding, indices, indexBuffer);
-        }
-
-        /// <summary>
-        /// Draws the given part
-        /// </summary>
-        private void DrawPart(
-            DeviceContext deviceContext,
-            BasicEffect effect,
-            VertexBufferBinding vertexBufferBinding,
-            Buffer indexBuffer,
-            int count,
-            BaseCamera camera,
-            Matrix world)
-        {
-            effect.SetTransform(camera.ViewProjection, world);
-
-            //Set input assembler
-            deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            deviceContext.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
-            deviceContext.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
-
-            //Draw
-            foreach (var pass in effect.Passes)
-            {
-                pass.Apply(deviceContext);
-                deviceContext.DrawIndexed(count, 0, 0);
-            }
         }
 
         /// <summary>
@@ -157,21 +93,15 @@ namespace SpaceSimulator.Rendering
             var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
             var offsetRotationWorld = offset * rotation * world;
 
-            this.DrawPart(
+            this.arrowHead.Draw(
                 deviceContext,
                 effect,
-                this.headVertexBufferBinding,
-                this.headIndexBuffer,
-                this.headIndices.Length,
                 camera,
                 offset * Matrix.Translation(Vector3.Up * this.HeadHeight * 0.5f) * offsetRotationWorld);
 
-            this.DrawPart(
+            this.arrowBase.Draw(
                 deviceContext,
                 effect,
-                this.baseVertexBufferBinding,
-                this.baseIndexBuffer,
-                this.baseIndices.Length,
                 camera,
                 offsetRotationWorld);
         }
@@ -242,10 +172,8 @@ namespace SpaceSimulator.Rendering
 
         public void Dispose()
         {
-            this.baseVertexBuffer.Dispose();
-            this.baseIndexBuffer.Dispose();
-            this.headVertexBuffer.Dispose();
-            this.headIndexBuffer.Dispose();
+            this.arrowBase.Dispose();
+            this.arrowHead.Dispose();
         }
     }
 }

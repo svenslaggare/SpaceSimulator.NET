@@ -41,7 +41,7 @@ namespace SpaceSimulator.Rendering
         {
             this.graphicsDevice = graphicsDevice;
 
-            GeometryGenerator.CreateCylinder(bottomRadius, topRadius, height, 50, 50, out var geometryVertices, out var this.indices);
+            GeometryGenerator.CreateCylinder(bottomRadius, topRadius, height, 50, 50, out var geometryVertices, out this.indices);
             this.vertices = geometryVertices.Select(vertex => new BasicVertex()
             {
                 Position = vertex.Position,
@@ -69,7 +69,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="effect">The effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="world">The world matrix</param>
-        public void DrawPart(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, Matrix world)
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, BaseCamera camera, Matrix world)
         {
             effect.SetTransform(camera.ViewProjection, world);
 
@@ -82,7 +82,7 @@ namespace SpaceSimulator.Rendering
             foreach (var pass in effect.Passes)
             {
                 pass.Apply(deviceContext);
-                deviceContext.DrawIndexed(this.vertices.Length, 0, 0);
+                deviceContext.DrawIndexed(this.indices.Length, 0, 0);
             }
         }
 
