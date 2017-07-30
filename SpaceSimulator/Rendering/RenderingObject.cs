@@ -27,16 +27,15 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         public PhysicsObject PhysicsObject { get; }
 
-        /// <summary>
-        /// The path of the texture
-        /// </summary>
-        public string TextureName { get; }
-
         private readonly Color orbitColor;
 
         private IList<Orbit.Point> positions;
         private readonly Orbit renderingOrbit;
-        private readonly Sphere renderingSphere;
+
+        /// <summary>
+        /// The model
+        /// </summary>
+        public IPhysicsObjectModel Model { get; }
 
         private readonly Rendering.Orbit nextManeuverRenderingOrbit;
         private DateTime nextManeuverRenderingOrbitUpdated;
@@ -65,30 +64,20 @@ namespace SpaceSimulator.Rendering
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="physicsObject">The physics object to render</param>
         /// <param name="orbitColor">The color of the orbit</param>
-        /// <param name="textureName">The name of the texture for the sphere model</param>
-        /// <param name="baseTransform">The base transform</param>
+        /// <param name="model">The model</param>
         /// <param name="ringColor">The color of the rings</param>
         /// <param name="ringRadius">The radius of the rings</param>
         public RenderingObject(
             Device graphicsDevice,
             PhysicsObject physicsObject,
             Color orbitColor,
-            string textureName,
-            Matrix? baseTransform = null,
+            IPhysicsObjectModel model,
             Color? ringColor = null,
             double ringRadius = 0.0)
         {
             this.PhysicsObject = physicsObject;
-            this.TextureName = textureName;
-
             this.orbitColor = orbitColor;
-
-            var defaultMaterial = new Material()
-            {
-                Ambient = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
-                Diffuse = new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-                Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
-            };
+            this.Model = model;
 
             var drawRelativeToFocus = physicsObject.Type != PhysicsObjectType.ArtificialSatellite;
             drawRelativeToFocus = false;
@@ -106,13 +95,6 @@ namespace SpaceSimulator.Rendering
                     orbitColor,
                     drawRelativeToFocus);
             }
-
-            this.renderingSphere = new Sphere(
-                graphicsDevice, 
-                1.0f, 
-                textureName,
-                defaultMaterial, 
-                baseTransform ?? Matrix.Identity);
 
             this.nextManeuverRenderingOrbit = new Rendering.Orbit(
                 graphicsDevice,
@@ -138,7 +120,46 @@ namespace SpaceSimulator.Rendering
                 };
             }
         }
-        
+
+        /// <summary>
+        /// Creates a new rendering object
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="physicsObject">The physics object to render</param>
+        /// <param name="orbitColor">The color of the orbit</param>
+        /// <param name="textureName">The name of the texture</param>
+        /// <param name="baseTransform">The base transform<</param>
+        /// <param name="ringColor">The color of the rings</param>
+        /// <param name="ringRadius">The radius of the rings</param>
+        public RenderingObject(
+            Device graphicsDevice,
+            PhysicsObject physicsObject,
+            Color orbitColor,
+            string textureName,
+            Matrix? baseTransform = null,
+            Color? ringColor = null,
+            double ringRadius = 0.0)
+            : this(
+                  graphicsDevice,
+                  physicsObject,
+                  orbitColor,
+                  new Sphere(
+                      graphicsDevice,
+                      1.0f,
+                      textureName,
+                      new Material()
+                      {
+                          Ambient = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
+                          Diffuse = new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+                          Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
+                      },
+                      baseTransform ?? Matrix.Identity),
+                  ringColor,
+                  ringRadius)
+        {
+
+        }
+
         /// <summary>
         /// Returns the scaling matrix
         /// </summary>
@@ -235,15 +256,18 @@ namespace SpaceSimulator.Rendering
         /// <param name="position">The position to draw at</param>
         public void DrawSphere(DeviceContext deviceContext, BasicEffect planetEffect, EffectPass pass, SpaceCamera camera, Vector3? position = null)
         {
-            this.renderingSphere.Draw(
-                deviceContext,
-                planetEffect,
-                pass,
-                camera,
-                this.ScalingMatrix(camera)
-                * this.renderingSphere.Transform
-                * Matrix.RotationY(-(float)this.PhysicsObject.Rotation)
-                * Matrix.Translation(position ?? this.DrawPosition(camera)));
+            if (this.Model is Sphere sphere)
+            {
+                sphere.Draw(
+                    deviceContext,
+                    planetEffect,
+                    pass,
+                    camera,
+                    this.ScalingMatrix(camera)
+                    * sphere.Transform
+                    * Matrix.RotationY(-(float)this.PhysicsObject.Rotation)
+                    * Matrix.Translation(position ?? this.DrawPosition(camera)));
+            }
         }
 
         /// <summary>
@@ -450,7 +474,6 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)
             {
-                //foreach (var currentObject in objects.Where(obj => !obj.PhysicsObject.IsObjectOfReference && obj.ShowSphere))
                 foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.NaturalSatellite && obj.ShowSphere))
                 {
                     currentObject.DrawSphere(deviceContext, planetEffect, pass, camera);
@@ -472,27 +495,29 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Draws the given artificial objects
+        /// Draws artificial objects
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
+        /// <param name="textureEffect">The texture effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="objects">The objects</param>
         public static void DrawObjects(
             DeviceContext deviceContext,
             BasicEffect effect,
+            BasicEffect textureEffect,
             SpaceCamera camera,
             IList<RenderingObject> objects)
         {
-            effect.SetEyePosition(camera.Position);
-            effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
-
-            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
             foreach (var pass in effect.Passes)
             {
                 foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.ArtificialSatellite && obj.ShowSphere))
                 {
-                    currentObject.DrawSphere(deviceContext, effect, pass, camera);
+                    currentObject.Model.Draw(
+                        deviceContext, 
+                        currentObject.Model.IsTextured ? textureEffect : effect,
+                        camera, 
+                        currentObject.PhysicsObject);
                 }
             }
         }
@@ -524,7 +549,7 @@ namespace SpaceSimulator.Rendering
 
         public void Dispose()
         {
-            this.renderingSphere.Dispose();
+            this.Model.Dispose();
             this.renderingOrbit?.Dispose();
             this.nextManeuverRenderingOrbit?.Dispose();
             this.ringRenderingOrbit?.Dispose();

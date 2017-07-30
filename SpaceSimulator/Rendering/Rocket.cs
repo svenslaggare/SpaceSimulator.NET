@@ -74,6 +74,11 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Indicates if the effect is textured
+        /// </summary>
+        public bool IsTextured => false;
+
+        /// <summary>
         /// Draws the given rocket object
         /// </summary>
         /// <param name="deviceContext">The device context</param>

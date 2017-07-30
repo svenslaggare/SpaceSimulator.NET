@@ -13,8 +13,13 @@ namespace SpaceSimulator.Rendering
     /// <summary>
     /// Represents a model for a physics object
     /// </summary>
-    public interface IPhysicsObjectModel
+    public interface IPhysicsObjectModel : IDisposable
     {
+        /// <summary>
+        /// Indicates if the effect is textured
+        /// </summary>
+        bool IsTextured { get; }
+
         /// <summary>
         /// Draws the given object
         /// </summary>

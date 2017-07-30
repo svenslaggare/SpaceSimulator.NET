@@ -38,7 +38,12 @@ namespace SpaceSimulator.Rendering
         private readonly Material material;
 
         /// <summary>
-        /// The transform before world transform<
+        /// The name of the texture
+        /// </summary>
+        public string TextureName { get; }
+
+        /// <summary>
+        /// The transform before world transform
         /// </summary>
         public Matrix Transform { get; }
 
@@ -47,11 +52,13 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="radius">The radius of the sphere</param>
-        /// <param name="textureFile">The path of the texture to use</param>
+        /// <param name="textureName">The path of the texture to use</param>
         /// <param name="material">The material</param>
         /// <param name="transform">Transform before world transform</param>
-        public Sphere(Device graphicsDevice, float radius, string textureFile, Material material, Matrix transform)
+        public Sphere(Device graphicsDevice, float radius, string textureName, Material material, Matrix transform)
         {
+            this.TextureName = textureName;
+
             GeometryGenerator.CreateSphere(radius, 50, 50, out var sphereVertices, out this.indices);
             this.vertices = new BasicVertex[sphereVertices.Length];
 
@@ -79,12 +86,17 @@ namespace SpaceSimulator.Rendering
                 BindFlags.IndexBuffer,
                 this.indices);
 
-            this.texture = TextureHelpers.FromFile(graphicsDevice, textureFile);
+            this.texture = TextureHelpers.FromFile(graphicsDevice, textureName);
             this.textureView = new ShaderResourceView(graphicsDevice, this.texture);
             this.material = material;
 
             this.Transform = transform;
         }
+
+        /// <summary>
+        /// Indicates if the effect is textured
+        /// </summary>
+        public bool IsTextured => true;
 
         /// <summary>
         /// Draws the sphere using the given effect
@@ -147,9 +159,10 @@ namespace SpaceSimulator.Rendering
             effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
 
-            var world = 
+            var world =
                 this.ScalingMatrix(camera, physicsObject)
-                //* Matrix.RotationY(this.baseRotationY - (float)this.PhysicsObject.Rotation)
+                * this.Transform
+                * Matrix.RotationY(-(float)physicsObject.Rotation)
                 * Matrix.Translation(camera.ToDrawPosition(physicsObject.Position));
 
             foreach (var pass in effect.Passes)

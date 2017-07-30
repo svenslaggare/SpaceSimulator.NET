@@ -152,11 +152,13 @@ namespace SpaceSimulator.UI
             {
                 if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
                 {
+                    var primaryBodyRenderingObject = this.SimulatorContainer.GetRenderingObject(this.SelectedObject.PrimaryBody);
+
                     groundTrack = new GroundTrack(
                         this.RenderingManager2D,
                         this.SimulatorEngine.KeplerProblemSolver,
                         this.SelectedObject,
-                        this.SimulatorContainer.GetRenderingObject(this.SelectedObject.PrimaryBody).TextureName,
+                        ((Sphere)primaryBodyRenderingObject.Model).TextureName,
                         Vector2.Zero);
 
                     this.groundTracks.Add(this.SelectedObject, groundTrack);
