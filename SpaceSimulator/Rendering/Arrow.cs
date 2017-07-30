@@ -20,8 +20,16 @@ namespace SpaceSimulator.Rendering
     public sealed class Arrow : IDisposable
     {
         private readonly Device graphicsDevice;
-        private readonly float baseHeight;
-        private readonly float headHeight;
+
+        /// <summary>
+        /// The height of the base
+        /// </summary>
+        public float BaseHeight { get; }
+
+        /// <summary>
+        /// The height of the head
+        /// </summary>
+        public float HeadHeight { get; }
 
         private readonly BasicVertex[] baseVertices;
         private readonly Buffer baseVertexBuffer;
@@ -47,8 +55,8 @@ namespace SpaceSimulator.Rendering
         public Arrow(Device graphicsDevice, float radius, float baseHeight, float headHeight)
         {
             this.graphicsDevice = graphicsDevice;
-            this.baseHeight = baseHeight;
-            this.headHeight = headHeight;
+            this.BaseHeight = baseHeight;
+            this.HeadHeight = headHeight;
 
             (this.baseVertices, this.baseVertexBuffer, this.baseVertexBufferBinding, this.baseIndices, this.baseIndexBuffer) = this.CreateGeometry(radius, radius, baseHeight);
             (this.headVertices, this.headVertexBuffer, this.headVertexBufferBinding, this.headIndices, this.headIndexBuffer) = this.CreateGeometry(radius * 2.0f, 0, headHeight);
@@ -139,13 +147,13 @@ namespace SpaceSimulator.Rendering
             });
 
             effect.SetEyePosition(camera.Position);
-            this.directionalLights[0].Direction = MathHelpers.Normalized(-camera.Look + 0.2f * camera.Up);
+            this.directionalLights[0].Direction = (-camera.Look + 0.2f * camera.Up).Normalized();
             //this.directionalLights[0].Direction = MathHelpers.Normalized(-camera.Up);
             effect.SetDirectionalLights(this.directionalLights);
 
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
 
-            var offset = Matrix.Translation(Vector3.Up * this.baseHeight * 0.5f);
+            var offset = Matrix.Translation(Vector3.Up * this.BaseHeight * 0.5f);
             var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
             var offsetRotationWorld = offset * rotation * world;
 
@@ -156,7 +164,7 @@ namespace SpaceSimulator.Rendering
                 this.headIndexBuffer,
                 this.headIndices.Length,
                 camera,
-                offset * Matrix.Translation(Vector3.Up * this.headHeight * 0.5f) * offsetRotationWorld);
+                offset * Matrix.Translation(Vector3.Up * this.HeadHeight * 0.5f) * offsetRotationWorld);
 
             this.DrawPart(
                 deviceContext,
@@ -220,6 +228,11 @@ namespace SpaceSimulator.Rendering
             Color upColor,
             Color rightColor)
         {
+            if (up.Length() <= 0.0001)
+            {
+                up = MathHelpers.Normal(forward);
+            }
+
             var right = Vector3.Cross(forward, up);
             var scaling = Matrix.Scaling(scale);
             this.Draw(deviceContext, effect, camera, scaling * MathHelpers.FaceDirection(forward, up, right) * world, forwardColor);

@@ -243,11 +243,10 @@ namespace SpaceSimulator.UI
                     deviceContext,
                     arrowEffect,
                     camera,
-                    //0.001f * 0.75f,
                     camera.ToDraw(2.5E4),
                     Matrix.Translation(position),
-                    MathHelpers.Normalized(targetPosition - position),
-                    MathHelpers.Normalized(upPosition - position),
+                    (targetPosition - position).Normalized(),
+                    (upPosition - position).Normalized(),
                     Color.Red,
                     Color.Blue,
                     Color.Green);

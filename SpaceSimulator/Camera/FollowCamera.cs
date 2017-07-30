@@ -44,14 +44,14 @@ namespace SpaceSimulator.Camera
 
         public override void UpdateViewMatrix()
         {
-            var cameraPosition = this.FocusPosition + MathHelpers.Normalized(-this.followForward + this.followNormal * 1) * this.Distance;
+            var cameraPosition = this.FocusPosition + (-this.followForward + this.followNormal * 1).Normalized() * this.Distance;
             var targetPosition = this.FocusPosition;
 
             this.position = this.ToDrawPosition(cameraPosition);
             var targetDrawPosition = this.ToDrawPosition(targetPosition);
 
-            this.up = MathHelpers.Normalized(this.ToDrawPosition(this.FocusPosition + this.FromDraw(1.0f) * this.followNormal) - this.position);
-            this.look = MathHelpers.Normalized(targetDrawPosition - this.position);
+            this.up = (this.ToDrawPosition(this.FocusPosition + this.FromDraw(1.0f) * this.followNormal) - this.position).Normalized();
+            this.look = (targetDrawPosition - this.position).Normalized();
             this.right = Vector3.Cross(this.Up, this.Look);
 
             this.view = Matrix.LookAtLH(this.position, targetDrawPosition, this.up);

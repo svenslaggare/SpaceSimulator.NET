@@ -38,7 +38,7 @@ namespace SpaceSimulator.Physics
                 return r;
             }
 
-            return -Constants.G * ((m1 * m2) * MathHelpers.Normalized(r)) / normSquared;
+            return -Constants.G * ((m1 * m2) * r.Normalized()) / normSquared;
         }
 
         /// <summary>

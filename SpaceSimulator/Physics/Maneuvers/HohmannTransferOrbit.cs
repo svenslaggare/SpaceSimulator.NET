@@ -172,7 +172,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 t1,
                 out var burnState,
                 out var burnPrimaryState);
-            var dir1 = MathHelpers.Normalized(burnState.Velocity - burnPrimaryState.Velocity);
+            var dir1 = (burnState.Velocity - burnPrimaryState.Velocity).Normalized();
             var dir2 = -dir1;
 
             var data = CalculateBurn(mu, currentRadius, newRadius);

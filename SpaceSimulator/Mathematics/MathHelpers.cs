@@ -124,7 +124,7 @@ namespace SpaceSimulator.Mathematics
         /// Normalizes the given vector
         /// </summary>
         /// <param name="vector">The vector</param>
-        public static Vector3d Normalized(Vector3d vector)
+        public static Vector3d Normalized(this Vector3d vector)
         {
             vector.Normalize();
             return vector;
@@ -134,7 +134,7 @@ namespace SpaceSimulator.Mathematics
         /// Normalizes the given vector
         /// </summary>
         /// <param name="vector">The vector</param>
-        public static Vector3 Normalized(Vector3 vector)
+        public static Vector3 Normalized(this Vector3 vector)
         {
             vector.Normalize();
             return vector;
@@ -246,7 +246,7 @@ namespace SpaceSimulator.Mathematics
                 return 0;
             }
 
-            var angle = Math.Acos(Vector3d.Dot(MathHelpers.Normalized(u), MathHelpers.Normalized(v)));
+            var angle = Math.Acos(Vector3d.Dot(Normalized(u), Normalized(v)));
             var cross = Vector3d.Cross(u, v);
             return angle * Math.Sign(Vector3d.Dot(n, cross));
         }

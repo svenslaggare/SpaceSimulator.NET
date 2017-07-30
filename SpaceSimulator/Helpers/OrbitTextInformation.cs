@@ -87,7 +87,7 @@ namespace SpaceSimulator.Helpers
                 if (physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
                 {
                     var relativeVelocity = state.Velocity - refVelocity;
-                    var gravityAccelerationDirection = MathHelpers.Normalized(primaryBody.Position - state.Position);
+                    var gravityAccelerationDirection = (primaryBody.Position - state.Position).Normalized();
 
                     (var horizontalSpeed, var verticalSpeed) = OrbitHelpers.ComputeHorizontalAndVerticalVelocity(gravityAccelerationDirection, relativeVelocity);
 
@@ -96,36 +96,41 @@ namespace SpaceSimulator.Helpers
                 }
             }
 
-            var gravityAcceleration = OrbitFormulas.GravityAcceleration(physicsObject.PrimaryBody.StandardGravitationalParameter, state.Position - refPosition);
-            Vector3d? thrustAcceleration = null;
-            Vector3d? dragAcceleration = null;
-
-            if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
+            if (physicsObject.PrimaryBody != null)
             {
-                var primaryPlanet = primaryBody as PlanetObject;
-                dragAcceleration = primaryPlanet.DragOnObject(artificialPhysicsObject, ref state) / artificialPhysicsObject.Mass;
+                var gravityAcceleration = OrbitFormulas.GravityAcceleration(
+                    physicsObject.PrimaryBody.StandardGravitationalParameter,
+                    state.Position - refPosition);
+                Vector3d? thrustAcceleration = null;
+                Vector3d? dragAcceleration = null;
 
-                if (physicsObject is RocketObject rocketObject)
+                if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
                 {
-                    thrustAcceleration = rocketObject.EngineAcceleration();
-                }
-            }
+                    var primaryPlanet = primaryBody as PlanetObject;
+                    dragAcceleration = primaryPlanet.DragOnObject(artificialPhysicsObject, ref state) / artificialPhysicsObject.Mass;
 
-            var acceleration = gravityAcceleration + thrustAcceleration ?? Vector3d.Zero + dragAcceleration ?? Vector3d.Zero;
-
-            infoBuilder.AppendLine("Acceleration: " + DataFormatter.Format(acceleration.Length(), DataUnit.Acceleration));
-            if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
-            {
-                AddBulletItem("Gravity: " + DataFormatter.Format(gravityAcceleration.Length(), DataUnit.Acceleration));
-
-                if (thrustAcceleration != null)
-                {
-                    AddBulletItem("Thrust: " + DataFormatter.Format((thrustAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration));
+                    if (physicsObject is RocketObject rocketObject)
+                    {
+                        thrustAcceleration = rocketObject.EngineAcceleration();
+                    }
                 }
 
-                if (dragAcceleration != null)
+                var acceleration = gravityAcceleration + thrustAcceleration ?? Vector3d.Zero + dragAcceleration ?? Vector3d.Zero;
+
+                infoBuilder.AppendLine("Acceleration: " + DataFormatter.Format(acceleration.Length(), DataUnit.Acceleration));
+                if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
                 {
-                    AddBulletItem("Drag: " + DataFormatter.Format((dragAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration));
+                    AddBulletItem("Gravity: " + DataFormatter.Format(gravityAcceleration.Length(), DataUnit.Acceleration));
+
+                    if (thrustAcceleration != null)
+                    {
+                        AddBulletItem("Thrust: " + DataFormatter.Format((thrustAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration));
+                    }
+
+                    if (dragAcceleration != null)
+                    {
+                        AddBulletItem("Drag: " + DataFormatter.Format((dragAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration));
+                    }
                 }
             }
 

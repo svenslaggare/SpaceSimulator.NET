@@ -58,7 +58,7 @@ namespace SpaceSimulator.Physics.Solvers
             var nextPosition = OrbitHelpers.FromSphericalCoordinates(latitude, longitude, r.Length());
 
             //Calculate the surface velocity due to rotation of primary body
-            var surfaceSpeedDir = Vector3d.Cross(MathHelpers.Normalized(nextPosition), primaryBody.AxisOfRotation);
+            var surfaceSpeedDir = Vector3d.Cross(nextPosition.Normalized(), primaryBody.AxisOfRotation);
             surfaceSpeedDir.Normalize();
             var velocity = OrbitHelpers.SurfaceSpeedDueToRotation(primaryBody, Math.PI / 2.0 - latitude) * surfaceSpeedDir;
 

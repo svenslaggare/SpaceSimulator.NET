@@ -77,7 +77,6 @@ namespace SpaceSimulator.Simulator.Environments
             renderingObjects.Add(new RenderingObject(graphicsDevice, falcon9Object, Color.Yellow, baseDir + "Satellite.png"));
 
             var falcon9TargetAltitude = 300E3;
-
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
 
             //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
@@ -86,7 +85,7 @@ namespace SpaceSimulator.Simulator.Environments
             //    1E3,
             //    falcon9TargetOrbit);
             var bestPitchStart = 1E3;
-            var bestPitchEnd = 15.7875E3;
+            var bestPitchEnd = 2.6E3;
 
             falcon9Object.SetControlProgram(new AscentControlProgram(
                 falcon9Object,

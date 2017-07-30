@@ -381,6 +381,21 @@ namespace SpaceSimulator.Physics
         }
 
         /// <summary>
+        /// Returns the position of the periapsis
+        /// </summary>
+        public OrbitPosition PeriapsisPosition => new OrbitPosition(this, 0.0);
+
+        /// <summary>
+        /// Returns the position of the apoapsis
+        /// </summary>
+        public OrbitPosition ApopasisPosition => new OrbitPosition(this, MathUtild.Pi);
+
+        /// <summary>
+        /// Returns the position of the ascending node
+        /// </summary>
+        public OrbitPosition AscendingNodePosition => new OrbitPosition(this, MathUtild.TwoPi - this.ArgumentOfPeriapsis);
+
+        /// <summary>
         /// Calculates the orbit from the given state
         /// </summary>
         /// <param name="primaryBody">The object the orbit is around</param>

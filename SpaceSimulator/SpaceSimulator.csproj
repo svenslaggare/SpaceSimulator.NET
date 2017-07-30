@@ -140,6 +140,7 @@
     <Compile Include="Rendering\Plot\GroundTrack.cs" />
     <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Rendering\Plot\PlotHelpers.cs" />
+    <Compile Include="Rendering\Rocket.cs" />
     <Compile Include="Simulator\Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />
     <Compile Include="Helpers\CollisionHelpers.cs" />

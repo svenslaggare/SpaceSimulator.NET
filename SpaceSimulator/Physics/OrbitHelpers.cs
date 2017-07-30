@@ -19,7 +19,7 @@ namespace SpaceSimulator.Physics
         /// <param name="velocity">The velocity vector</param>
         public static Vector3d Prograde(Vector3d velocity)
         {
-            return MathHelpers.Normalized(velocity);
+            return velocity.Normalized();
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SpaceSimulator.Physics
         /// <param name="radial">The radial vector</param>
         public static Vector3d Normal(Vector3d prograde, Vector3d radial)
         {
-            return MathHelpers.Normalized(Vector3d.Cross(prograde, radial));
+            return Vector3d.Cross(prograde, radial).Normalized();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace SpaceSimulator.Physics
         /// <param name="position">The position vector</param>
         public static Vector3d Radial(Vector3d position)
         {
-            return MathHelpers.Normalized(position);
+            return position.Normalized();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SpaceSimulator.Physics
         /// <param name="prograde">The prograde vector</param>
         public static Vector3d PseudoRadial(Vector3d prograde)
         {
-            return MathHelpers.Normalized(Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)));
+            return Vector3d.Transform(prograde, Matrix3x3d.RotationY(Math.PI / 2)).Normalized();
         }
 
         /// <summary>
@@ -85,8 +85,8 @@ namespace SpaceSimulator.Physics
         /// <returns>(Horizontal, Vertical)</returns>
         public static (double, double) ComputeHorizontalAndVerticalVelocity(Vector3d gravityAccelerationDirection, Vector3d velocity)
         {
-            var verticalDir = MathHelpers.Normalized(-gravityAccelerationDirection);
-            var horizontalDir = MathHelpers.Normalized(Vector3d.Transform(verticalDir, Matrix3x3d.RotationY(Math.PI / 2)));
+            var verticalDir = (-gravityAccelerationDirection).Normalized();
+            var horizontalDir = (Vector3d.Transform(verticalDir, Matrix3x3d.RotationY(Math.PI / 2))).Normalized();
 
             var basis = Matrix<double>.Build.Dense(3, 2);
             basis.SetColumn(0, horizontalDir.ToArray());

@@ -61,10 +61,10 @@ namespace SpaceSimulator.Rendering
             var radius = physicsObject.State.Position - primaryBody.State.Position;
             var maxDistance = 1E12;
 
-            orbitPositions.Add(new Orbit.Point(radius + -maxDistance * MathHelpers.Normalized(radius), 0.0));
+            orbitPositions.Add(new Orbit.Point(radius + -maxDistance * radius.Normalized(), 0.0));
             orbitPositions.Add(new Orbit.Point(radius, 0.0));
-            orbitPositions.Add(new Orbit.Point(primaryBody.Radius * MathHelpers.Normalized(radius), 0.0));
-            orbitPositions.Add(new Orbit.Point(radius + maxDistance * MathHelpers.Normalized(radius), 0.0));
+            orbitPositions.Add(new Orbit.Point(primaryBody.Radius * radius.Normalized(), 0.0));
+            orbitPositions.Add(new Orbit.Point(radius + maxDistance * radius.Normalized(), 0.0));
             orbitPositions.Sort((x, y) => x.Position.Length().CompareTo(y.Position.Length()));
 
             return orbitPositions;

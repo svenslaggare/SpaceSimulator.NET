@@ -81,12 +81,25 @@ namespace SpaceSimulator.Physics.Maneuvers
             var orbit = orbitPosition.Orbit;
 
             orbitPosition = orbitPosition.Set(trueAnomaly: Math.PI, argumentOfPeriapsis: 0.0);
-
             var velocity = orbitPosition.CalculateState().Velocity;
             orbitPosition = orbitPosition.Set(inclination: newInclination);
             var velocityNext = orbitPosition.CalculateState().Velocity;
+            var deltaV = velocityNext - velocity;
 
-            return OrbitalManeuvers.Single(OrbitalManeuver.Burn(simulatorEngine, physicsObject, velocityNext - velocity, OrbitalManeuverTime.Apoapsis()));
+            return OrbitalManeuvers.Single(OrbitalManeuver.Burn(simulatorEngine, physicsObject, deltaV, OrbitalManeuverTime.Apoapsis()));
+
+            //var ascendingNodePosition = orbit.AscendingNodePosition;
+            //var state = ascendingNodePosition.CalculateState();
+            //state.MakeRelative(physicsObject.PrimaryBody.State);
+            //var velocity = state.Velocity;
+            //var deltaV = (velocity + state.Normal * 1000) - velocity;
+
+            //return OrbitalManeuvers.Single(
+            //    OrbitalManeuver.Burn(
+            //        simulatorEngine, 
+            //        physicsObject, 
+            //        deltaV, 
+            //        OrbitalManeuverTime.TimeFromNow(orbitPosition.TimeToTrueAnomaly(ascendingNodePosition.TrueAnomaly))));
         }
     }
 }

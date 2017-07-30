@@ -41,6 +41,8 @@ namespace SpaceSimulator
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
 
+        private Rocket rocket;
+
         /// <summary>
         /// Creates a new space simulator application
         /// </summary>
@@ -98,6 +100,8 @@ namespace SpaceSimulator
             this.planetNoLightEffect.CreateInputLayout(BasicVertex.CreateInput());
             this.orbitEffect.CreateInputLayout(Rendering.OrbitVertex.CreateInput());
             this.arrowEffect.CreateInputLayout(BasicVertex.CreateInput());
+
+            this.rocket = new Rocket(this.GraphicsDevice, 0.1f, 0.2f, 1.0f, 0.1f);
         }
 
         /// <summary>
@@ -262,6 +266,11 @@ namespace SpaceSimulator
                     this.RenderingObjects);
 
                 selectedObjectUI.DrawArrows(deviceContext, this.arrowEffect, this.SpaceCamera);
+
+                if (this.simulatorContainer.SelectedObject is RocketObject rocketObject)
+                {
+                    this.rocket.Draw(deviceContext, this.arrowEffect, this.SpaceCamera, rocketObject);
+                }
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>

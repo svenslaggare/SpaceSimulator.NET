@@ -379,7 +379,7 @@ namespace SpaceSimulator.Simulator
                 //If impacted, move to the edge of the primary body
                 if (impacted)
                 {
-                    var dir = MathHelpers.Normalized(this.state.Position - this.PrimaryBody.nextState.Position);
+                    var dir = (this.state.Position - this.PrimaryBody.nextState.Position).Normalized();
                     var newDistance = this.PrimaryBody.Radius + radius + 1;
                     this.state.Position = this.PrimaryBody.nextState.Position + dir * newDistance;
                     this.state.Velocity = Vector3d.Zero;
