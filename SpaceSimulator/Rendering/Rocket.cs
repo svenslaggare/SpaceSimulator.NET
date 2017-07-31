@@ -88,6 +88,8 @@ namespace SpaceSimulator.Rendering
         /// <param name="scale">The scale to draw the rocket at</param>
         public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject, float scale = 0.01f)
         {
+            var arrowScale = camera.ToDraw(2.5E4);
+
             //Compute transformations
             var position = camera.ToDrawPosition(rocketObject.Position);
             var targetPosition = camera.ToDrawPosition(rocketObject.Position + camera.FromDraw(1) * rocketObject.State.Prograde);
@@ -101,7 +103,6 @@ namespace SpaceSimulator.Rendering
             var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
 
             //Draw thrust arrow
-            var arrowScale = camera.ToDraw(2.5E4);
             var thrustDirection = MathHelpers.ToFloat(rocketObject.EngineAcceleration().Normalized());
 
             var engineStartPosition = position - forward * scale * 0.5f * (this.mainBodyHeight + this.nozzleHeight * 1 + 0.2f * 1);
@@ -175,7 +176,7 @@ namespace SpaceSimulator.Rendering
         {
             if (physicsObject is RocketObject rocketObject)
             {
-                this.Draw(deviceContext, effect, camera, rocketObject);
+                this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(3E5));
             }
         }
 

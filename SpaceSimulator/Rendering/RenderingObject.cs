@@ -405,39 +405,6 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Draws the current object.
-        /// </summary>
-        /// <param name="deviceContext">The device context</param>
-        /// <param name="planetEffect">The planet effect</param>
-        /// <param name="orbitEffect">The orbit effect</param>
-        /// <param name="camera">The camera</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect planetEffect, OrbitEffect orbitEffect, SpaceCamera camera)
-        {
-            //Draw planet
-            planetEffect.SetEyePosition(camera.Position);
-            planetEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
-
-            deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
-            foreach (var pass in planetEffect.Passes)
-            {
-                this.DrawSphere(deviceContext, planetEffect, pass, camera);
-            }
-
-            //Draw orbit
-            deviceContext.InputAssembler.InputLayout = orbitEffect.InputLayout;
-            foreach (var pass in orbitEffect.Passes)
-            {
-                if (this.renderingOrbit != null)
-                {
-                    this.UpdatePassedPositions();
-                    this.DrawOrbit(deviceContext, orbitEffect, pass, camera);
-                    this.DrawNextManeuver(deviceContext, orbitEffect, pass, camera);
-                    this.DrawRings(deviceContext, orbitEffect, pass, camera);
-                }
-            }
-        }
-
-        /// <summary>
         /// Draws planets
         /// </summary>
         /// <param name="deviceContext">The device context</param>
@@ -481,6 +448,9 @@ namespace SpaceSimulator.Rendering
             }
 
             //Draw planetary rings
+            //ringEffect.SetEyePosition(camera.Position);
+            //ringEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
+
             deviceContext.InputAssembler.InputLayout = ringEffect.InputLayout;
             foreach (var pass in ringEffect.Passes)
             {

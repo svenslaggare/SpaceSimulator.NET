@@ -117,17 +117,13 @@ float4 PS(VertexOut pin, uniform int gLightCount, uniform bool gUseTexture) : SV
 
 	// Common to take alpha from diffuse material and texture.
 	litColor.a = gMaterial.Diffuse.a * texColor.a;
-
 	return litColor;
 }
 
-float4 PlanetPS(VertexOut pin, uniform bool uUseLighting, uniform bool gUseTexture) : SV_Target
+float4 PlanetPS(VertexOut pin, uniform bool gUseLighting, uniform bool gUseTexture) : SV_Target
 {
 	// Interpolating normal can unnormalize it, so normalize it.
 	pin.NormalW = normalize(pin.NormalW);
-	float3 toEye = gEyePosW - pin.PosW;
-	float distToEye = length(toEye);
-	toEye /= distToEye;
 
     float4 texColor = float4(1, 1, 1, 1);
     if (gUseTexture)
@@ -138,8 +134,12 @@ float4 PlanetPS(VertexOut pin, uniform bool uUseLighting, uniform bool gUseTextu
 	//Lighting
 	float4 litColor = texColor;
 
-	if (uUseLighting)
+    if (gUseLighting)
 	{
+        float3 toEye = gEyePosW - pin.PosW;
+        float distToEye = length(toEye);
+        toEye /= distToEye;
+
 		float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		float4 spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -149,7 +149,7 @@ float4 PlanetPS(VertexOut pin, uniform bool uUseLighting, uniform bool gUseTextu
 		pointLight.Diffuse = float4(0.7f, 0.7f, 0.7f, 1.0f);
 		pointLight.Specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		pointLight.Position = gPointLightSource;
-		pointLight.Range = 1000;
+        //pointLight.Range = 1000;
 		pointLight.Att = float3(1.0f, 0.0f, 0.0f);
 
 		float4 A, D, S;
@@ -158,11 +158,10 @@ float4 PlanetPS(VertexOut pin, uniform bool uUseLighting, uniform bool gUseTextu
 		diffuse += D;
 		spec += S;
 		litColor = texColor * (ambient + diffuse) + spec;
-	}
+    }
 
 	// Common to take alpha from diffuse material and texture.
 	litColor.a = gMaterial.Diffuse.a * texColor.a;
-
 	return litColor;
 }
 

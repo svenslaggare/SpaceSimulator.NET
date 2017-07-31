@@ -35,7 +35,10 @@ namespace SpaceSimulator.Rendering
         private readonly Texture2D texture;
         private readonly ShaderResourceView textureView;
 
-        private readonly Material material;
+        /// <summary>
+        /// The material
+        /// </summary>
+        public Material Material { get; }
 
         /// <summary>
         /// The name of the texture
@@ -88,7 +91,7 @@ namespace SpaceSimulator.Rendering
 
             this.texture = TextureHelpers.FromFile(graphicsDevice, textureName);
             this.textureView = new ShaderResourceView(graphicsDevice, this.texture);
-            this.material = material;
+            this.Material = material;
 
             this.Transform = transform;
         }
@@ -117,7 +120,7 @@ namespace SpaceSimulator.Rendering
 
             //Set per object constants
             effect.SetTransform(camera.ViewProjection, world);
-            effect.SetMaterial(this.material);
+            effect.SetMaterial(this.Material);
             effect.SetTextureTransform(Matrix.Identity);
             effect.SetDiffuseMap(this.textureView);
 

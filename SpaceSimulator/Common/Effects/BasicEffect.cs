@@ -79,7 +79,8 @@ namespace SpaceSimulator.Common.Effects
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="effectName">The name of the effect file</param>
         /// <param name="techniqueName">The name of the technique to use</param>
-        public BasicEffect(Device graphicsDevice, string effectName, string techniqueName)
+        /// <param name="inputElements">The input elements</param>
+        public BasicEffect(Device graphicsDevice, string effectName, string techniqueName, InputElement[] inputElements)
         {
             this.graphicsDevice = graphicsDevice;
 
@@ -116,6 +117,8 @@ namespace SpaceSimulator.Common.Effects
 
             this.blurSizeXVariable = this.effect.GetVariableByName("gBlurSizeX").AsScalar();
             this.blurSizeYVariable = this.effect.GetVariableByName("gBlurSizeY").AsScalar();
+
+            this.InputLayout = new InputLayout(this.graphicsDevice, this.ShaderBytecode, inputElements);
         }
 
         /// <summary>
@@ -146,15 +149,6 @@ namespace SpaceSimulator.Common.Effects
                     yield return this.Technique.GetPassByIndex(i);
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates the input layout
-        /// </summary>
-        /// <param name="elements">The input elements</param>
-        public void CreateInputLayout(InputElement[] elements)
-        {
-            this.InputLayout = new InputLayout(this.graphicsDevice, this.ShaderBytecode, elements);
         }
 
         /// <summary>

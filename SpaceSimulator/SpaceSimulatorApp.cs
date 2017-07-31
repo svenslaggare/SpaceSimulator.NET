@@ -35,6 +35,7 @@ namespace SpaceSimulator
         private BasicEffect planetNoLightEffect;
         private BasicEffect planetEffect;
         private OrbitEffect orbitEffect;
+        private OrbitEffect ringEffect;
         private BasicEffect arrowEffect;
 
         private readonly UIManager uiManager;
@@ -49,11 +50,13 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            //this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
+            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
 
-            this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+
+            this.simulatorContainer.IsPaused = true;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -87,17 +90,12 @@ namespace SpaceSimulator
         /// </summary>
         private void CreateEffect()
         {
-            this.sunEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "SunTex");
-            this.planetNoLightEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetNoLightTex");
-            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetTex");
-            this.orbitEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "Orbit");
-            this.arrowEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light1");
-
-            this.sunEffect.CreateInputLayout(BasicVertex.CreateInput());
-            this.planetEffect.CreateInputLayout(BasicVertex.CreateInput());
-            this.planetNoLightEffect.CreateInputLayout(BasicVertex.CreateInput());
-            this.orbitEffect.CreateInputLayout(Rendering.OrbitVertex.CreateInput());
-            this.arrowEffect.CreateInputLayout(BasicVertex.CreateInput());
+            this.sunEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "SunTex", BasicVertex.CreateInput());
+            this.planetNoLightEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetNoLightTex", BasicVertex.CreateInput());
+            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetTex", BasicVertex.CreateInput());
+            this.orbitEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "Orbit", Rendering.OrbitVertex.CreateInput());
+            this.ringEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "PlanetRing", Rendering.OrbitVertex.CreateInput());
+            this.arrowEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light1", BasicVertex.CreateInput());
         }
 
         /// <summary>
@@ -257,7 +255,7 @@ namespace SpaceSimulator
                     deviceContext,
                     this.sunEffect,
                     this.planetEffect,
-                    this.orbitEffect,
+                    this.ringEffect,
                     this.SpaceCamera,
                     this.RenderingObjects);
 
@@ -338,6 +336,7 @@ namespace SpaceSimulator
             this.planetEffect.Dispose();
             this.planetNoLightEffect.Dispose();
             this.orbitEffect.Dispose();
+            this.planetEffect.Dispose();
             this.arrowEffect.Dispose();
 
             foreach (var renderingObject in this.RenderingObjects)

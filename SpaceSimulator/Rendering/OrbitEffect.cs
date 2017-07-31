@@ -23,8 +23,9 @@ namespace SpaceSimulator.Rendering
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="effectName">The name of the effect file</param>
         /// <param name="techniqueName">The name of the technique to use</param>
-        public OrbitEffect(Device graphicsDevice, string effectName, string techniqueName)
-            : base(graphicsDevice, effectName, techniqueName)
+        /// <param name="inputElements">The input elements</param>
+        public OrbitEffect(Device graphicsDevice, string effectName, string techniqueName, InputElement[] inputElements)
+            : base(graphicsDevice, effectName, techniqueName, inputElements)
         {
             this.lineWidth = this.effect.GetVariableByName("gLineWidth").AsScalar();
         }

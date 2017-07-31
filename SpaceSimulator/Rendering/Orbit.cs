@@ -101,6 +101,11 @@ namespace SpaceSimulator.Rendering
         public bool RotateToFaceCamera { get; set; } = true;
 
         /// <summary>
+        /// The material
+        /// </summary>
+        public Material? Material { get; set; } = null;
+
+        /// <summary>
         /// Represents a point in the orbit
         /// </summary>
         public struct Point
@@ -306,8 +311,6 @@ namespace SpaceSimulator.Rendering
 
             this.UpdateVertices(deviceContext, camera);
 
-            effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, objectPosition)));
-
             //Set draw type
             deviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;
             deviceContext.Rasterizer.State = this.rasterizerStates.NoCull;
@@ -318,6 +321,11 @@ namespace SpaceSimulator.Rendering
 
             //Set per object constants
             effect.SetTransform(camera.ViewProjection, world);
+            effect.SetLineWidth((lineWidth ?? OrbitLineWidth(camera, objectPosition)));
+            if (this.Material != null)
+            {
+                effect.SetMaterial(this.Material.Value);
+            }
 
             //Draw
             pass.Apply(deviceContext);
