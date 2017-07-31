@@ -85,7 +85,8 @@ namespace SpaceSimulator.Rendering
         /// <param name="effect">The effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="rocketObject">The rocket object</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject)
+        /// <param name="scale">The scale to draw the rocket at</param>
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject, float scale = 0.01f)
         {
             //Compute transformations
             var position = camera.ToDrawPosition(rocketObject.Position);
@@ -93,7 +94,6 @@ namespace SpaceSimulator.Rendering
             var forward = (targetPosition - position).Normalized();
             var facing = MathHelpers.FaceDirection(forward);
 
-            var scale = 0.01f;
             var world =
                 Matrix.Scaling(scale)
                 * facing

@@ -47,15 +47,16 @@ namespace SpaceSimulator.Rendering
         private DateTime lastOrbitUpdate = new DateTime();
         private bool updateOrbit = false;
 
-        /// <summary>
-        /// Indicates if the sphere should be drawn
-        /// </summary>
-        public bool ShowSphere { get; set; } = true;
 
         /// <summary>
         /// Indicates if the orbit should be drawn
         /// </summary>
         public bool ShowOrbit { get; set; } = true;
+
+        /// <summary>
+        /// Indicates if the model should be drawn
+        /// </summary>
+        public bool ShowModel { get; set; } = true;
 
         /// <summary>
         /// Creates a new rendering object
@@ -454,7 +455,7 @@ namespace SpaceSimulator.Rendering
             IList<RenderingObject> objects)
         {
             //Draw the sun
-            if (objects[0].ShowSphere)
+            if (objects[0].ShowModel)
             {
                 sunEffect.SetEyePosition(camera.Position);
                 sunEffect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
@@ -473,7 +474,7 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = planetEffect.InputLayout;
             foreach (var pass in planetEffect.Passes)
             {
-                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.NaturalSatellite && obj.ShowSphere))
+                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.NaturalSatellite && obj.ShowModel))
                 {
                     currentObject.DrawSphere(deviceContext, planetEffect, pass, camera);
                 }
@@ -483,12 +484,9 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = ringEffect.InputLayout;
             foreach (var pass in ringEffect.Passes)
             {
-                foreach (var currentObject in objects.Where(obj => obj.ShowSphere))
+                foreach (var currentObject in objects.Where(obj => obj.ShowModel))
                 {
-                    if (currentObject.renderingOrbit != null)
-                    {
-                        currentObject.DrawRings(deviceContext, ringEffect, pass, camera);
-                    }
+                    currentObject.DrawRings(deviceContext, ringEffect, pass, camera);
                 }
             }
         }
@@ -510,7 +508,7 @@ namespace SpaceSimulator.Rendering
         {
             foreach (var pass in effect.Passes)
             {
-                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.ArtificialSatellite && obj.ShowSphere))
+                foreach (var currentObject in objects.Where(obj => obj.PhysicsObject.Type == PhysicsObjectType.ArtificialSatellite && obj.ShowModel))
                 {
                     currentObject.Model.Draw(
                         deviceContext, 

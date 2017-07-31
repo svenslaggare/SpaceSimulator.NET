@@ -328,7 +328,7 @@ namespace SpaceSimulator.UI
                 overlayObject.DrawText = screenWidth * screenWidth <= 100.0f;
                 var drawnSize = overlayObject.ThumbnailSize;
                 overlayObject.DrawThumbnail = inview && screenWidth < drawnSize.X && screenHeight < drawnSize.Y;
-                overlayObject.RenderingObject.ShowSphere = !overlayObject.DrawThumbnail;
+                overlayObject.RenderingObject.ShowModel = !overlayObject.DrawThumbnail;
             }
 
             if (!physicsObject.IsObjectOfReference && physicsObject.ReferenceOrbit.IsBound)
@@ -453,7 +453,7 @@ namespace SpaceSimulator.UI
                 foreach (var overlayObject in this.overlayObjects)
                 {
                     overlayObject.RenderingObject.ShowOrbit = true;
-                    overlayObject.RenderingObject.ShowSphere = true;
+                    overlayObject.RenderingObject.ShowModel = true;
                 }
             }
         }

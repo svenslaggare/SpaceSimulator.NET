@@ -296,7 +296,7 @@ namespace SpaceSimulator
                 textBuilder.AppendLine(
                     $"{renderingObject.PhysicsObject.Name} - " +
                     $"Position: {renderingObject.DrawPosition(this.SpaceCamera)}, " +
-                    $"ShowSphere: {renderingObject.ShowSphere}, " +
+                    $"ShowSphere: {renderingObject.ShowModel}, " +
                     $"ShowOrbit: {renderingObject.ShowOrbit}");
             }
 

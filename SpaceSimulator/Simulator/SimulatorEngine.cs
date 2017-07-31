@@ -253,10 +253,7 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the objects
         /// </summary>
-        public IList<PhysicsObject> Objects
-        {
-            get { return this.objects; }
-        }
+        public IList<PhysicsObject> Objects => this.objects;
 
         /// <summary>
         /// Returns the object of reference
@@ -277,43 +274,28 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Returns the total time the system has been running
         /// </summary>
-        public double TotalTime
-        {
-            get { return this.totalTime; }
-        }
+        public double TotalTime => this.totalTime;
 
         /// <summary>
         /// Returns the total time the system has been running as a formatted string
         /// </summary>
-        public string TotalTimeString
-        {
-            get { return DataFormatter.Format(this.totalTime, DataUnit.Time, 0); }
-        }
+        public string TotalTimeString => DataFormatter.Format(this.totalTime, DataUnit.Time, 0);
 
         /// <summary>
         /// Returns the scheduled maneuvers
         /// </summary>
-        public IReadOnlyList<SimulationManeuever> Maneuvers
-        {
-            get { return this.maneuvers; }
-        }
+        public IReadOnlyList<SimulationManeuever> Maneuvers => this.maneuvers;
 
         /// <summary>
         /// Returns the events
         /// </summary>
-        public IReadOnlyList<SimulationEvent> Events
-        {
-            get { return this.events; }
-        }
+        public IReadOnlyList<SimulationEvent> Events => this.events;
 
         /// <summary>
         /// Returns the given orbit simulator
         /// </summary>
         /// <param name="mode">The simulator</param>
-        public IOrbitSimulator GetSimulator(PhysicsSimulationMode mode)
-        {
-            return this.orbitSimulators[mode];
-        }
+        public IOrbitSimulator GetSimulator(PhysicsSimulationMode mode) => this.orbitSimulators[mode];
 
         /// <summary>
         /// Adds the given object
@@ -788,21 +770,6 @@ namespace SpaceSimulator.Simulator
                                 added = true;
                             }
 
-                            //If we have a target, calculate a closest approach and add as internal event
-                            //if (maneuver.Object.Type == PhysicsObjectType.ArtificialSatellite
-                            //    && maneuver.Object.Target != null
-                            //    && maneuver.Object.PrimaryBody == maneuver.Object.Target.PrimaryBody)
-                            //{
-                            //    var closestApproach = OrbitCalculators.ClosestApproach(
-                            //        this.keplerProblemSolver,
-                            //        maneuver.Object,
-                            //        objectOrbitPosition,
-                            //        maneuver.Object.Target,
-                            //        OrbitPosition.CalculateOrbitPosition(maneuver.Object.Target));
-
-                            //    this.events.Add(new SimulationEvent(SimulationEventType.Internal, maneuver.Object, closestApproach.Time));
-                            //    Console.WriteLine("Closest approach: " + DataFormatter.Format(closestApproach.Distance, DataUnit.Distance));
-                            //}
                             if (this.AddClosestApproachEvent(maneuver.Object))
                             {
                                 added = true;
@@ -993,7 +960,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="time">The amount of time to simulate for</param>
         private void UpdateKeplerSolver(double time)
         {
-            //Determine the of sub-intervals
+            //Determine the sub-intervals
             this.DetermineSubIntervals(time);
 
             var lastStart = this.totalTime;
