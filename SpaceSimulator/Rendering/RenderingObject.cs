@@ -14,6 +14,7 @@ using SpaceSimulator.Physics.Solvers;
 using SpaceSimulator.Simulator;
 using Device = SharpDX.Direct3D11.Device;
 using DeviceContext = SharpDX.Direct3D11.DeviceContext;
+using SpaceSimulator.Helpers;
 
 namespace SpaceSimulator.Rendering
 {

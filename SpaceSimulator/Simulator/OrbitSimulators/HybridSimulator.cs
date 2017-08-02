@@ -48,7 +48,8 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// Updates the internal mode of the simulator
         /// </summary>
         /// <param name="objects">The physics objects</param>
-        public void UpdateMode(IList<PhysicsObject> objects)
+        /// <returns>True if mode changed</returns>
+        public bool UpdateMode(IList<PhysicsObject> objects)
         {
             var allGravity = true;
             foreach (var currentObject in objects)
@@ -75,28 +76,20 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                         allGravity = false;
                         break;
                     }
-
-                    //if (currentObject.PrimaryBody is PlanetObject planet && insideAtmosphere)
-                    //{
-                    //    allGravity = false;
-                    //    break;
-                    //}
-                    //else if (artificialPhysicsObject is RocketObject rocketObject
-                    //    && (rocketObject.IsEngineRunning || !rocketObject.IsIdle))
-                    //{
-                    //    allGravity = false;
-                    //    break;
-                    //}
                 }
             }
 
             if (allGravity)
             {
+                var changed = this.currentSimulator != this.keplerSolverSimulator;
                 this.currentSimulator = this.keplerSolverSimulator;
+                return changed;
             }
             else
             {
+                var changed = this.currentSimulator != this.integratorSimulator;
                 this.currentSimulator = this.integratorSimulator;
+                return changed;
             }
         }
 

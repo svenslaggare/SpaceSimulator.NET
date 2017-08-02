@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics.Solvers;
 
@@ -84,6 +85,7 @@ namespace SpaceSimulator.Physics
 
             var t = 0.0;
             var prevDistance = 0.0;
+
             while (t <= synodicPeriod)
             {
                 var s1 = keplerProblemSolver.Solve(

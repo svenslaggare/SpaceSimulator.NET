@@ -200,6 +200,12 @@ namespace SpaceSimulator.Rendering.Plot
         /// </summary>
         private void CreatePlot()
         {
+            if (this.plot != null)
+            {
+                this.plot.ReleaseResources();
+                this.plot.Dispose();
+            }
+
             this.plot = new Function2D(
                 this.renderingManager2D,
                 this.CalculateTrackPositions(this.numOrbits),

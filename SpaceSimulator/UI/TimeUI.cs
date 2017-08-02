@@ -76,8 +76,11 @@ namespace SpaceSimulator.UI
                 }
             }
 
-            this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
-            this.SimulatorEngine.SimulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
+            if (deltaSimulationSpeedIndex != 0)
+            {
+                this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
+                this.SimulatorEngine.SimulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
+            }
         }
 
         /// <summary>

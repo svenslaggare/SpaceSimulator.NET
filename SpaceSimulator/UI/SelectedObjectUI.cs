@@ -148,7 +148,8 @@ namespace SpaceSimulator.UI
             }
 
             if (this.SelectedObject.Type == PhysicsObjectType.ArtificialSatellite
-                && this.SelectedObject.ReferenceOrbit.IsBound)
+                && this.SelectedObject.ReferenceOrbit.IsBound
+                && this.SelectedObject.PrimaryBody.Name != "Sun")
             {
                 if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
                 {

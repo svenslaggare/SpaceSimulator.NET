@@ -272,6 +272,11 @@ namespace SpaceSimulator.Mathematics
         /// <param name="angle">The angle</param>
         public static double ClampAngle(double angle)
         {
+            if (double.IsNaN(angle) || double.IsInfinity(angle))
+            {
+                return angle;
+            }
+
             var twoPi = 2 * Math.PI;
             while (angle < 0)
             {

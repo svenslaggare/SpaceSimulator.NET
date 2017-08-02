@@ -220,7 +220,7 @@ namespace SpaceSimulator.Simulator
                     this.GetSimulator(PhysicsSimulationMode.PerturbationCowell), 
                     this.GetSimulator(PhysicsSimulationMode.KeplerProblemUniversalVariable)));
 
-            this.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
+            this.SimulationMode = PhysicsSimulationMode.Hybrid;
         }
 
         /// <summary>
@@ -1035,7 +1035,10 @@ namespace SpaceSimulator.Simulator
         {
             if (this.currentOrbitSimulator is HybridSimulator hybridSimulator)
             {
-                hybridSimulator.UpdateMode(this.objects);
+                if (hybridSimulator.UpdateMode(this.objects))
+                {
+                    this.SimulationSpeed = 1;
+                }
             }
         }
 
