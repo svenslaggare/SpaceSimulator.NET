@@ -1035,10 +1035,7 @@ namespace SpaceSimulator.Simulator
         {
             if (this.currentOrbitSimulator is HybridSimulator hybridSimulator)
             {
-                if (hybridSimulator.UpdateMode(this.objects))
-                {
-                    this.SimulationSpeed = 1;
-                }
+                hybridSimulator.UpdateMode(this.objects);
             }
         }
 

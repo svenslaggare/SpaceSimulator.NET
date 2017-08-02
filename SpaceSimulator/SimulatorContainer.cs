@@ -19,6 +19,11 @@ namespace SpaceSimulator
         /// </summary>
         public SimulatorEngine SimulatorEngine { get; }
 
+        /// <summary>
+        /// The multiplier for the simulation speed
+        /// </summary>
+        public int SimulationSpeedMultiplier { get; set; } = 1;
+
         private bool isFrozen = false;
         private bool isPaused = false;
 
@@ -84,6 +89,11 @@ namespace SpaceSimulator
         /// Indicates if the simulator is frozen
         /// </summary>
         public bool IsFrozen => this.isFrozen;
+
+        /// <summary>
+        /// Returns the actual simulation speed
+        /// </summary>
+        public int ActualSimulationSpeed => this.SimulatorEngine.SimulationSpeed * this.SimulationSpeedMultiplier;
 
         /// <summary>
         /// The selected object

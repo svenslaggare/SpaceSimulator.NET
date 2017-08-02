@@ -19,7 +19,45 @@ namespace SpaceSimulator.UI
     /// </summary>
     public class TimeUI : UIComponent
     {
-        private readonly int[] simulationSpeeds = new int[] { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
+        /// <summary>
+        /// Represents a simulation speed
+        /// </summary>
+        private class SimulationSpeed
+        {
+            /// <summary>
+            /// The speed
+            /// </summary>
+            public int Speed { get; }
+
+            /// <summary>
+            /// The multiplier
+            /// </summary>
+            public int Multiplier { get; }
+
+            /// <summary>
+            /// Creates a new simulation speed
+            /// </summary>
+            /// <param name="speed">The speed</param>
+            /// <param name="multiplier">The multiplier</param>
+            public SimulationSpeed(int speed, int multiplier)
+            {
+                this.Speed = speed;
+                this.Multiplier = multiplier;
+            }
+        }
+
+         private readonly SimulationSpeed[] simulationSpeeds = new SimulationSpeed[]
+         {
+             new SimulationSpeed(1, 1),
+             new SimulationSpeed(10, 1),
+             new SimulationSpeed(100, 1),
+             new SimulationSpeed(1000, 1),
+             new SimulationSpeed(10000, 1),
+             new SimulationSpeed(100000, 1),
+             new SimulationSpeed(100000, 10),
+             new SimulationSpeed(100000, 100),
+         };
+
         private int simulationSpeedIndex = 0;
 
         /// <summary>
@@ -76,11 +114,10 @@ namespace SpaceSimulator.UI
                 }
             }
 
-            if (deltaSimulationSpeedIndex != 0)
-            {
-                this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
-                this.SimulatorEngine.SimulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
-            }
+            this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
+            var simulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
+            this.SimulatorEngine.SimulationSpeed = simulationSpeed.Speed;
+            this.SimulatorContainer.SimulationSpeedMultiplier = simulationSpeed.Multiplier;
         }
 
         /// <summary>
@@ -91,7 +128,7 @@ namespace SpaceSimulator.UI
         {
             this.TextColorBrush.DrawText(
                 deviceContext,
-                $"Simulation speed: {this.SimulatorEngine.SimulationSpeed}x ({this.SimulatorEngine.CurrentOrbitSimulator})",
+                $"Simulation speed: {this.SimulatorContainer.ActualSimulationSpeed}x ({this.SimulatorEngine.CurrentOrbitSimulator})",
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 5)));
 

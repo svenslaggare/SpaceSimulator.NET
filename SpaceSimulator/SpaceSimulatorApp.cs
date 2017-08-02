@@ -215,7 +215,10 @@ namespace SpaceSimulator
 
             if (!this.simulatorContainer.IsPaused)
             {
-                this.SimulatorEngine.Update();
+                for (int i = 0; i < this.simulatorContainer.SimulationSpeedMultiplier; i++)
+                {
+                    this.SimulatorEngine.Update();
+                }
             }
 
             foreach (var component in this.uiComponents)
