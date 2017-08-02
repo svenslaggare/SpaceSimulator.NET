@@ -189,7 +189,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                     launchOrbit,
                     t);
 
-                if (CollisionHelpers.SphereIntersection(primaryLaunchState.Position, this.primaryBody.Radius, nextState.Position, 10))
+                if (this.physicsObject.Intersects(this.primaryBody, primaryLaunchState.Position, nextState.Position))
                 {
                     return false;
                 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 
@@ -52,6 +53,17 @@ namespace SpaceSimulator.Simulator
         public double Altitude(Vector3d position)
         {
             return (position - this.Position).Length() - this.Radius;
+        }
+
+        /// <summary>
+        /// Indicates if the current object intersects the given primary body at the given position
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="primaryBodyPosition">The position of the primary</param>
+        /// <param name="position">The current position of the object</param>
+        public override bool Intersects(IPrimaryBodyObject primaryBody, Vector3d primaryBodyPosition, Vector3d position)
+        {
+            return CollisionHelpers.SphereIntersection(primaryBodyPosition, primaryBody.Radius, position, this.Radius);
         }
     }
 }

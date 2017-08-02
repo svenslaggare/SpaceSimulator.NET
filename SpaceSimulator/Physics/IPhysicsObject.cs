@@ -46,6 +46,14 @@ namespace SpaceSimulator.Physics
         /// Indicates if the object is the object of reference
         /// </summary>
         bool IsObjectOfReference { get; }
+
+        /// <summary>
+        /// Indicates if the current object intersects the given primary body at the given position
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="primaryBodyPosition">The position of the primary</param>
+        /// <param name="position">The current position of the object</param>
+        bool Intersects(IPrimaryBodyObject primaryBody, Vector3d primaryBodyPosition, Vector3d position);
     }
 
     /// <summary>

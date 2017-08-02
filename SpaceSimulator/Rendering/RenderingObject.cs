@@ -161,25 +161,6 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Returns the scaling matrix
-        /// </summary>
-        /// <param name="camera">The camera</param>
-        private Matrix ScalingMatrix(SpaceCamera camera)
-        {
-            var size = 0.0f;
-            if (this.PhysicsObject is NaturalSatelliteObject naturalObject)
-            {
-                size = camera.ToDraw(naturalObject.Radius);
-            }
-            else
-            {
-                size = camera.ToDraw(Simulator.Data.SolarSystemBodies.Earth.Radius * 0.01);
-            }
-
-            return Matrix.Scaling(size);
-        }
-
-        /// <summary>
         /// Calculates the orbit positions
         /// </summary>
         private void CalculateOrbitPositions()
@@ -263,7 +244,7 @@ namespace SpaceSimulator.Rendering
                     planetEffect,
                     pass,
                     camera,
-                    this.ScalingMatrix(camera)
+                    sphere.ScalingMatrix(camera, this.PhysicsObject)
                     * sphere.Transform
                     * Matrix.RotationY(-(float)this.PhysicsObject.Rotation)
                     * Matrix.Translation(position ?? this.DrawPosition(camera)));

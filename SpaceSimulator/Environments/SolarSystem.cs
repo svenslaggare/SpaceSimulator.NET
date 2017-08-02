@@ -4,29 +4,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
-using SpaceSimulator.Camera;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
-using SpaceSimulator.Physics.Maneuvers;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.Simulator.Data;
 using SpaceSimulator.Simulator.Rocket;
 
-namespace SpaceSimulator.Simulator.Environments
+namespace SpaceSimulator.Environments
 {
     /// <summary>
     /// Contains an environment for the solar system
     /// </summary>
-    public static class SolarSystem
+    public sealed class SolarSystem : IEnvironment
     {
+        private readonly bool coplanar;
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
+        public SolarSystem(bool coplanar = false)
+        {
+            this.coplanar = coplanar;
+        }
+
         /// <summary>
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="coplanar">Indicates if all planets lie in the same plane</param>
-        public static SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice, bool coplanar = false)
+        public SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice)
         {
             var sun = new PlanetObject(
                 "Sun",
@@ -42,16 +50,7 @@ namespace SpaceSimulator.Simulator.Environments
 
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { sun });
             var renderingObjects = new List<RenderingObject>();
-            var baseDir = "Content/Textures/Planets/";
-
-            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
-            {
-                return new RenderingObject(
-                    graphicsDevice,
-                    newObject,
-                    Color.Yellow,
-                    baseDir + "Satellite.png");
-            };
+            var baseDir = EnvironmentHelpers.BaseDirectory;
 
             PlanetObject AddPlanet(
                 NaturalSatelliteObject primaryBody,
@@ -179,6 +178,15 @@ namespace SpaceSimulator.Simulator.Environments
             //        MathUtild.Deg2Rad * 181.7195),
             //    isRealSize: false);
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite3));
+
+            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
+            {
+                return new RenderingObject(
+                    graphicsDevice,
+                    newObject,
+                    Color.Yellow,
+                    baseDir + "Satellite.png");
+            };
 
             return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
         }

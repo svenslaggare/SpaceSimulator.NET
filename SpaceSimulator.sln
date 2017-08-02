@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceSimulator", "SpaceSimulator\SpaceSimulator.csproj", "{DFE9B17C-4703-480D-9B11-236DFF7F11FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceSimulator.Horizons", "SpaceSimulator.Horizons\SpaceSimulator.Horizons.csproj", "{2667BAED-7416-4FC1-B3F6-9FE4BE37A5F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DFE9B17C-4703-480D-9B11-236DFF7F11FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE9B17C-4703-480D-9B11-236DFF7F11FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFE9B17C-4703-480D-9B11-236DFF7F11FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2667BAED-7416-4FC1-B3F6-9FE4BE37A5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2667BAED-7416-4FC1-B3F6-9FE4BE37A5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2667BAED-7416-4FC1-B3F6-9FE4BE37A5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2667BAED-7416-4FC1-B3F6-9FE4BE37A5F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

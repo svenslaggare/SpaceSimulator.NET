@@ -36,8 +36,17 @@
     <Reference Include="ColorMine, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ColorMine.1.1.3.0\lib\ColorMine.dll</HintPath>
     </Reference>
+    <Reference Include="LiteGuard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteGuard.1.1.0\lib\net35\LiteGuard.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PrimS.Telnet.NetStandard, Version=0.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Telnet.0.8.0\lib\net451\PrimS.Telnet.NetStandard.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=3.1.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.3.1.1\lib\net45\SharpDX.dll</HintPath>
@@ -83,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera\FollowCamera.cs" />
+    <Compile Include="Camera\GroundCamera.cs" />
     <Compile Include="Common\BitmapHelpers.cs" />
     <Compile Include="Common\Camera\BaseCamera.cs" />
     <Compile Include="Common\Camera\CameraHelpers.cs" />
@@ -129,7 +139,11 @@
     <Compile Include="Common\UI\UIHelpers.cs" />
     <Compile Include="Common\UI\UIManager.cs" />
     <Compile Include="Common\UI\UIObject.cs" />
+    <Compile Include="Environments\EnvironmentHelpers.cs" />
+    <Compile Include="Environments\Horizons.cs" />
+    <Compile Include="Environments\IEnvironment.cs" />
     <Compile Include="Helpers\Timing.cs" />
+    <Compile Include="Integrations\NASAHorizons.cs" />
     <Compile Include="Mathematics\StatisticsHelpers.cs" />
     <Compile Include="Mathematics\Vector2d.cs" />
     <Compile Include="Physics\Maneuvers\InterceptManeuver.cs" />
@@ -143,7 +157,7 @@
     <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Rendering\Plot\PlotHelpers.cs" />
     <Compile Include="Rendering\Rocket.cs" />
-    <Compile Include="Simulator\Environments\EarthSystem.cs" />
+    <Compile Include="Environments\EarthSystem.cs" />
     <Compile Include="Helpers\CollectionHelpers.cs" />
     <Compile Include="Helpers\CollisionHelpers.cs" />
     <Compile Include="Helpers\DataFormater.cs" />
@@ -190,7 +204,7 @@
     <Compile Include="Physics\Rocket\RocketStages.cs" />
     <Compile Include="Physics\SimplePhysicsObject.cs" />
     <Compile Include="Rendering\RenderingObject.cs" />
-    <Compile Include="Simulator\Environments\SolarSystem.cs" />
+    <Compile Include="Environments\SolarSystem.cs" />
     <Compile Include="Simulator\OrbitSimulators\CowellSimulator.cs" />
     <Compile Include="Simulator\OrbitSimulators\IOrbitSimulator.cs" />
     <Compile Include="Simulator\OrbitSimulators\TwoBodySimulator.cs" />

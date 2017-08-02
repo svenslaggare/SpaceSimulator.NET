@@ -177,6 +177,7 @@ namespace SpaceSimulator.Rendering
             if (physicsObject is RocketObject rocketObject)
             {
                 this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(3E5));
+                //this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(100));
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
 
 namespace SpaceSimulator.Physics
@@ -76,6 +77,17 @@ namespace SpaceSimulator.Physics
         public bool IsObjectOfReference
         {
             get { return this.PrimaryBody == null; }
+        }
+
+        /// <summary>
+        /// Indicates if the current object intersects the given primary body at the given position
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="primaryBodyPosition">The position of the primary</param>
+        /// <param name="position">The current position of the object</param>
+        public bool Intersects(IPrimaryBodyObject primaryBody, Vector3d primaryBodyPosition, Vector3d position)
+        {
+            return CollisionHelpers.SphereIntersection(primaryBodyPosition, primaryBody.Radius, position, 10);
         }
     }
 }

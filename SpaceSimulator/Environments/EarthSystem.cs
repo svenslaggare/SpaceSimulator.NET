@@ -4,30 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
-using SpaceSimulator.Camera;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
-using SpaceSimulator.Physics.Maneuvers;
-using SpaceSimulator.Physics.Rocket;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.Simulator.Rocket;
 
-namespace SpaceSimulator.Simulator.Environments
+namespace SpaceSimulator.Environments
 {
     /// <summary>
     /// Contains an environment for the earth system
     /// </summary>
-    public static class EarthSystem
+    public sealed class EarthSystem : IEnvironment
     {
         /// <summary>
         /// Creates a new system
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        public static SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice)
+        public SimulatorContainer Create(SharpDX.Direct3D11.Device graphicsDevice)
         {
-            var baseDir = "Content/Textures/Planets/";
+            var baseDir = EnvironmentHelpers.BaseDirectory;
 
             var earth = new PlanetObject(
                 "Earth",
@@ -108,7 +105,7 @@ namespace SpaceSimulator.Simulator.Environments
                 new OrbitPosition(
                     Physics.Orbit.New(
                         earth,
-                        semiMajorAxis: Simulator.Data.SolarSystemBodies.Earth.Radius + 300E3,
+                        semiMajorAxis: earth.Radius + 300E3,
                         //semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
                         //longitudeOfAscendingNode: 45.0 * MathUtild.Deg2Rad,
                         inclination: 0.0 * MathUtild.Deg2Rad),

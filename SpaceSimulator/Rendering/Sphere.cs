@@ -134,7 +134,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="camera">The camera</param>
         /// <param name="physicsObject">The object</param>
-        private Matrix ScalingMatrix(SpaceCamera camera, PhysicsObject physicsObject)
+        public Matrix ScalingMatrix(SpaceCamera camera, PhysicsObject physicsObject)
         {
             var size = 0.0f;
             if (physicsObject is NaturalSatelliteObject naturalObject)

@@ -206,9 +206,6 @@ namespace SpaceSimulator.Physics
         public static Vector3d FromCoordinates(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
             return FromCoordinates(primaryBody, primaryBody.State.Rotation, latitude, longitude, elevation);
-            //return primaryBody.State.Position
-            //       + primaryBody.GetRotationalTransform()
-            //       * FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
         }
         
         /// <summary>
@@ -220,7 +217,6 @@ namespace SpaceSimulator.Physics
         public static Vector3d SphereNormal(IPrimaryBodyObject primaryBody, double latitude, double longitude, double? elevation = null)
         {
             var direction = FromCoordinates(primaryBody, latitude, longitude, elevation) - primaryBody.State.Position;
-            //var direction = FromSphericalCoordinates(Math.PI / 2.0 - latitude, longitude, elevation ?? primaryBody.Radius);
             direction.Normalize();
             return direction;
         }

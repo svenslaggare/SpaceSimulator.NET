@@ -111,6 +111,9 @@ namespace SpaceSimulator.Helpers
            new KeyValuePair<string, double>("M", 1E6),
            new KeyValuePair<string, double>("G", 1E9),
            new KeyValuePair<string, double>("T", 1E12),
+           new KeyValuePair<string, double>("P", 1E15),
+           new KeyValuePair<string, double>("E", 1E18),
+           new KeyValuePair<string, double>("Z", 1E21),
         };
 
         private static readonly IDictionary<DataUnit, string> unitNames = new Dictionary<DataUnit, string>()

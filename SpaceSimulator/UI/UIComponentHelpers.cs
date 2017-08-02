@@ -151,10 +151,13 @@ namespace SpaceSimulator.UI
                 case "Gm":
                     unitScaleFactor = 1E9;
                     break;
+                case "Tm":
+                    unitScaleFactor = 1E12;
+                    break;
             }
 
             var offset = 0.0;
-            if (primaryBody != null && primaryBody.Name != "Sun")
+            if (primaryBody != null)
             {
                 offset = primaryBody.Radius;
             }

@@ -50,13 +50,12 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            this.simulatorContainer = Simulator.Environments.SolarSystem.Create(this.GraphicsDevice, false);
-            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            //var environment = new Environments.SolarSystem();
+            var environment = new Environments.EarthSystem();
+            //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
-            //this.simulatorContainer = Simulator.Environments.EarthSystem.Create(this.GraphicsDevice);
+            this.simulatorContainer = environment.Create(this.GraphicsDevice);
             //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
-
-            this.simulatorContainer.IsPaused = true;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -66,6 +65,11 @@ namespace SpaceSimulator
             this.CameraManager.AddCamera("FollowCameraNormal", new FollowCamera(FollowCamera.Mode.FollowNormal));
             this.CameraManager.AddCamera("FollowCameraRadial", new FollowCamera(FollowCamera.Mode.FollowRadial));
             this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));
+            //this.CameraManager.AddCamera("GroundCamera", new GroundCamera()
+            //{
+            //    Latitude = 28.524058 * MathUtild.Deg2Rad * 0,
+            //    Longitude = -80.65085 * MathUtild.Deg2Rad
+            //});
 
             this.uiStyle = new UIStyle(this.RenderingManager2D);
         }
