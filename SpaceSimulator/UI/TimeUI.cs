@@ -88,13 +88,13 @@ namespace SpaceSimulator.UI
         {
             this.TextColorBrush.DrawText(
                 deviceContext,
-                $"Simulation speed: {this.SimulatorEngine.SimulationSpeed}x" + (this.SimulatorContainer.IsPaused ? " (paused)" : ""),
+                $"Simulation speed: {this.SimulatorEngine.SimulationSpeed}x ({this.SimulatorEngine.CurrentOrbitSimulator})",
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 5)));
 
             this.TextColorBrush.DrawText(
                 deviceContext,
-                "Simulated time: " + DataFormatter.Format(Math.Round(this.SimulatorEngine.TotalTime), DataUnit.Time),
+                $"Simulated time: {DataFormatter.Format(Math.Round(this.SimulatorEngine.TotalTime), DataUnit.Time)}{(this.SimulatorContainer.IsPaused ? " (paused)" : "")}",
                 this.TextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(UIConstants.OffsetLeft, 23)));
         }

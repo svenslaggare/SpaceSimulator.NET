@@ -24,6 +24,11 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         }
 
         /// <summary>
+        /// Defines how the simulator handles time
+        /// </summary>
+        public SimulatorTimeMode TimeMode => SimulatorTimeMode.Interval;
+
+        /// <summary>
         /// Updates the simulator one step
         /// </summary>
         /// <param name="totalTime">The total simulated time</param>
@@ -44,6 +49,11 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 (totalTime + timeStep) - currentObject.ReferenceState.Time);
 
             currentObject.SetNextState(nextState);
+        }
+
+        public override string ToString()
+        {
+            return "KeplerSolver";
         }
     }
 }

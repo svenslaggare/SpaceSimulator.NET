@@ -7,10 +7,24 @@ using SpaceSimulator.Simulator;
 namespace SpaceSimulator.Simulator.OrbitSimulators
 {
     /// <summary>
+    /// Defines different modes for handling time
+    /// </summary>
+    public enum SimulatorTimeMode
+    {
+        Step,
+        Interval
+    }
+
+    /// <summary>
     /// Represents an orbit simulator
     /// </summary>
     public interface IOrbitSimulator
     {
+        /// <summary>
+        /// Defines how the simulator handles time
+        /// </summary>
+        SimulatorTimeMode TimeMode { get; }
+
         /// <summary>
         /// Updates the simulator one step
         /// </summary>

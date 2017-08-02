@@ -28,6 +28,10 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             this.forceModel = forceModel;
         }
 
+        /// <summary>
+        /// Defines how the simulator handles time
+        /// </summary>
+        public SimulatorTimeMode TimeMode => SimulatorTimeMode.Step;
 
         /// <summary>
         /// Updates the simulator one step
@@ -61,6 +65,11 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
 
                 rocketObject.ClearStagedObjects(addObject);
             }
+        }
+
+        public override string ToString()
+        {
+            return "Integrator";
         }
     }
 }

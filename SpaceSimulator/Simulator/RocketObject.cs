@@ -53,18 +53,17 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Indicates if the engine is running
         /// </summary>
-        public bool IsEngineRunning
-        {
-            get { return this.engineRunning; }
-        }
+        public bool IsEngineRunning => this.engineRunning;
+
+        /// <summary>
+        /// Indicates if the rocket is idle
+        /// </summary>
+        public bool IsIdle => this.controlProgram?.Completed ?? true;
 
         /// <summary>
         /// Returns the stages
         /// </summary>
-        public RocketStages Stages
-        {
-            get { return this.rocketStages; }
-        }
+        public RocketStages Stages => this.rocketStages;
 
         /// <summary>
         /// Returns the atmospheric properties

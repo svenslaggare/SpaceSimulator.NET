@@ -51,16 +51,26 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Calculates the drag force on the given object
         /// </summary>
-        /// <param name="rocketObject">The object</param>
+        /// <param name="physicsObject">The object</param>
         /// <param name="state">The state of the object</param>
-        public Vector3d DragOnObject(ArtificialPhysicsObject rocketObject, ref ObjectState state)
+        public Vector3d DragOnObject(ArtificialPhysicsObject physicsObject, ref ObjectState state)
         {
             var primaryState = this.State;
             return this.AtmosphericModel.CalculateDrag(
                 this,
                 ref primaryState,
-                rocketObject.AtmosphericProperties,
+                physicsObject.AtmosphericProperties,
                 ref state);
+        }
+
+        /// <summary>
+        /// Indicates if the given object is inside the atmosphere
+        /// </summary>
+        /// <param name="physicsObject">The physics object</param>
+        public bool InsideAtmosphere(ArtificialPhysicsObject physicsObject)
+        {
+            var state = physicsObject.State;
+            return this.AtmosphericModel.Inside(this, ref state);
         }
     }
 }

@@ -92,8 +92,10 @@ namespace SpaceSimulator.Rendering
 
             //Compute transformations
             var position = camera.ToDrawPosition(rocketObject.Position);
-            var targetPosition = camera.ToDrawPosition(rocketObject.Position + camera.FromDraw(1) * rocketObject.State.Prograde);
-            var forward = (targetPosition - position).Normalized();
+            var state = rocketObject.State;
+            state.MakeRelative(rocketObject.PrimaryBody.State);
+            var forward = MathHelpers.ToFloat(state.Prograde);
+
             var facing = MathHelpers.FaceDirection(forward);
 
             var world =

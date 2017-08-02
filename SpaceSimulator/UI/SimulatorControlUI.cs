@@ -42,6 +42,11 @@ namespace SpaceSimulator.UI
             {
                 this.SimulatorEngine.SimulationMode = Simulator.PhysicsSimulationMode.KeplerProblemUniversalVariable;
             }
+
+            if (this.KeyboardManager.IsKeyPressed(SharpDX.DirectInput.Key.F3))
+            {
+                this.SimulatorEngine.SimulationMode = Simulator.PhysicsSimulationMode.Hybrid;
+            }
         }
 
         public override void Draw(DeviceContext deviceContext)

@@ -21,7 +21,8 @@ namespace SpaceSimulator.Simulator
     public enum PhysicsSimulationMode
     {
         PerturbationCowell,
-        KeplerProblemUniversalVariable
+        KeplerProblemUniversalVariable,
+        Hybrid
     }
 
     /// <summary>
@@ -213,6 +214,12 @@ namespace SpaceSimulator.Simulator
 
             this.orbitSimulators.Add(PhysicsSimulationMode.PerturbationCowell, new CowellSimulator(this.numericIntegrator, this.forceModel));
             this.orbitSimulators.Add(PhysicsSimulationMode.KeplerProblemUniversalVariable, new TwoBodySimulator(this.keplerProblemSolver));
+            this.orbitSimulators.Add(
+                PhysicsSimulationMode.Hybrid,
+                new HybridSimulator(
+                    this.GetSimulator(PhysicsSimulationMode.PerturbationCowell), 
+                    this.GetSimulator(PhysicsSimulationMode.KeplerProblemUniversalVariable)));
+
             this.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
         }
 
@@ -246,6 +253,22 @@ namespace SpaceSimulator.Simulator
             {
                 this.simulationMode = value;
                 this.currentOrbitSimulator = this.orbitSimulators[value];
+            }
+        }
+
+        /// <summary>
+        /// Returns the current orbit simulator
+        /// </summary>
+        public IOrbitSimulator CurrentOrbitSimulator => this.currentOrbitSimulator;
+
+        /// <summary>
+        /// Returns the current time mode
+        /// </summary>
+        private SimulatorTimeMode TimeMode
+        {
+            get
+            {
+                return this.currentOrbitSimulator.TimeMode;
             }
         }
 
@@ -774,7 +797,7 @@ namespace SpaceSimulator.Simulator
 
                             if (added)
                             {
-                                if (this.SimulationMode == PhysicsSimulationMode.KeplerProblemUniversalVariable)
+                                if (this.TimeMode == SimulatorTimeMode.Interval)
                                 {
                                     this.addedEvent = true;
                                 }
@@ -864,13 +887,13 @@ namespace SpaceSimulator.Simulator
             var timeStep = 0.0;
             var numSimulationSteps = 0;
 
-            switch (this.SimulationMode)
+            switch (this.TimeMode)
             {
-                case PhysicsSimulationMode.PerturbationCowell:
+                case SimulatorTimeMode.Step:
                     timeStep = deltaTime;
                     numSimulationSteps = numSteps;
                     break;
-                case PhysicsSimulationMode.KeplerProblemUniversalVariable:
+                case SimulatorTimeMode.Interval:
                     timeStep = deltaTime * numSteps;
                     numSimulationSteps = 1;
                     break;
@@ -898,13 +921,13 @@ namespace SpaceSimulator.Simulator
 
                 this.totalTime += timeStep;
 
-                if (this.SimulationMode == PhysicsSimulationMode.KeplerProblemUniversalVariable)
+                if (this.TimeMode == SimulatorTimeMode.Interval)
                 {
                     this.ChangeSOI();
                 }
             }
 
-            if (this.SimulationMode != PhysicsSimulationMode.KeplerProblemUniversalVariable)
+            if (this.TimeMode != SimulatorTimeMode.Interval)
             {
                 this.ChangeSOI();
             }
@@ -994,14 +1017,25 @@ namespace SpaceSimulator.Simulator
         /// <param name="duration">The duration</param>
         public void Advance(TimeSpan duration)
         {
-            switch (this.simulationMode)
+            switch (this.TimeMode)
             {
-                case PhysicsSimulationMode.PerturbationCowell:
+                case SimulatorTimeMode.Step:
                     this.UpdateIntegrator((int)Math.Ceiling(duration.TotalSeconds / this.timeStep));
                     break;
-                case PhysicsSimulationMode.KeplerProblemUniversalVariable:
+                case SimulatorTimeMode.Interval:
                     this.UpdateKeplerSolver(duration.TotalSeconds);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Updates the hybrid simulator
+        /// </summary>
+        private void UpdateHybrid()
+        {
+            if (this.currentOrbitSimulator is HybridSimulator hybridSimulator)
+            {
+                hybridSimulator.UpdateMode(this.objects);
             }
         }
 
@@ -1010,15 +1044,19 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public void Update()
         {
-            switch (this.simulationMode)
+            this.UpdateHybrid();
+
+            switch (this.TimeMode)
             {
-                case PhysicsSimulationMode.PerturbationCowell:
+                case SimulatorTimeMode.Step:
                     this.UpdateIntegrator(this.SimulationSpeed);
                     break;
-                case PhysicsSimulationMode.KeplerProblemUniversalVariable:
+                case SimulatorTimeMode.Interval:
                     this.UpdateKeplerSolver(this.timeStep * this.SimulationSpeed);
                     break;
             }
+
+            this.UpdateHybrid();
         }
 
         /// <summary>
