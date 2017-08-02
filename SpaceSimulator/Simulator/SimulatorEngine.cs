@@ -520,7 +520,6 @@ namespace SpaceSimulator.Simulator
                     if (this.totalTime >= currentEvent.Time - this.maneuverTimeEpsilon)
                     {
                         this.executedEvents.Add(currentEvent);
-                        //Debug.Log(currentEvent.Type + ": " + (this.totalTime - currentEvent.Time));
                     }
                 }
 
@@ -583,7 +582,6 @@ namespace SpaceSimulator.Simulator
         {
             foreach (var object1 in this.objects)
             {
-                //if (object1.Type == PhysicsObjectType.ArtificialSatellite && !object1.HasImpacted)
                 if (object1.Type == PhysicsObjectType.ArtificialSatellite)
                 {
                     //Change primary bodys

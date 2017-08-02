@@ -145,8 +145,8 @@ namespace SpaceSimulator.Environments
                 Color.Yellow,
                 new Rendering.Rocket(graphicsDevice, 0.1f, 0.2f, 1.0f, 0.1f)));
 
-            //var bestPitchStart = 2E3;
-            //var bestPitchEnd = 12.8625E3;
+            //var bestPitchStart = 1E3;
+            //var bestPitchEnd = 2.6E3;
             //falcon9Object.SetControlProgram(new AscentControlProgram(
             //    falcon9Object,
             //    falcon9TargetOrbit,

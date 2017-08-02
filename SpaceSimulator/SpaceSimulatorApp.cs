@@ -50,8 +50,8 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            //var environment = new Environments.SolarSystem();
-            var environment = new Environments.EarthSystem();
+            var environment = new Environments.SolarSystem();
+            //var environment = new Environments.EarthSystem();
             //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
             this.simulatorContainer = environment.Create(this.GraphicsDevice);
