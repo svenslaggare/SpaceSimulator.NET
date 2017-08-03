@@ -137,7 +137,8 @@ namespace SpaceSimulator.Simulator.Rocket
 
                         var radial = Vector3d.Transform(prograde, Matrix3x3d.RotationY(MathUtild.Pi / 2));
                         var pitchAxis = Vector3d.Cross(radial, prograde);
-                        this.ThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(pitchAxis, 4.0 * MathUtild.Deg2Rad));
+                        var turnAngle = 4.0 * MathUtild.Deg2Rad;
+                        this.ThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(pitchAxis, turnAngle));
 
                         if (!this.pitchStarted)
                         {
@@ -153,7 +154,7 @@ namespace SpaceSimulator.Simulator.Rocket
                             this.pitchCompleted = true;
                         }
 
-                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 60.0)
+                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
                         {
                             this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
                         }
@@ -202,11 +203,16 @@ namespace SpaceSimulator.Simulator.Rocket
                     break;
             }
 
-            //if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
-            //{
-            //    this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde))}");
-            //    this.lastTime = DateTime.UtcNow;
-            //}
+            if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
+            {
+                var thrustAngle = MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde));
+
+                if (thrustAngle >= 1E-4)
+                {
+                    this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * thrustAngle}");
+                    this.lastTime = DateTime.UtcNow;
+                }
+            }
         }
 
         /// <summary>

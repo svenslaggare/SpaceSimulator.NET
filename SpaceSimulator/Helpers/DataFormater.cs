@@ -256,7 +256,7 @@ namespace SpaceSimulator.Helpers
             }
             else
             {
-                var power = Math.Round(Math.Log10(absValue));
+                var power = Math.Floor(Math.Log10(absValue));
                 if (power != 0)
                 {
                     prefix = new KeyValuePair<string, double>($"E{power} ", Math.Pow(10, power));
