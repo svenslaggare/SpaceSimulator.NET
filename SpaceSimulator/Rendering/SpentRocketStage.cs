@@ -19,9 +19,7 @@ namespace SpaceSimulator.Rendering
     {
         private readonly Device graphicsDevice;
 
-        private readonly Cylinder mainBody;
-        //private readonly RocketEngine engine;
-        private readonly RocketEngineCluster engines;
+        private readonly RocketStage stage;
 
         private readonly DirectionalLight[] directionalLights;
 
@@ -29,13 +27,11 @@ namespace SpaceSimulator.Rendering
         /// Creates a new spent rocket stage
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="rocket">The rocket</param>
-        public SpentRocketStage(Device graphicsDevice, Rocket rocket)
+        /// <param name="stage">The rocket stage</param>
+        public SpentRocketStage(Device graphicsDevice, RocketStage stage)
         {
             this.graphicsDevice = graphicsDevice;
-
-            this.mainBody = new Cylinder(graphicsDevice, rocket.Radius, rocket.Radius, rocket.MainBodyHeight, true);
-            this.engines = rocket.Engines.Clone();
+            this.stage = stage;
 
             this.directionalLights = new DirectionalLight[]
             {
@@ -76,7 +72,7 @@ namespace SpaceSimulator.Rendering
             var world =
                 Matrix.Scaling(scale)
                 * facing
-                * Matrix.Translation(camera.ToDrawPosition(physicsObject.Position));
+                * Matrix.Translation(position);
 
             //Set effect parameters
             effect.SetMaterial(Rocket.DefaultMaterial(Color.Gray));
@@ -86,25 +82,20 @@ namespace SpaceSimulator.Rendering
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
 
             //Draw
-            this.mainBody.Draw(
-                deviceContext,
-                effect,
-                camera,
-                world);
-
-            this.engines.Draw(
+            this.stage.Draw(
                 deviceContext,
                 effect,
                 camera,
                 scale,
                 forward,
                 position,
+                world,
                 forward);
         }
 
         public void Dispose()
         {
-            this.mainBody.Dispose();
+            this.stage.Dispose();
         }
     }
 }
