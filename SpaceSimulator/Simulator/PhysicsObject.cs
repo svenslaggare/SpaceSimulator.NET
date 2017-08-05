@@ -37,7 +37,6 @@ namespace SpaceSimulator.Simulator
         protected ObjectState state;
         protected ObjectState nextState;
 
-        protected bool orbitChanged = false;
         protected int orbitVersion = 0;
 
         /// <summary>
@@ -306,14 +305,19 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Indicates if the orbit of the object has changed.
-        /// If that this is the case, resets the indication.
+        /// Indicates if the orbit has changed.
+        /// If that is the case, updates the currentVersion
         /// </summary>
-        public bool HasChangedOrbit()
+        /// <param name="currentVersion">The current version</param>
+        public bool HasChangedOrbit(ref int currentVersion)
         {
-            var hasChanged = this.orbitChanged;
-            this.orbitChanged = false;
-            return hasChanged;
+            if (this.orbitVersion != currentVersion)
+            {
+                currentVersion = this.orbitVersion;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -321,7 +325,6 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         protected void OrbitChanged()
         {
-            this.orbitChanged = true;
             this.orbitVersion++;
         }
 

@@ -31,6 +31,7 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         public PhysicsObject PhysicsObject { get; }
 
+        private int orbitVersion = 0;
         private readonly Color orbitColor;
         private IList<Orbit.Point> orbitPositions;
         private readonly Orbit renderingOrbit;
@@ -143,6 +144,30 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Creates a rendering object for the given physics object assumed to be a part of the current object
+        /// </summary>
+        /// <param name="physicsObject">The object</param>
+        public RenderingObject CreateForSub(PhysicsObject physicsObject)
+        {
+            if (this.PhysicsObject is RocketObject rocketObject)
+            {
+                var rocketModel = (Rocket)this.Model;
+
+                return new RenderingObject(
+                    this.graphicsDevice,
+                    physicsObject,
+                    this.orbitColor,
+                    rocketModel.CreateSpentStage());
+            }
+
+            return new RenderingObject(
+                this.graphicsDevice,
+                physicsObject,
+                this.orbitColor,
+                EnvironmentHelpers.BaseDirectory + "Satellite.png");
+        }
+
+        /// <summary>
         /// Calculates the orbit positions
         /// </summary>
         private void CalculateOrbitPositions()
@@ -179,27 +204,73 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
-        /// Creates a rendering object for the given physics object assumed to be a part of the current object
+        /// Returns the next maneuver
         /// </summary>
-        /// <param name="physicsObject">The object</param>
-        public RenderingObject CreateForSub(PhysicsObject physicsObject)
+        /// <param name="simulatorEngine">The simulator engine</param>
+        private SimulationManeuever NextManeuver(SimulatorEngine simulatorEngine)
         {
-            if (this.PhysicsObject is RocketObject rocketObject)
-            {
-                var rocketModel = (Rocket)this.Model;
+            return simulatorEngine.Maneuvers.FirstOrDefault(x => x.Object == this.PhysicsObject);
+        }
 
-                return new RenderingObject(
-                    this.graphicsDevice,
-                    physicsObject,
-                    this.orbitColor,
-                    rocketModel.CreateSpentStage());
+        /// <summary>
+        /// Updates the object
+        /// </summary>
+        /// <param name="simulatorEngine">The simulator engine</param>
+        public void Update(SimulatorEngine simulatorEngine)
+        {
+            //Orbit
+            if (this.PhysicsObject.HasChangedOrbit(ref orbitVersion))
+            {
+                this.updateOrbit = true;
             }
 
-            return new RenderingObject(
-                this.graphicsDevice,
-                physicsObject,
-                this.orbitColor,
-                EnvironmentHelpers.BaseDirectory + "Satellite.png");
+            if (this.updateOrbit)
+            {
+                if (DateTime.UtcNow - this.lastOrbitUpdate >= this.orbitUpdateTime)
+                {
+                    this.CalculateOrbitPositions();
+                    this.renderingOrbit.Update(this.orbitPositions);
+                    this.updateOrbit = false;
+                    this.lastOrbitUpdate = DateTime.UtcNow;
+                }
+            }
+
+            //Next maneuver
+            var nextManeuver = this.NextManeuver(simulatorEngine);
+            if (nextManeuver != null)
+            {
+                var duration = DateTime.UtcNow - this.nextManeuverRenderingOrbitUpdated;
+                if (duration >= this.nextManeuverRenderingOrbitUpdateFrequency)
+                {
+                    var currentOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object);
+
+                    var currentState = new ObjectState();
+                    var currentPrimaryBodyState = new ObjectState();
+
+                    SolverHelpers.AfterTime(
+                        simulatorEngine.KeplerProblemSolver,
+                        nextManeuver.Object,
+                        nextManeuver.Object.State,
+                        currentOrbit,
+                        nextManeuver.Maneuver.ManeuverTime - simulatorEngine.TotalTime,
+                        out currentState,
+                        out currentPrimaryBodyState);
+
+                    currentState.Velocity += nextManeuver.Maneuver.DeltaVelocity;
+                    var nextOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object.PrimaryBody, ref currentPrimaryBodyState, ref currentState);
+
+                    var positions = OrbitPositions.Create(nextOrbit, true);
+                    this.nextManeuverRenderingOrbit.Update(positions);
+
+                    this.nextManeuverRenderingOrbitUpdated = DateTime.UtcNow;
+                }
+
+                this.drawNextManeuver = true;
+            }
+            else
+            {
+                this.drawNextManeuver = false;
+            }
         }
 
         /// <summary>
@@ -328,76 +399,6 @@ namespace SpaceSimulator.Rendering
                     camera,
                     this.PrimaryBodyTransform(camera, true, (NaturalSatelliteObject)this.PhysicsObject),
                     this.DrawPosition(camera));
-            }
-        }
-
-        /// <summary>
-        /// Returns the next maneuver
-        /// </summary>
-        /// <param name="simulatorEngine">The simulator engine</param>
-        private SimulationManeuever NextManeuver(SimulatorEngine simulatorEngine)
-        {
-            return simulatorEngine.Maneuvers.FirstOrDefault(x => x.Object == this.PhysicsObject);
-        }
-
-        /// <summary>
-        /// Updates the object
-        /// </summary>
-        /// <param name="simulatorEngine">The simulator engine</param>
-        public void Update(SimulatorEngine simulatorEngine)
-        {
-            //Orbit
-            if (this.PhysicsObject.HasChangedOrbit())
-            {
-                this.updateOrbit = true;
-            }
-
-            if (this.updateOrbit)
-            {
-                if (DateTime.UtcNow - this.lastOrbitUpdate >= this.orbitUpdateTime)
-                {
-                    this.CalculateOrbitPositions();
-                    this.renderingOrbit.Update(this.orbitPositions);
-                    this.updateOrbit = false;
-                    this.lastOrbitUpdate = DateTime.UtcNow;
-                }
-            }
-
-            //Next maneuver
-            var nextManeuver = this.NextManeuver(simulatorEngine);
-            if (nextManeuver != null)
-            {
-                var duration = DateTime.UtcNow - this.nextManeuverRenderingOrbitUpdated;
-                if (duration >= this.nextManeuverRenderingOrbitUpdateFrequency)
-                {
-                    var currentOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object);
-
-                    var currentState = new ObjectState();
-                    var currentPrimaryBodyState = new ObjectState();
-
-                    SolverHelpers.AfterTime(
-                        simulatorEngine.KeplerProblemSolver,
-                        nextManeuver.Object,
-                        nextManeuver.Object.State,
-                        currentOrbit,
-                        nextManeuver.Maneuver.ManeuverTime - simulatorEngine.TotalTime,
-                        out currentState,
-                        out currentPrimaryBodyState);
-
-                    currentState.Velocity += nextManeuver.Maneuver.DeltaVelocity;
-                    var nextOrbit = Physics.Orbit.CalculateOrbit(nextManeuver.Object.PrimaryBody, ref currentPrimaryBodyState, ref currentState);
-
-                    var positions = OrbitPositions.Create(nextOrbit, true);
-                    this.nextManeuverRenderingOrbit.Update(positions);
-
-                    this.nextManeuverRenderingOrbitUpdated = DateTime.UtcNow;
-                }
-
-                this.drawNextManeuver = true;
-            }
-            else
-            {
-                this.drawNextManeuver = false;
             }
         }
 

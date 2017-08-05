@@ -250,7 +250,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="camera">The camera</param>
         /// <param name="rocketObject">The rocket object</param>
         /// <param name="scale">The scale to draw the rocket at</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject, float scale = 0.01f)
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject, float scale)
         {
             var arrowScale = camera.ToDraw(1.5E4);
 
@@ -320,7 +320,6 @@ namespace SpaceSimulator.Rendering
             if (physicsObject is RocketObject rocketObject)
             {
                 this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(3E5));
-                //this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(100));
             }
         }
 
