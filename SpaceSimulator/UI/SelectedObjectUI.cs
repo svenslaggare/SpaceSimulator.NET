@@ -70,7 +70,7 @@ namespace SpaceSimulator.UI
 
             this.SimulatorContainer.SelectedObjectChanged += SelectedObjectChanged;
 
-            this.arrow = new Arrow(graphicsDevice, 0.25f, 10.0f, 2.0f);
+            this.arrow = new Arrow(graphicsDevice, 0.2f, 10.0f, 2.0f);
         }
 
         /// <summary>

@@ -165,11 +165,11 @@ namespace SpaceSimulator.Rendering
         /// Creates a new cluster of rocket engines
         /// </summary>
         /// <param name="engine">The engine</param>
-        /// <param name="positions">The positions of the engines</param>
-        public RocketEngineCluster(RocketEngine engine, IList<Vector2> positions)
+        /// <param name="positions">The positions of the engines. If null, then one at the center</param>
+        public RocketEngineCluster(RocketEngine engine, IList<Vector2> positions = null)
         {
             this.Engine = engine;
-            this.positions = new List<Vector2>(positions);
+            this.positions = positions != null ? new List<Vector2>(positions) : new List<Vector2>() { Vector2.Zero };
         }
 
         /// <summary>
@@ -308,9 +308,16 @@ namespace SpaceSimulator.Rendering
     public sealed class RocketStage : IDisposable
     {
         private readonly Device graphicsDevice;
+        
+        /// <summary>
+        /// The radius of the rocket
+        /// </summary>
+        public float MainBodyRadius { get; }
 
-        private readonly float radius;
-        private readonly float mainBodyHeight;
+        /// <summary>
+        /// The radius of the main body
+        /// </summary>
+        public float MainBodyHeight { get; }
 
         private readonly Cylinder mainBody;
 
@@ -329,8 +336,8 @@ namespace SpaceSimulator.Rendering
         public RocketStage(Device graphicsDevice, float radius, float mainBodyHeight, RocketEngineCluster engines)
         {
             this.graphicsDevice = graphicsDevice;
-            this.radius = radius;
-            this.mainBodyHeight = mainBodyHeight;
+            this.MainBodyRadius = radius;
+            this.MainBodyHeight = mainBodyHeight;
             this.mainBody = new Cylinder(graphicsDevice, radius, radius, mainBodyHeight, true);
             this.Engines = engines;
         }
@@ -342,8 +349,8 @@ namespace SpaceSimulator.Rendering
         {
             return new RocketStage(
                 this.graphicsDevice,
-                this.radius,
-                this.mainBodyHeight,
+                this.MainBodyRadius,
+                this.MainBodyHeight,
                 this.Engines.Clone());
         }
 
@@ -392,41 +399,69 @@ namespace SpaceSimulator.Rendering
     }
 
     /// <summary>
+    /// Represents a payload
+    /// </summary>
+    public abstract class Payload : IDisposable
+    {
+        /// <summary>
+        /// Draws the payload
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="world">The world matrix</param>
+        /// <param name="offset">The offset within the rocket</param>
+        public abstract void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, Matrix world, Matrix offset);
+
+        public abstract void Dispose();
+    }
+
+    /// <summary>
+    /// Represents a nose cone
+    /// </summary>
+    public sealed class NoseCone : Payload
+    {
+        private readonly Cylinder model;
+        private readonly float radius;
+        private readonly float height;
+
+        /// <summary>
+        /// Creates a new nose cone
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
+        /// <param name="radius">The radius</param>
+        /// <param name="height">The height</param>
+        public NoseCone(Device graphicsDevice, float radius, float height)
+        {
+            this.radius = radius;
+            this.height = height;
+            this.model = new Cylinder(graphicsDevice, radius, 0, height, true);
+        }
+
+        public override void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, Matrix world, Matrix offset)
+        {
+            this.model.Draw(
+               deviceContext,
+               effect,
+               camera,
+               offset * Matrix.Translation(Vector3.BackwardLH * 0.5f * this.height) * world);
+        }
+
+        public override void Dispose()
+        {
+            this.model.Dispose();
+        }
+    }
+
+    /// <summary>
     /// Draws a rocket
     /// </summary>
     public sealed class Rocket : IDisposable, IPhysicsObjectModel
     {
         private readonly Device graphicsDevice;
 
-        /// <summary>
-        /// The radius of the rocket
-        /// </summary>
-        public float Radius { get; }
-
-        /// <summary>
-        /// The height of the nose cone
-        /// </summary>
-        public float NoseConeHeight { get; }
-
-        /// <summary>
-        /// The height of the main body
-        /// </summary>
-        public float MainBodyHeight { get; }
-
-        /// <summary>
-        /// The neight of the nozzle
-        /// </summary>
-        public float NozzleHeight { get; }
-
-        /// <summary>
-        /// The radius of the nozzle
-        /// </summary>
-        public float NozzleRadius { get; }
-
-        private readonly Cylinder noseCone;
-        //private readonly Cylinder mainBody;
-        //private readonly RocketEngineCluster engines;
-        private readonly RocketStage stage;
+        private readonly IList<RocketStage> stages;
+        private readonly Payload payload;
 
         private readonly Arrow arrow;
 
@@ -436,39 +471,16 @@ namespace SpaceSimulator.Rendering
         /// Creates a new rocket
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="radius">The radius of the rocket</param>
-        /// <param name="noseConeHeight">The height of the nose cone</param>
-        /// <param name="mainBodyHeight">The height of the main body</param>
-        /// <param name="nozzleHeight">The height of the nozzle</param>
-        /// <param name="nozzleRadius">The radius of the nozzle</param>
-        /// <param name="enginePositions">The positions of the engines</param>
-        public Rocket(
-            Device graphicsDevice,
-            float radius, 
-            float noseConeHeight, 
-            float mainBodyHeight, 
-            float nozzleHeight, 
-            float nozzleRadius,
-            IList<Vector2> enginePositions)
+        /// <param name="stages">The stages</param>
+        /// <param name="payload">The payload</param>
+        public Rocket(Device graphicsDevice, IList<RocketStage> stages, Payload payload)
         {
             this.graphicsDevice = graphicsDevice;
 
-            this.Radius = radius;
-            this.NoseConeHeight = noseConeHeight;
-            this.MainBodyHeight = mainBodyHeight;
-            this.NozzleHeight = nozzleHeight;
-            this.NozzleRadius = nozzleRadius;
+            this.stages = new List<RocketStage>(stages);
+            this.payload = payload;
 
-            this.noseCone = new Cylinder(graphicsDevice, this.Radius, 0, this.NoseConeHeight, true);
-            this.stage = new RocketStage(
-                this.graphicsDevice,
-                this.Radius,
-                this.MainBodyHeight,
-                new RocketEngineCluster(
-                    new RocketEngine(graphicsDevice, this.MainBodyHeight, this.NozzleHeight, this.NozzleRadius),
-                    enginePositions));
-
-            this.arrow = new Arrow(graphicsDevice, 0.25f, 10.0f, 2.0f);
+            this.arrow = new Arrow(graphicsDevice, 0.2f, 10.0f, 2.0f);
 
             this.directionalLights = new DirectionalLight[]
             {
@@ -488,34 +500,79 @@ namespace SpaceSimulator.Rendering
         /// <param name="graphicsDevice">The graphics device</param>
         public static Rocket CreateFalcon9(Device graphicsDevice)
         {
-            var radius = 0.1f;
+            var mainBodyRadius = 0.1f;
             var noseConeHeight = 0.2f;
-            var mainBodyHeight = 1.0f;
-            var nozzleHeight = 0.1f * 0.5f;
-            var nozzleRadius = 0.075f * 0.35f;
+            var firstStageHeight = 1.0f;
+            var secondStageHeight = 0.25f;
 
-            var sideEngines = 8;
-            var enginePositions = new List<Vector2>
+            var firstStageSdeEngines = 8;
+            var firstStageEnginePositions = new List<Vector2>
             {
                 Vector2.Zero
             };
 
-            for (int i = 0; i < sideEngines; i++)
+            for (int i = 0; i < firstStageSdeEngines; i++)
             {
-                var angle = ((float)i / sideEngines) * MathUtil.TwoPi;
-                enginePositions.Add(0.75f * radius * new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
+                var angle = ((float)i / firstStageSdeEngines) * MathUtil.TwoPi;
+                firstStageEnginePositions.Add(0.75f * mainBodyRadius * new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
             }
 
-            return new Rocket(graphicsDevice, radius, noseConeHeight, mainBodyHeight, nozzleHeight, nozzleRadius, enginePositions);
+            var payload = new NoseCone(
+                graphicsDevice,
+                mainBodyRadius,
+                noseConeHeight);
+
+            var firstStage = new RocketStage(
+                graphicsDevice,
+                mainBodyRadius,
+                firstStageHeight,
+                new RocketEngineCluster(
+                    new RocketEngine(graphicsDevice, firstStageHeight, 0.1f * 0.5f, 0.075f * 0.35f),
+                    firstStageEnginePositions));
+
+            var secondStage = new RocketStage(
+                graphicsDevice,
+                mainBodyRadius,
+                secondStageHeight,
+                new RocketEngineCluster(new RocketEngine(graphicsDevice, secondStageHeight, 0.1f * 0.75f, 0.075f * 0.75f)));
+
+            return new Rocket(
+                graphicsDevice,
+                new List<RocketStage>() { firstStage, secondStage },
+                payload);
+        }
+
+        /// <summary>
+        /// Returns the current stage
+        /// </summary>
+        /// <param name="rocketObject">The rocket object</param>
+        /// <param name="stageNumber">The stage number</param>
+        private RocketStage CurrentStage(RocketObject rocketObject, int? stageNumber = null)
+        {
+            if (stageNumber == null)
+            {
+                stageNumber = rocketObject.Stages.CurrentStage.Number;
+            }
+
+            if (stageNumber < this.stages.Count)
+            {
+                return this.stages[stageNumber.Value];
+            }
+
+            return null;
         }
 
         /// <summary>
         /// Creates a model for a spent stage
         /// </summary>
-        public IPhysicsObjectModel CreateSpentStage()
+        /// <param name="rocketObject">The current rocket object</param>
+        public IPhysicsObjectModel CreateSpentStage(RocketObject rocketObject)
         {
-            var stage = this.stage.Clone();
-            return new SpentRocketStage(this.graphicsDevice, stage);
+            return new SpentRocketStage(
+                this.graphicsDevice,
+                this.CurrentStage(
+                    rocketObject,
+                    rocketObject.Stages.CurrentStage.Number - 1).Clone());
         }
 
         /// <summary>
@@ -535,6 +592,49 @@ namespace SpaceSimulator.Rendering
         public bool IsTextured => false;
 
         /// <summary>
+        /// Computes transformations and vectors
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        /// <param name="physicsObject">The physics object</param>
+        /// <param name="scale">The scale</param>
+        public static (Vector3 position, Vector3 forward, Matrix facing, Matrix world) ComputeTransformations(
+            SpaceCamera camera, 
+            PhysicsObject physicsObject,
+            float scale)
+        {
+            var position = camera.ToDrawPosition(physicsObject.Position);
+            var state = physicsObject.State;
+            state.MakeRelative(physicsObject.PrimaryBody.State);
+
+            var forward = MathHelpers.ToFloat(state.Prograde);
+            var facing = MathHelpers.FaceDirection(forward);
+
+            var world = Matrix.Scaling(scale) * facing * Matrix.Translation(position);
+
+            return (position, forward, facing, world);
+        }
+
+        /// <summary>
+        /// Sets the effect parameters
+        /// </summary>
+        /// <param name="deviceContext">The device context</param>
+        /// <param name="effect">The effect</param>
+        /// <param name="camera">The camera</param>
+        /// <param name="directionalLights">The directional lights</param>
+        public static void SetEffectParameters(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, DirectionalLight[] directionalLights)
+        {
+            effect.SetMaterial(DefaultMaterial(Color.Gray));
+
+            effect.SetEyePosition(camera.Position);
+
+            directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
+            //this.directionalLights[0].Direction = (position - camera.ToDrawPosition(Vector3d.Zero)).Normalized();
+            effect.SetDirectionalLights(directionalLights);
+
+            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
+        }
+
+        /// <summary>
         /// Draws the given rocket object
         /// </summary>
         /// <param name="deviceContext">The device context</param>
@@ -547,63 +647,48 @@ namespace SpaceSimulator.Rendering
             var arrowScale = camera.ToDraw(1.5E4);
 
             //Compute transformations
-            var position = camera.ToDrawPosition(rocketObject.Position);
-            var state = rocketObject.State;
-            state.MakeRelative(rocketObject.PrimaryBody.State);
-
-            var forward = MathHelpers.ToFloat(state.Prograde);
-            var facing = MathHelpers.FaceDirection(forward);
-
-            var world =
-                Matrix.Scaling(scale)
-                * facing
-                * Matrix.Translation(position);
-
+            (var position, var forward, var facing, var world) = ComputeTransformations(camera, rocketObject, scale);
             var thrustDirection = MathHelpers.ToFloat(rocketObject.EngineAcceleration().Normalized());
-            //var baseEngineTransform = this.engines.Engine.EngineTransform(
-            //    scale,
-            //    forward,
-            //    position,
-            //    thrustDirection,
-            //    offset: new Vector2(0, 0));
+
+            var currentStage = this.CurrentStage(rocketObject);
 
             //Draw thrust arrow
-            this.stage.Engines.DrawCenterThrustArrow(
-                deviceContext,
-                effect,
-                camera,
-                this.arrow,
-                arrowScale,
-                scale,
-                forward,
-                position,
-                thrustDirection);
+            if (currentStage != null)
+            {
+                currentStage.Engines.DrawCenterThrustArrow(
+                    deviceContext,
+                    effect,
+                    camera,
+                    this.arrow,
+                    arrowScale,
+                    scale,
+                    forward,
+                    position,
+                    thrustDirection);
+            }
 
             //Draw rocket
-            effect.SetMaterial(DefaultMaterial(Color.Gray));
+            SetEffectParameters(deviceContext, effect, camera, this.directionalLights);
 
-            effect.SetEyePosition(camera.Position);
-            this.directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
-            //this.directionalLights[0].Direction = (position - camera.ToDrawPosition(Vector3d.Zero)).Normalized();
-            effect.SetDirectionalLights(this.directionalLights);
-            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
-
-            this.noseCone.Draw(
+            this.payload.Draw(
                 deviceContext,
                 effect,
                 camera,
-                Matrix.Translation(Vector3.BackwardLH * 0.5f * (this.MainBodyHeight + this.NoseConeHeight))
-                * world);
-
-            this.stage.Draw(
-                deviceContext,
-                effect,
-                camera,
-                scale,
-                forward,
-                position,
                 world,
-                thrustDirection);
+                Matrix.Translation(Vector3.BackwardLH * 0.5f * ((currentStage?.MainBodyHeight ?? 0))));
+
+            if (currentStage != null)
+            {
+                currentStage.Draw(
+                    deviceContext,
+                    effect,
+                    camera,
+                    scale,
+                    forward,
+                    position,
+                    world,
+                    thrustDirection);
+            }
         }
 
         /// <summary>
@@ -623,8 +708,12 @@ namespace SpaceSimulator.Rendering
 
         public void Dispose()
         {
-            this.noseCone.Dispose();
-            this.stage.Dispose();
+            foreach (var stage in this.stages)
+            {
+                stage.Dispose();
+            }
+
+            this.payload.Dispose();
             this.arrow.Dispose();
         }
     }

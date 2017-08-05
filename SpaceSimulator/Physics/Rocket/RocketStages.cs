@@ -14,7 +14,7 @@ namespace SpaceSimulator.Physics.Rocket
     public sealed class RocketStages : IEnumerable<RocketStage>
     {
         private readonly Queue<RocketStage> stages;
-
+        
         /// <summary>
         /// Returns the current stage
         /// </summary>

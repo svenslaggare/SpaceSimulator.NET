@@ -18,9 +18,7 @@ namespace SpaceSimulator.Rendering
     public sealed class SpentRocketStage : IPhysicsObjectModel
     {
         private readonly Device graphicsDevice;
-
         private readonly RocketStage stage;
-
         private readonly DirectionalLight[] directionalLights;
 
         /// <summary>
@@ -62,24 +60,10 @@ namespace SpaceSimulator.Rendering
             var scale = camera.ToDraw(3E5);
 
             //Compute transformations
-            var position = camera.ToDrawPosition(physicsObject.Position);
-            var state = physicsObject.State;
-            state.MakeRelative(physicsObject.PrimaryBody.State);
-
-            var forward = MathHelpers.ToFloat(state.Prograde);
-            var facing = MathHelpers.FaceDirection(forward);
-
-            var world =
-                Matrix.Scaling(scale)
-                * facing
-                * Matrix.Translation(position);
+            (var position, var forward, var facing, var world) = Rocket.ComputeTransformations(camera, physicsObject, scale);
 
             //Set effect parameters
-            effect.SetMaterial(Rocket.DefaultMaterial(Color.Gray));
-            effect.SetEyePosition(camera.Position);
-            this.directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
-            effect.SetDirectionalLights(this.directionalLights);
-            deviceContext.InputAssembler.InputLayout = effect.InputLayout;
+            Rocket.SetEffectParameters(deviceContext, effect, camera, this.directionalLights);
 
             //Draw
             this.stage.Draw(

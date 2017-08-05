@@ -20,9 +20,9 @@ namespace SpaceSimulator.Simulator.Rocket
         public static RocketStages CreateFalcon9(double payloadMass)
         {
             return RocketStages.New(
-                RocketStage.FromBurnTime("Stage 1", 9, 845E3, 282, 5000, 470, new AtmosphericProperties(AtmosphericFormulas.CircleArea(3.75), 0.1 * 1.0), 162),
-                RocketStage.FromBurnTime("Stage 2", 1, 934E3, 348, 500, 470, new AtmosphericProperties(AtmosphericFormulas.CircleArea(3.75), 0.1 * 1.0), 397),
-                RocketStage.Payload("Payload", payloadMass, new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 1.5), 0.01 * 1.0))
+                RocketStage.FromBurnTime(0, "Stage 1", 9, 845E3, 282, 5000, 470, new AtmosphericProperties(AtmosphericFormulas.CircleArea(3.75), 0.1 * 1.0), 162),
+                RocketStage.FromBurnTime(1, "Stage 2", 1, 934E3, 348, 500, 470, new AtmosphericProperties(AtmosphericFormulas.CircleArea(3.75), 0.1 * 1.0), 397),
+                RocketStage.Payload(2, "Payload", payloadMass, new AtmosphericProperties(AtmosphericFormulas.ConeNoseSurfaceArea(3.7, 1.5), 0.01 * 1.0))
             );
         }
     }

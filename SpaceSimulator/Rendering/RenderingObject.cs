@@ -157,7 +157,7 @@ namespace SpaceSimulator.Rendering
                     this.graphicsDevice,
                     physicsObject,
                     this.orbitColor,
-                    rocketModel.CreateSpentStage());
+                    rocketModel.CreateSpentStage(rocketObject));
             }
 
             return new RenderingObject(
