@@ -151,7 +151,7 @@ namespace SpaceSimulator.Environments
                 graphicsDevice,
                 falcon9Object,
                 Color.Yellow,
-                new Rendering.Rocket(graphicsDevice, 0.1f, 0.2f, 1.0f, 0.1f, 0.075f)));
+                Rendering.Rocket.CreateFalcon9(graphicsDevice)));
 
             //var bestPitchStart = 1E3;
             //var bestPitchEnd = 2.6E3;

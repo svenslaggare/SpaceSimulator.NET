@@ -66,7 +66,7 @@ namespace SpaceSimulator.Environments
                 graphicsDevice, 
                 falcon9Object, 
                 Color.Yellow,
-                new Rendering.Rocket(graphicsDevice, 0.1f, 0.2f, 1.0f, 0.1f, 0.075f)));
+                Rendering.Rocket.CreateFalcon9(graphicsDevice)));
 
             var falcon9TargetAltitude = 300E3;
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);

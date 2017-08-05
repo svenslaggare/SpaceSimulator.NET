@@ -20,7 +20,8 @@ namespace SpaceSimulator.Rendering
         private readonly Device graphicsDevice;
 
         private readonly Cylinder mainBody;
-        private readonly RocketEngine engine;
+        //private readonly RocketEngine engine;
+        private readonly RocketEngineCluster engines;
 
         private readonly DirectionalLight[] directionalLights;
 
@@ -34,7 +35,7 @@ namespace SpaceSimulator.Rendering
             this.graphicsDevice = graphicsDevice;
 
             this.mainBody = new Cylinder(graphicsDevice, rocket.Radius, rocket.Radius, rocket.MainBodyHeight, true);
-            this.engine = new RocketEngine(graphicsDevice, rocket.MainBodyHeight, rocket.NozzleHeight, rocket.NozzleRadius);
+            this.engines = rocket.Engines.Clone();
 
             this.directionalLights = new DirectionalLight[]
             {
@@ -91,13 +92,14 @@ namespace SpaceSimulator.Rendering
                 camera,
                 world);
 
-            var baseEngineTransform = this.engine.EngineTransform(
+            this.engines.Draw(
+                deviceContext,
+                effect,
+                camera,
                 scale,
                 forward,
                 position,
                 forward);
-
-            this.engine.Draw(deviceContext, effect, camera, baseEngineTransform);
         }
 
         public void Dispose()
