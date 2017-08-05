@@ -15,6 +15,7 @@ using SpaceSimulator.Simulator;
 using Device = SharpDX.Direct3D11.Device;
 using DeviceContext = SharpDX.Direct3D11.DeviceContext;
 using SpaceSimulator.Helpers;
+using SpaceSimulator.Environments;
 
 namespace SpaceSimulator.Rendering
 {
@@ -23,6 +24,8 @@ namespace SpaceSimulator.Rendering
     /// </summary>
     public sealed class RenderingObject : IDisposable
     {
+        private readonly Device graphicsDevice;
+
         /// <summary>
         /// The object being drawn
         /// </summary>
@@ -42,12 +45,11 @@ namespace SpaceSimulator.Rendering
         private readonly TimeSpan nextManeuverRenderingOrbitUpdateFrequency = TimeSpan.FromSeconds(1.0);
         private bool drawNextManeuver = false;
 
-        private readonly Rendering.Orbit ringRenderingOrbit;
+        private readonly PlanetaryRings rings;
 
         private readonly TimeSpan orbitUpdateTime = TimeSpan.FromMilliseconds(50.0);
         private DateTime lastOrbitUpdate = new DateTime();
         private bool updateOrbit = false;
-
 
         /// <summary>
         /// Indicates if the orbit should be drawn
@@ -66,16 +68,16 @@ namespace SpaceSimulator.Rendering
         /// <param name="physicsObject">The physics object to render</param>
         /// <param name="orbitColor">The color of the orbit</param>
         /// <param name="model">The model</param>
-        /// <param name="ringColor">The color of the rings</param>
-        /// <param name="ringRadius">The radius of the rings</param>
+        /// <param name="rings">The planetary rings</param>
         public RenderingObject(
             Device graphicsDevice,
             PhysicsObject physicsObject,
             Color orbitColor,
             IPhysicsObjectModel model,
-            Color? ringColor = null,
-            double ringRadius = 0.0)
+            PlanetaryRings rings = null)
         {
+            this.graphicsDevice = graphicsDevice;
+
             this.PhysicsObject = physicsObject;
             this.orbitColor = orbitColor;
             this.Model = model;
@@ -103,22 +105,9 @@ namespace SpaceSimulator.Rendering
                 new Color(124, 117, 6),
                 drawRelativeToFocus);
 
-            if (ringColor.HasValue && physicsObject is NaturalSatelliteObject naturalSatelliteObject)
+            if (rings != null && physicsObject is NaturalSatelliteObject naturalSatelliteObject)
             {
-                var ringPositions = OrbitPositions.Create(
-                    Physics.Orbit.New(naturalSatelliteObject, semiMajorAxis: ringRadius),
-                    true);
-
-                this.ringRenderingOrbit = new Rendering.Orbit(
-                    graphicsDevice,
-                    ringPositions,
-                    ringColor.Value,
-                    false)
-                {
-                    IsBound = true,
-                    ChangeBrightnessForPassed = false,
-                    RotateToFaceCamera = false
-                };
+                this.rings = rings;
             }
         }
 
@@ -130,16 +119,14 @@ namespace SpaceSimulator.Rendering
         /// <param name="orbitColor">The color of the orbit</param>
         /// <param name="textureName">The name of the texture</param>
         /// <param name="baseTransform">The base transform<</param>
-        /// <param name="ringColor">The color of the rings</param>
-        /// <param name="ringRadius">The radius of the rings</param>
+        /// <param name="rings">The rings</param>
         public RenderingObject(
             Device graphicsDevice,
             PhysicsObject physicsObject,
             Color orbitColor,
             string textureName,
             Matrix? baseTransform = null,
-            Color? ringColor = null,
-            double ringRadius = 0.0)
+            PlanetaryRings rings = null)
             : this(
                   graphicsDevice,
                   physicsObject,
@@ -148,15 +135,9 @@ namespace SpaceSimulator.Rendering
                       graphicsDevice,
                       1.0f,
                       textureName,
-                      new Material()
-                      {
-                          Ambient = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
-                          Diffuse = new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-                          Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
-                      },
+                      Sphere.DefaultMaterial,
                       baseTransform ?? Matrix.Identity),
-                  ringColor,
-                  ringRadius)
+                  rings)
         {
 
         }
@@ -198,12 +179,36 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Creates a rendering object for the given physics object assumed to be a part of the current object
+        /// </summary>
+        /// <param name="physicsObject">The object</param>
+        public RenderingObject CreateForSub(PhysicsObject physicsObject)
+        {
+            if (this.PhysicsObject is RocketObject rocketObject)
+            {
+                var rocketModel = (Rocket)this.Model;
+
+                return new RenderingObject(
+                    this.graphicsDevice,
+                    physicsObject,
+                    this.orbitColor,
+                    rocketModel.CreateSpentStage());
+            }
+
+            return new RenderingObject(
+                this.graphicsDevice,
+                physicsObject,
+                this.orbitColor,
+                EnvironmentHelpers.BaseDirectory + "Satellite.png");
+        }
+
+        /// <summary>
         /// The transform of the primary body
         /// </summary>
         /// <param name="camera">The camera</param>
-        /// <param name="renderingOrbit">The rendering orbit</param>
+        /// <param name="relativeToFocus">Indicates if relative to focus</param>
         /// <param name="primaryBody">The primary body</param>
-        private Matrix PrimaryBodyTransform(SpaceCamera camera, Orbit renderingOrbit, NaturalSatelliteObject primaryBody = null)
+        private Matrix PrimaryBodyTransform(SpaceCamera camera, bool relativeToFocus, NaturalSatelliteObject primaryBody = null)
         {
             primaryBody = primaryBody ?? this.PhysicsObject.PrimaryBody;
             if (primaryBody == null)
@@ -217,8 +222,19 @@ namespace SpaceSimulator.Rendering
                 transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
             }
 
-            transform *= Matrix.Translation(camera.ToDrawPosition(primaryBody.Position, relativeToFocus: !renderingOrbit.DrawRelativeToFocus));
+            transform *= Matrix.Translation(camera.ToDrawPosition(primaryBody.Position, relativeToFocus: relativeToFocus));
             return transform;
+        }
+
+        /// <summary>
+        /// The transform of the primary body
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        /// <param name="renderingOrbit">The rendering orbit</param>
+        /// <param name="primaryBody">The primary body</param>
+        private Matrix PrimaryBodyTransform(SpaceCamera camera, Orbit renderingOrbit, NaturalSatelliteObject primaryBody = null)
+        {
+            return this.PrimaryBodyTransform(camera, !renderingOrbit.DrawRelativeToFocus, primaryBody);
         }
 
         /// <summary>
@@ -303,16 +319,15 @@ namespace SpaceSimulator.Rendering
         /// <param name="camera">The camera</param>
         private void DrawRings(DeviceContext deviceContext, OrbitEffect orbitEffect, EffectPass pass, SpaceCamera camera)
         {
-            if (this.ringRenderingOrbit != null)
+            if (this.rings != null)
             {
-                this.ringRenderingOrbit.Draw(
+                this.rings.Draw(
                     deviceContext,
                     orbitEffect,
                     pass,
                     camera,
-                    this.PrimaryBodyTransform(camera, this.ringRenderingOrbit, (NaturalSatelliteObject)this.PhysicsObject),
-                    this.DrawPosition(camera),
-                    lineWidth: camera.ToDraw(2E7));
+                    this.PrimaryBodyTransform(camera, true, (NaturalSatelliteObject)this.PhysicsObject),
+                    this.DrawPosition(camera));
             }
         }
 
@@ -501,7 +516,7 @@ namespace SpaceSimulator.Rendering
             this.Model.Dispose();
             this.renderingOrbit?.Dispose();
             this.nextManeuverRenderingOrbit?.Dispose();
-            this.ringRenderingOrbit?.Dispose();
+            this.rings?.Dispose();
         }
     }
 }

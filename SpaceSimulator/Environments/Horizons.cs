@@ -290,16 +290,7 @@ namespace SpaceSimulator.Environments
                     baseTransform: baseTransform));
             }
 
-            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
-            {
-                return new RenderingObject(
-                    graphicsDevice,
-                    newObject,
-                    Color.Yellow,
-                    baseDir + "Satellite.png");
-            };
-
-            return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
+            return new SimulatorContainer(graphicsDevice, simulatorEngine, renderingObjects);
         }
     }
 }

@@ -48,15 +48,6 @@ namespace SpaceSimulator.Environments
             var simulatorEngine = new SimulatorEngine(new List<PhysicsObject>() { earth });
             var renderingObjects = new List<RenderingObject>() { earthRenderingObject };
 
-            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
-            {
-                return new RenderingObject(
-                    graphicsDevice,
-                    newObject,
-                    Color.Yellow,
-                    baseDir + "Satellite.png");
-            };
-
             //var moon = simulatorEngine.AddPlanetInOrbit(
             //    "Moon",
             //    PhysicsObjectType.NaturalSatellite,
@@ -166,7 +157,7 @@ namespace SpaceSimulator.Environments
             //Console.WriteLine($"Computed in {(DateTime.UtcNow - startTime).TotalSeconds} seconds.");
             //simulatorEngine.ScheduleManeuver(rocketObject, maneuvers);
 
-            return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
+            return new SimulatorContainer(graphicsDevice, simulatorEngine, renderingObjects);
         }
     }
 }

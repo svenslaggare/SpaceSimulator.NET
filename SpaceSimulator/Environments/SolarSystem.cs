@@ -59,8 +59,7 @@ namespace SpaceSimulator.Environments
                 Color color,
                 string textureName,
                 float baseRotationY = 180.0f * MathHelpers.Deg2Rad,
-                Color? ringColor = null,
-                double ringRadius = 0)
+                Func<NaturalSatelliteObject, PlanetaryRings> createRings = null)
             {
                 var orbit = new OrbitPosition(body.Orbit(primaryBody), 0.0);
 
@@ -78,14 +77,19 @@ namespace SpaceSimulator.Environments
                     body.AtmosphericModel,
                     orbit);
 
+                PlanetaryRings rings = null;
+                if (createRings != null)
+                {
+                    rings = createRings(newObject);
+                }
+
                 renderingObjects.Add(new RenderingObject(
                     graphicsDevice,
                     newObject,
                     color,
                     textureName,
                     baseTransform: Matrix.RotationY(baseRotationY),
-                    ringColor: ringColor,
-                    ringRadius: ringRadius));
+                    rings: rings));
                 return newObject;
             }
 
@@ -104,8 +108,12 @@ namespace SpaceSimulator.Environments
                 Simulator.Data.SolarSystemBodies.Saturn,
                 new Color(255, 167, 0, 255),
                 baseDir + "Saturn.jpg",
-                ringColor: new Color(255, 227, 107),
-                ringRadius: 1.4 * Simulator.Data.SolarSystemBodies.Saturn.Radius);
+                createRings: planet => new PlanetaryRings(
+                    graphicsDevice,
+                    planet,
+                    new Color(255, 227, 107),
+                    1.4 * Simulator.Data.SolarSystemBodies.Saturn.Radius,
+                    2E7));
 
             AddPlanet(sun, "Uranus", Simulator.Data.SolarSystemBodies.Uranus, Color.Blue, baseDir + "Uranus.jpg");
             AddPlanet(sun, "Neptune", Simulator.Data.SolarSystemBodies.Neptune, new Color(0, 148, 255, 255), baseDir + "Neptune.jpg");
@@ -179,16 +187,7 @@ namespace SpaceSimulator.Environments
             //    isRealSize: false);
             //renderingObjects.Add(new RenderingObject(graphicsDevice, Color.Yellow, baseDir + "Satellite.png", satellite3));
 
-            Func<PhysicsObject, RenderingObject> createRenderingObject = newObject =>
-            {
-                return new RenderingObject(
-                    graphicsDevice,
-                    newObject,
-                    Color.Yellow,
-                    baseDir + "Satellite.png");
-            };
-
-            return new SimulatorContainer(simulatorEngine, renderingObjects, createRenderingObject);
+            return new SimulatorContainer(graphicsDevice, simulatorEngine, renderingObjects);
         }
     }
 }

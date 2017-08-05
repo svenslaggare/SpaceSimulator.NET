@@ -49,8 +49,8 @@ namespace SpaceSimulator.Rendering
             this.BaseHeight = baseHeight;
             this.HeadHeight = headHeight;
 
-            this.arrowBase = new Cylinder(graphicsDevice, radius, radius, baseHeight);
-            this.arrowHead = new Cylinder(graphicsDevice, radius * 2.0f, 0, headHeight);
+            this.arrowBase = new Cylinder(graphicsDevice, radius, radius, baseHeight, true);
+            this.arrowHead = new Cylinder(graphicsDevice, radius * 2.0f, 0, headHeight, true);
 
             this.directionalLights = new DirectionalLight[]
             {
@@ -84,26 +84,26 @@ namespace SpaceSimulator.Rendering
 
             effect.SetEyePosition(camera.Position);
             this.directionalLights[0].Direction = (-camera.Look + 0.2f * camera.Up).Normalized();
-            //this.directionalLights[0].Direction = MathHelpers.Normalized(-camera.Up);
             effect.SetDirectionalLights(this.directionalLights);
 
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
 
-            var offset = Matrix.Translation(Vector3.Up * this.BaseHeight * 0.5f);
-            var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
-            var offsetRotationWorld = offset * rotation * world;
+            var offset = Matrix.Translation(Vector3.BackwardLH * this.BaseHeight * 0.5f);
+            //var rotation = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
+            var rotation = Matrix.Identity;
+            var offsetWorld = offset * world;
 
             this.arrowHead.Draw(
                 deviceContext,
                 effect,
                 camera,
-                offset * Matrix.Translation(Vector3.Up * this.HeadHeight * 0.5f) * offsetRotationWorld);
+                rotation * offset * Matrix.Translation(Vector3.BackwardLH * this.HeadHeight * 0.5f) * offsetWorld);
 
             this.arrowBase.Draw(
                 deviceContext,
                 effect,
                 camera,
-                offsetRotationWorld);
+                rotation * offsetWorld);
         }
 
         /// <summary>

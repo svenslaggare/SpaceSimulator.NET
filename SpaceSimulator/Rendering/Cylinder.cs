@@ -30,6 +30,9 @@ namespace SpaceSimulator.Rendering
         private readonly int[] indices;
         private readonly Buffer indexBuffer;
 
+        private readonly Matrix baseTransform = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
+        private readonly Matrix3x3 baseTransform3x3 = Matrix3x3.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
+
         /// <summary>
         /// Creates a new cylinder
         /// </summary>
@@ -37,15 +40,16 @@ namespace SpaceSimulator.Rendering
         /// <param name="bottomRadius">The bottom radius</param>
         /// <param name="topRadius">The top radius</param>
         /// <param name="height">The height of the cylinder</param>
-        public Cylinder(Device graphicsDevice, float bottomRadius, float topRadius, float height)
+        /// <param name="transform">Indicates if the cylinder is transformed such that its default orientation is facing forwards</param>
+        public Cylinder(Device graphicsDevice, float bottomRadius, float topRadius, float height, bool transform = false)
         {
             this.graphicsDevice = graphicsDevice;
 
             GeometryGenerator.CreateCylinder(bottomRadius, topRadius, height, 50, 50, out var geometryVertices, out this.indices);
             this.vertices = geometryVertices.Select(vertex => new BasicVertex()
             {
-                Position = vertex.Position,
-                Normal = vertex.Normal,
+                Position = transform ? Vector3.TransformCoordinate(vertex.Position, this.baseTransform) : vertex.Position,
+                Normal = transform ? Vector3.Transform(vertex.Normal, this.baseTransform3x3).Normalized() : vertex.Normal,
                 TextureCoordinates = vertex.TextureCoordinates
             }).ToArray();
 

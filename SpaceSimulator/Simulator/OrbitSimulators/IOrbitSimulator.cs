@@ -16,6 +16,13 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
     }
 
     /// <summary>
+    /// Adds a new physics object
+    /// </summary>
+    /// <param name="parentObject">The parent object</param>
+    /// <param name="newObject">The new object</param>
+    public delegate void AddPhysicsObject(PhysicsObject parentObject, PhysicsObject newObject);
+
+    /// <summary>
     /// Represents an orbit simulator
     /// </summary>
     public interface IOrbitSimulator
@@ -32,6 +39,6 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// <param name="timeStep">The time step</param>
         /// <param name="currentObject">The current object</param>
         /// <param name="addObject">A function to add a new object</param>
-        void Update(double totalTime, double timeStep, PhysicsObject currentObject, Action<PhysicsObject> addObject = null);
+        void Update(double totalTime, double timeStep, PhysicsObject currentObject, AddPhysicsObject addObject = null);
     }
 }

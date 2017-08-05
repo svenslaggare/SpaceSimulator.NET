@@ -153,6 +153,7 @@
     <Compile Include="Rendering\Arrow.cs" />
     <Compile Include="Rendering\Cylinder.cs" />
     <Compile Include="Rendering\IPhysicsObjectModel.cs" />
+    <Compile Include="Rendering\PlanetaryRings.cs" />
     <Compile Include="Rendering\Plot\GroundTrack.cs" />
     <Compile Include="Rendering\Plot\Heatmap.cs" />
     <Compile Include="Rendering\Plot\PlotHelpers.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Mathematics\Quaterniond.cs" />
     <Compile Include="Mathematics\Vector3d.cs" />
     <Compile Include="Mathematics\Vector4d.cs" />
+    <Compile Include="Rendering\SpentRocketStage.cs" />
     <Compile Include="Simulator\ArtificialPhysicsObject.cs" />
     <Compile Include="Physics\Atmosphere\AtmosphericFormulas.cs" />
     <Compile Include="Physics\Atmosphere\AtmosphericProperties.cs" />

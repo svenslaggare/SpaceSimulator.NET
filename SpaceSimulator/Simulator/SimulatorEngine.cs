@@ -159,7 +159,7 @@ namespace SpaceSimulator.Simulator
     {
         private readonly IList<PhysicsObject> objects = new List<PhysicsObject>();
         private readonly IList<PhysicsObject> naturalObjects = new List<PhysicsObject>();
-        private readonly IList<PhysicsObject> newObjects = new List<PhysicsObject>();
+        private readonly IList<(PhysicsObject, PhysicsObject)> newObjects = new List<(PhysicsObject, PhysicsObject)>();
         private NaturalSatelliteObject objectOfReference;
 
         private double totalTime;
@@ -338,10 +338,11 @@ namespace SpaceSimulator.Simulator
         /// <summary>
         /// Adds the given object to the list of objects to add
         /// </summary>
+        /// <param name="parentObject">The parent object</param>
         /// <param name="physicsObject">The object</param>
-        private void AddNewObject(PhysicsObject physicsObject)
+        private void AddNewObject(PhysicsObject parentObject, PhysicsObject physicsObject)
         {
-            this.newObjects.Add(physicsObject);
+            this.newObjects.Add((parentObject, physicsObject));
         }
 
         /// <summary>
@@ -866,10 +867,10 @@ namespace SpaceSimulator.Simulator
             //Add new objects
             if (this.newObjects.Count > 0)
             {
-                foreach (var newObject in this.newObjects)
+                foreach ((var parentObject, var newObject) in this.newObjects)
                 {
                     this.AddObject(newObject);
-                    this.ObjectAdded?.Invoke(this, newObject);
+                    this.ObjectAdded?.Invoke(parentObject, newObject);
                 }
 
                 this.newObjects.Clear();

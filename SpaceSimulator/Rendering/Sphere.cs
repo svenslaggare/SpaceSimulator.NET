@@ -51,6 +51,16 @@ namespace SpaceSimulator.Rendering
         public Matrix Transform { get; }
 
         /// <summary>
+        /// The default material
+        /// </summary>
+        public static Material DefaultMaterial => new Material()
+        {
+            Ambient = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
+            Diffuse = new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+            Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
+        };
+
+        /// <summary>
         /// Creates a new spehre
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
@@ -102,6 +112,26 @@ namespace SpaceSimulator.Rendering
         public bool IsTextured => true;
 
         /// <summary>
+        /// Returns the scaling matrix
+        /// </summary>
+        /// <param name="camera">The camera</param>
+        /// <param name="physicsObject">The object</param>
+        public Matrix ScalingMatrix(SpaceCamera camera, PhysicsObject physicsObject)
+        {
+            var size = 0.0f;
+            if (physicsObject is NaturalSatelliteObject naturalObject)
+            {
+                size = camera.ToDraw(naturalObject.Radius);
+            }
+            else
+            {
+                size = camera.ToDraw(Simulator.Data.SolarSystemBodies.Earth.Radius * 0.01);
+            }
+
+            return Matrix.Scaling(size);
+        }
+
+        /// <summary>
         /// Draws the sphere using the given effect
         /// </summary>
         /// <param name="deviceContext">The device context</param>
@@ -127,26 +157,6 @@ namespace SpaceSimulator.Rendering
             //Draw
             pass.Apply(deviceContext);
             deviceContext.DrawIndexed(this.indices.Length, 0, 0);
-        }
-
-        /// <summary>
-        /// Returns the scaling matrix
-        /// </summary>
-        /// <param name="camera">The camera</param>
-        /// <param name="physicsObject">The object</param>
-        public Matrix ScalingMatrix(SpaceCamera camera, PhysicsObject physicsObject)
-        {
-            var size = 0.0f;
-            if (physicsObject is NaturalSatelliteObject naturalObject)
-            {
-                size = camera.ToDraw(naturalObject.Radius);
-            }
-            else
-            {
-                size = camera.ToDraw(Simulator.Data.SolarSystemBodies.Earth.Radius * 0.01);
-            }
-
-            return Matrix.Scaling(size);
         }
 
         /// <summary>

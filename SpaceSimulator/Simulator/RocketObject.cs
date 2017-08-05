@@ -7,6 +7,7 @@ using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
 using SpaceSimulator.Physics.Rocket;
+using SpaceSimulator.Simulator.OrbitSimulators;
 using SpaceSimulator.Simulator.Rocket;
 
 namespace SpaceSimulator.Simulator
@@ -179,13 +180,13 @@ namespace SpaceSimulator.Simulator
         /// Clears the staged objects
         /// </summary>
         /// <param name="apply">Applied to each staged object</param>
-        public void ClearStagedObjects(Action<PhysicsObject> apply = null)
+        public void ClearStagedObjects(AddPhysicsObject apply = null)
         {
             if (apply != null)
             {
                 foreach (var staged in this.toStage)
                 {
-                    apply(staged);
+                    apply(this, staged);
                 }
             }
 

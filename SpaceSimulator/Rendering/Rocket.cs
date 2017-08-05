@@ -23,8 +23,6 @@ namespace SpaceSimulator.Rendering
     {
         private readonly Device graphicsDevice;
 
-        private readonly Matrix baseTransform;
-
         private readonly float mainBodyHeight;
         private readonly float nozzleHeight;
         private readonly float nozzleRadius;
@@ -36,23 +34,20 @@ namespace SpaceSimulator.Rendering
         /// Creates a new rocket
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
-        /// <param name="baseTransform">The base transform</param>
         /// <param name="mainBodyHeight">The height of the main body</param>
         /// <param name="nozzleHeight">The height of the nozzle</param>
         /// <param name="nozzleRadius">The radius of the nozzle</param>
-        public RocketEngine(Device graphicsDevice, Matrix baseTransform, float mainBodyHeight, float nozzleHeight, float nozzleRadius)
+        public RocketEngine(Device graphicsDevice, float mainBodyHeight, float nozzleHeight, float nozzleRadius)
         {
             this.graphicsDevice = graphicsDevice;
-
-            this.baseTransform = baseTransform;
 
             this.mainBodyHeight = mainBodyHeight;
             this.nozzleHeight = nozzleHeight;
             this.nozzleRadius = nozzleRadius;
 
             var nozzleMinRadius = this.nozzleRadius * 0.3f;
-            this.engineMount = new Cylinder(graphicsDevice, nozzleMinRadius, nozzleMinRadius, this.nozzleHeight * 0.5f);
-            this.engineNozzle = new Cylinder(graphicsDevice, this.nozzleRadius, nozzleMinRadius, this.nozzleHeight);
+            this.engineMount = new Cylinder(graphicsDevice, nozzleMinRadius, nozzleMinRadius, this.nozzleHeight * 0.5f, true);
+            this.engineNozzle = new Cylinder(graphicsDevice, this.nozzleRadius, nozzleMinRadius, this.nozzleHeight, true);
         }
 
         /// <summary>
@@ -62,11 +57,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="rocketForward">The forward direction of the rocket</param>
         /// <param name="rocketPosition">The position of the rocket</param>
         /// <param name="thrustDirection">The thurst direction</param>
-        public Matrix EngineTransform(
-            float rocketScale,
-            Vector3 rocketForward,
-            Vector3 rocketPosition,
-            Vector3 thrustDirection)
+        public Matrix EngineTransform(float rocketScale, Vector3 rocketForward, Vector3 rocketPosition, Vector3 thrustDirection)
         {
             return 
                 MathHelpers.FaceDirection(thrustDirection.IsZero ? rocketForward : thrustDirection)
@@ -81,10 +72,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="baseEngineTransform">The base transform of the engine</param>
         private Matrix NozzleTransform(Matrix baseEngineTransform)
         {
-            return 
-                this.baseTransform
-                * Matrix.Translation(Vector3.ForwardLH * 0.5f * this.nozzleHeight)
-                * baseEngineTransform;
+            return Matrix.Translation(Vector3.ForwardLH * 0.5f * this.nozzleHeight) * baseEngineTransform;
         }
 
         /// <summary>
@@ -106,7 +94,7 @@ namespace SpaceSimulator.Rendering
             Matrix baseEngineTranform,
             Vector3 thrustDirection)
         {
-            var engineStartPosition = Vector3.TransformCoordinate(0.1f * Vector3.Down, this.NozzleTransform(baseEngineTranform));
+            var engineStartPosition = Vector3.TransformCoordinate(0.1f * Vector3.ForwardLH, this.NozzleTransform(baseEngineTranform));
             var engineTargetPosition = engineStartPosition - thrustDirection * arrowScale * (arrow.BaseHeight + arrow.HeadHeight);
 
             arrow.DrawDirection(
@@ -128,7 +116,7 @@ namespace SpaceSimulator.Rendering
         /// <param name="baseEngineTransform">The base engine transform</param>
         public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, Matrix baseEngineTransform)
         {
-            var engineMountTransform = this.baseTransform * baseEngineTransform;
+            var engineMountTransform = baseEngineTransform;
             var engineTransform = this.NozzleTransform(baseEngineTransform);
 
             this.engineMount.Draw(
@@ -158,13 +146,30 @@ namespace SpaceSimulator.Rendering
     {
         private readonly Device graphicsDevice;
 
-        private readonly Matrix baseTransform = Matrix.RotationAxis(Vector3.Right, -MathHelpers.Deg2Rad * 90);
+        /// <summary>
+        /// The radius of the rocket
+        /// </summary>
+        public float Radius { get; }
 
-        private readonly float radius;
-        private readonly float noseConeHeight;
-        private readonly float mainBodyHeight;
-        private readonly float nozzleHeight;
-        private readonly float nozzleRadius;
+        /// <summary>
+        /// The height of the nose cone
+        /// </summary>
+        public float NoseConeHeight { get; }
+
+        /// <summary>
+        /// The height of the main body
+        /// </summary>
+        public float MainBodyHeight { get; }
+
+        /// <summary>
+        /// The neight of the nozzle
+        /// </summary>
+        public float NozzleHeight { get; }
+
+        /// <summary>
+        /// The radius of the nozzle
+        /// </summary>
+        public float NozzleRadius { get; }
 
         private readonly Cylinder noseCone;
         private readonly Cylinder mainBody;
@@ -187,17 +192,17 @@ namespace SpaceSimulator.Rendering
         {
             this.graphicsDevice = graphicsDevice;
 
-            this.radius = radius;
-            this.noseConeHeight = noseConeHeight;
-            this.mainBodyHeight = mainBodyHeight;
-            this.nozzleHeight = nozzleHeight;
-            this.nozzleRadius = nozzleRadius;
+            this.Radius = radius;
+            this.NoseConeHeight = noseConeHeight;
+            this.MainBodyHeight = mainBodyHeight;
+            this.NozzleHeight = nozzleHeight;
+            this.NozzleRadius = nozzleRadius;
 
-            this.noseCone = new Cylinder(graphicsDevice, this.radius, 0, this.noseConeHeight);
-            this.mainBody = new Cylinder(graphicsDevice, this.radius, this.radius, this.mainBodyHeight);
+            this.noseCone = new Cylinder(graphicsDevice, this.Radius, 0, this.NoseConeHeight, true);
+            this.mainBody = new Cylinder(graphicsDevice, this.Radius, this.Radius, this.MainBodyHeight, true);
 
-            var nozzleMinRadius = this.nozzleRadius * 0.3f;
-            this.engine = new RocketEngine(graphicsDevice, baseTransform, this.mainBodyHeight, this.nozzleHeight, this.nozzleRadius);
+            var nozzleMinRadius = this.NozzleRadius * 0.3f;
+            this.engine = new RocketEngine(graphicsDevice, this.MainBodyHeight, this.NozzleHeight, this.NozzleRadius);
 
             this.arrow = new Arrow(graphicsDevice, 0.25f, 10.0f, 2.0f);
 
@@ -214,9 +219,28 @@ namespace SpaceSimulator.Rendering
         }
 
         /// <summary>
+        /// Returns the default material for a rocket part
+        /// </summary>
+        /// <param name="color">The color</param>
+        public static Material DefaultMaterial(Color color) => new Material()
+        {
+            Ambient = color.ToVector4() * 0.25f,
+            Diffuse = color.ToVector4(),
+            Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
+        };
+
+        /// <summary>
         /// Indicates if the effect is textured
         /// </summary>
         public bool IsTextured => false;
+
+        /// <summary>
+        /// Creates a model for a spent stage
+        /// </summary>
+        public IPhysicsObjectModel CreateSpentStage()
+        {
+            return new SpentRocketStage(this.graphicsDevice, this);
+        }
 
         /// <summary>
         /// Draws the given rocket object
@@ -247,7 +271,7 @@ namespace SpaceSimulator.Rendering
             var baseEngineTransform = this.engine.EngineTransform(
                 scale,
                 forward,
-                camera.ToDrawPosition(rocketObject.Position),
+                position,
                 thrustDirection);
 
             //Draw thrust arrow
@@ -261,13 +285,7 @@ namespace SpaceSimulator.Rendering
                 thrustDirection);
 
             //Draw rocket
-            var color = Color.Gray;
-            effect.SetMaterial(new Material()
-            {
-                Ambient = color.ToVector4() * 0.25f,
-                Diffuse = color.ToVector4(),
-                Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
-            });
+            effect.SetMaterial(DefaultMaterial(Color.Gray));
 
             effect.SetEyePosition(camera.Position);
             this.directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
@@ -278,15 +296,14 @@ namespace SpaceSimulator.Rendering
                 deviceContext,
                 effect,
                 camera,
-                this.baseTransform
-                * Matrix.Translation(-Vector3.ForwardLH * 0.5f * (this.mainBodyHeight + this.noseConeHeight))
+                Matrix.Translation(Vector3.BackwardLH * 0.5f * (this.MainBodyHeight + this.NoseConeHeight))
                 * world);
 
             this.mainBody.Draw(
                 deviceContext,
                 effect,
                 camera,
-                this.baseTransform * world);
+                world);
      
             this.engine.Draw(deviceContext, effect, camera, baseEngineTransform);
         }

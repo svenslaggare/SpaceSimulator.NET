@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SharpDX.Direct3D11;
 using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 
@@ -14,6 +15,8 @@ namespace SpaceSimulator
     /// </summary>
     public class SimulatorContainer
     {
+        private readonly Device graphicsDevice;
+
         /// <summary>
         /// Returns the simulator engine
         /// </summary>
@@ -29,7 +32,6 @@ namespace SpaceSimulator
 
         private PhysicsObject selectedObject;
 
-        private readonly Func<PhysicsObject, RenderingObject> createRenderingObject;
 
         /// <summary>
         /// Event for when the selected object changes
@@ -46,11 +48,12 @@ namespace SpaceSimulator
         /// <summary>
         /// Creates a new simulator engine
         /// </summary>
+        /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="simulatorEngine">The simulator engine</param>
         /// <param name="renderingObjects">The rendering objects</param>
-        /// <param name="createRenderingObject">Creates a rendering object at runtime</param>
-        public SimulatorContainer(SimulatorEngine simulatorEngine, IList<RenderingObject> renderingObjects, Func<PhysicsObject, RenderingObject> createRenderingObject)
+        public SimulatorContainer(Device graphicsDevice, SimulatorEngine simulatorEngine, IList<RenderingObject> renderingObjects)
         {
+            this.graphicsDevice = graphicsDevice;
             this.SimulatorEngine = simulatorEngine;
             this.RenderingObjects = renderingObjects;
 
@@ -59,15 +62,11 @@ namespace SpaceSimulator
                 this.physicsToRendering.Add(renderingObject.PhysicsObject, renderingObject);
             }
 
-            if (createRenderingObject != null)
+            this.SimulatorEngine.ObjectAdded += (sender, newObject) =>
             {
-                this.createRenderingObject = createRenderingObject;
-
-                this.SimulatorEngine.ObjectAdded += (sender, newObject) =>
-                {
-                    this.AddRenderingObject(this.createRenderingObject(newObject));
-                };
-            }
+                var parentObject = this.physicsToRendering[(PhysicsObject)sender];
+                this.AddRenderingObject(parentObject.CreateForSub(newObject));
+            };
         }
 
         /// <summary>
@@ -150,15 +149,12 @@ namespace SpaceSimulator
         }
 
         /// <summary>
-        /// Creates and add a rendering object for the given object
+        /// Creates and add a rendering object
         /// </summary>
-        /// <param name="physicsObject">The physics object</param>
-        public void CreateRenderingObject(PhysicsObject physicsObject)
+        /// <param name="create">The create function</param>
+        public void CreateRenderingObject(Func<Device, RenderingObject> create)
         {
-            if (this.createRenderingObject != null)
-            {
-                this.AddRenderingObject(this.createRenderingObject(physicsObject));
-            }
+            this.AddRenderingObject(create(this.graphicsDevice));
         }
     }
 }

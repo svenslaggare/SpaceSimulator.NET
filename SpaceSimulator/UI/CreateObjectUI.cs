@@ -8,9 +8,11 @@ using SharpDX.Direct2D1;
 using SpaceSimulator.Common.Input;
 using SpaceSimulator.Common.Rendering2D;
 using SpaceSimulator.Common.UI;
+using SpaceSimulator.Environments;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
 using SpaceSimulator.Physics.Atmosphere;
+using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.UI
@@ -142,7 +144,15 @@ namespace SpaceSimulator.UI
                 1000,
                 new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
                 new OrbitPosition(orbit, 0.0));
-            this.SimulatorContainer.CreateRenderingObject(satellite);
+
+            this.SimulatorContainer.CreateRenderingObject(device =>
+            {
+                return new RenderingObject(
+                    device,
+                    satellite,
+                    Color.Yellow,
+                    EnvironmentHelpers.BaseDirectory + "Satellite.png");
+            });
         }
 
         public override void Update(TimeSpan elapsed)
