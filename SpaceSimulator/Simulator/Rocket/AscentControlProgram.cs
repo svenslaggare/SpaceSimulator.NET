@@ -128,7 +128,9 @@ namespace SpaceSimulator.Simulator.Rocket
                     if (altitude >= this.pitchManeuverStartAltitude && altitude <= this.pitchManeuverStopAltitude)
                     {
                         //var turnAmount = 0.70;
-                        //this.ThrustDirection = Vector3d.Transform(this.HorizontalThrustDirection(), Matrix3x3d.RotationY(MathUtild.Deg2Rad * turnAmount * 90.0));
+                        //this.ThrustDirection = Vector3d.Transform(
+                        //    this.HorizontalThrustDirection(), 
+                        //    Matrix3x3d.RotationY(MathUtild.Deg2Rad * turnAmount * 90.0));
 
                         var radial = Vector3d.Transform(prograde, Matrix3x3d.RotationY(MathUtild.Pi / 2));
                         var pitchAxis = Vector3d.Cross(radial, prograde);
@@ -149,9 +151,21 @@ namespace SpaceSimulator.Simulator.Rocket
                             this.pitchCompleted = true;
                         }
 
-                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
+                        //if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
+                        //{
+                        //    this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
+                        //}
+                        //else
+                        //{
+                        //    this.ThrustDirection = prograde;
+                        //}
+
+                        var minTime = 200.0;
+                        var turnSpeed = 0.1;
+                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= minTime)
                         {
-                            this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
+                            var turnAmount = (1.0 - currentOrbitPosition.TimeToApoapsis() / minTime) * (1.0 - turnSpeed) + turnSpeed;
+                            this.ThrustDirection = (prograde + 0.1 * turnAmount * gravityAccelerationDir).Normalized();
                         }
                         else
                         {

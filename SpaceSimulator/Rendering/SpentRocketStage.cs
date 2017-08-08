@@ -7,7 +7,6 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SpaceSimulator.Camera;
 using SpaceSimulator.Common.Effects;
-using SpaceSimulator.Mathematics;
 using SpaceSimulator.Simulator;
 
 namespace SpaceSimulator.Rendering

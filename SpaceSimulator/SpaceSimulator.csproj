@@ -171,6 +171,7 @@
     <Compile Include="Mathematics\Quaterniond.cs" />
     <Compile Include="Mathematics\Vector3d.cs" />
     <Compile Include="Mathematics\Vector4d.cs" />
+    <Compile Include="Rendering\RocketParts.cs" />
     <Compile Include="Rendering\SpentRocketStage.cs" />
     <Compile Include="Simulator\ArtificialPhysicsObject.cs" />
     <Compile Include="Physics\Atmosphere\AtmosphericFormulas.cs" />
