@@ -151,26 +151,26 @@ namespace SpaceSimulator.Simulator.Rocket
                             this.pitchCompleted = true;
                         }
 
-                        //if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
-                        //{
-                        //    this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
-                        //}
-                        //else
-                        //{
-                        //    this.ThrustDirection = prograde;
-                        //}
-
-                        var minTime = 200.0;
-                        var turnSpeed = 0.1;
-                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= minTime)
+                        if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
                         {
-                            var turnAmount = (1.0 - currentOrbitPosition.TimeToApoapsis() / minTime) * (1.0 - turnSpeed) + turnSpeed;
-                            this.ThrustDirection = (prograde + 0.1 * turnAmount * gravityAccelerationDir).Normalized();
+                            this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
                         }
                         else
                         {
                             this.ThrustDirection = prograde;
                         }
+
+                        //var minTime = 200.0;
+                        //var turnSpeed = 0.1;
+                        //if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= minTime)
+                        //{
+                        //    var turnAmount = (1.0 - currentOrbitPosition.TimeToApoapsis() / minTime) * (1.0 - turnSpeed) + turnSpeed;
+                        //    this.ThrustDirection = (prograde + 0.1 * turnAmount * gravityAccelerationDir).Normalized();
+                        //}
+                        //else
+                        //{
+                        //    this.ThrustDirection = prograde;
+                        //}
                     }
 
                     if (currentOrbitPosition.TrueAnomaly > 190.0 * MathUtild.Deg2Rad && currentOrbitPosition.TimeToApoapsis() >= currentOrbitPosition.Orbit.Period * 0.8)

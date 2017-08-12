@@ -70,18 +70,18 @@ namespace SpaceSimulator.Environments
 
             var falcon9TargetAltitude = 300E3;
             //var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
-            //    earth.StandardGravitationalParameter, 
+            //    earth.StandardGravitationalParameter,
             //    earth.RotationalPeriod) - earth.Radius;
 
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
 
-            //var (bestPitchStart, bestPitchEnd) = AscentControlProgram.CalculateOptimalPitchManeuver(
+            //var (bestPitchStart, bestPitchEnd) = AscentProgram.CalculateOptimalPitchManeuver(
             //    simulatorEngine.GetSimulator(PhysicsSimulationMode.PerturbationCowell),
             //    falcon9Object,
             //    1E3,
             //    falcon9TargetOrbit);
             var bestPitchStart = 1E3;
-            var bestPitchEnd = 2.6E3;
+            var bestPitchEnd = 2.8E3;
 
             falcon9Object.SetControlProgram(new AscentProgram(
                 falcon9Object,

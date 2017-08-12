@@ -7,11 +7,72 @@ using SpaceSimulator.Mathematics;
 namespace SpaceSimulator.Physics.Solvers
 {
     /// <summary>
+    /// The acceleration state
+    /// </summary>
+    public struct AccelerationState
+    {
+        /// <summary>
+        /// The acceleration
+        /// </summary>
+        public Vector3d Acceleration { get; set; }
+
+        /// <summary>
+        /// The change in mass of the object
+        /// </summary>
+        public double DeltaMass { get; set; }
+
+        /// <summary>
+        /// Creates a new acceleration state
+        /// </summary>
+        /// <param name="acceleration">The acceleration</param>
+        /// <param name="deltaMass">The change in mass of the object</param>
+        public AccelerationState(Vector3d acceleration, double deltaMass)
+        {
+            this.Acceleration = acceleration;
+            this.DeltaMass = deltaMass;
+        }
+    }
+
+    /// <summary>
+    /// The state of the integrator
+    /// </summary>
+    public struct IntegratorState
+    {
+        /// <summary>
+        /// The mass of the object
+        /// </summary>
+        public double Mass { get; set; }
+
+        /// <summary>
+        /// The total time
+        /// </summary>
+        public double TotalTime { get; set; }
+
+        /// <summary>
+        /// The time step
+        /// </summary>
+        public double TimeStep { get; set; }
+
+        /// <summary>
+        /// Creates a new integrator state
+        /// </summary>
+        /// <param name="mass">The mass of the object</param>
+        /// <param name="totalTime">The total time</param>
+        /// <param name="timeStep">The time step</param>
+        public IntegratorState(double mass, double totalTime, double timeStep)
+        {
+            this.Mass = mass;
+            this.TotalTime = totalTime;
+            this.TimeStep = timeStep;
+        }
+    }
+
+    /// <summary>
     /// Calculates the acceleration at the given state
     /// </summary>
-    /// <param name="totalTime">The time of the state</param>
-    /// <param name="state">The state</param>
-    public delegate Vector3d CalculateAcceleration(double totalTime, ref ObjectState state);
+    /// <param name="integratorState">The state of the integrator</param>
+    /// <param name="state">The state of the object</param>
+    public delegate AccelerationState CalculateAcceleration(ref IntegratorState integratorState, ref ObjectState state);
 
     /// <summary>
     /// Represents a numeric integrator

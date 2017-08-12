@@ -51,7 +51,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 ref currentState,
                 totalTime,
                 timeStep,
-                (double t, ref ObjectState state) => this.forceModel.CalculateAcceleration(currentObject, ref state, timeStep));
+                (ref IntegratorState integratorState, ref ObjectState state) => this.forceModel.CalculateAcceleration(currentObject, ref integratorState, ref state));
 
             nextState.MakeAbsolute(currentObject.PrimaryBody.State);
             currentObject.SetNextState(nextState);

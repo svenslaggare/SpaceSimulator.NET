@@ -45,17 +45,21 @@ namespace SpaceSimulator.Physics.Solvers
         /// </summary>
         private DerivativeState Evaluate(
             ref ObjectState initial,
+            ref double mass,
             double totalTime,
             double deltaTime,
             ref DerivativeState derivative,
             CalculateAcceleration calculateAcceleration)
         {
+            var integratorState = new IntegratorState(mass, totalTime, deltaTime);
             var state = new ObjectState(
                 initial.Time + deltaTime,
                 initial.Position + derivative.Velocity * deltaTime,
                 initial.Velocity + derivative.Acceleration * deltaTime);
 
-            return new DerivativeState(state.Velocity, calculateAcceleration(totalTime, ref state));
+            var accelerationState = calculateAcceleration(ref integratorState, ref state);
+            mass += accelerationState.DeltaMass;
+            return new DerivativeState(state.Velocity, accelerationState.Acceleration);
         }
 
         /// <summary>
@@ -89,10 +93,11 @@ namespace SpaceSimulator.Physics.Solvers
                     deltaTime);
             }
 
-            var k0 = this.Evaluate(ref state, totalTime, 0, ref zero, calculateAcceleration);
-            var k1 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
-            var k2 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
-            var k3 = this.Evaluate(ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
+            var mass = physicsObject.Mass;
+            var k0 = this.Evaluate(ref state, ref mass, totalTime, 0, ref zero, calculateAcceleration);
+            var k1 = this.Evaluate(ref state, ref mass, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
+            var k2 = this.Evaluate(ref state, ref mass, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
+            var k3 = this.Evaluate(ref state, ref mass, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
 
             var velocity = (1.0 / 6.0) * (k0.Velocity + 2 * (k1.Velocity + k2.Velocity) + k3.Velocity);
             var acceleration = (1.0 / 6.0) * (k0.Acceleration + 2 * (k1.Acceleration + k2.Acceleration) + k3.Acceleration);

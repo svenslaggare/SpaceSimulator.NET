@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics;
+using SpaceSimulator.Physics.Solvers;
 
 namespace SpaceSimulator.Simulator.OrbitSimulators
 {
@@ -17,9 +18,9 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// Calculates the acceleration applied to the given object
         /// </summary>
         /// <param name="physicsObject">The object</param>
+        /// <param name="integratorState">The state of the integrator</param>
         /// <param name="state">The state of the object</param>
-        /// <param name="timeStep">The time step</param>
-        Vector3d CalculateAcceleration(PhysicsObject physicsObject, ref ObjectState state, double timeStep);
+        AccelerationState CalculateAcceleration(PhysicsObject physicsObject, ref IntegratorState integratorState, ref ObjectState state);
     }
 
     /// <summary>
@@ -31,32 +32,32 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// Calculates the non-gravity based acceleration of the given object
         /// </summary>
         /// <param name="artificialObject">The physics object</param>
+        /// <param name="integratorState">The state of the integrator</param>
         /// <param name="state">The state</param>
-        /// <param name="timeStep">The time step</param>
-        private Vector3d CalculateNonGravityAcceleration(ArtificialPhysicsObject artificialObject, ref ObjectState state, double timeStep)
+        private (Vector3d, double) CalculateNonGravityAcceleration(ArtificialPhysicsObject artificialObject, ref IntegratorState integratorState, ref ObjectState state)
         {
-            var nonGravityAcceleration = Vector3d.Zero;
+            var acceleration = Vector3d.Zero;
+            var deltaMass = 0.0;
             var primaryBodyState = new ObjectState();
 
+            var mass = integratorState.Mass;
             if (artificialObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
-                nonGravityAcceleration += rocketObject.EngineAcceleration();
+                acceleration += rocketObject.EngineThrust() / mass;
+                deltaMass = -rocketObject.Stages.CurrentStage.TotalMassFlowRate * integratorState.TimeStep;
             }
 
             if (artificialObject.PrimaryBody is PlanetObject primaryPlanet
-                && primaryPlanet.AtmosphericModel.Inside(
-                    primaryPlanet,
-                    ref primaryBodyState,
-                    ref state))
+                && primaryPlanet.AtmosphericModel.Inside(primaryPlanet, ref primaryBodyState, ref state))
             {
-                nonGravityAcceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
+                acceleration += primaryPlanet.AtmosphericModel.CalculateDrag(
                     primaryPlanet,
                     ref primaryBodyState,
                     artificialObject.AtmosphericProperties,
-                    ref state) / artificialObject.Mass;
+                    ref state) / mass;
             }
 
-            return nonGravityAcceleration;
+            return (acceleration, deltaMass);
         }
 
         /// <summary>
@@ -64,23 +65,25 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
         /// </summary>
         /// <param name="physicsObject">The object</param>
         /// <param name="state">The state of the object</param>
-        /// <param name="timeStep">The time step</param>
-        public Vector3d CalculateAcceleration(PhysicsObject physicsObject, ref ObjectState state, double timeStep)
+        /// <param name="integratorState">The state of the integrator</param>
+        public AccelerationState CalculateAcceleration(PhysicsObject physicsObject, ref IntegratorState integratorState, ref ObjectState state)
         {
             if (physicsObject.PrimaryBody == null)
             {
-                return Vector3d.Zero;
+                return new AccelerationState(Vector3d.Zero, 0);
             }
 
             var nonGravityAcceleration = Vector3d.Zero;
+            var deltaMass = 0.0;
             if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
             {
-                nonGravityAcceleration = this.CalculateNonGravityAcceleration(artificialPhysicsObject, ref state, timeStep);
+                (nonGravityAcceleration, deltaMass) = this.CalculateNonGravityAcceleration(artificialPhysicsObject, ref integratorState, ref state);
             }
 
-            return OrbitFormulas.GravityAcceleration(
+            var gravityAcceleration = OrbitFormulas.GravityAcceleration(
                 physicsObject.PrimaryBody.StandardGravitationalParameter,
-                state.Position) + nonGravityAcceleration;
+                state.Position);
+            return new AccelerationState(gravityAcceleration + nonGravityAcceleration, deltaMass);
         }
     }
 }
