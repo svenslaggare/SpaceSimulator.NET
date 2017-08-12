@@ -101,6 +101,7 @@
     <Compile Include="Camera\SpaceCamera.cs" />
     <Compile Include="Common\Camera\CameraManager.cs" />
     <Compile Include="Common\D3DApp.cs" />
+    <Compile Include="Common\Effects\BaseEffect.cs" />
     <Compile Include="Common\Effects\BasicEffect.cs" />
     <Compile Include="Common\Effects\BlendStates.cs" />
     <Compile Include="Common\Effects\DepthStencilStates.cs" />
@@ -119,6 +120,8 @@
     <Compile Include="Common\Models\GeometryGenerator.cs" />
     <Compile Include="Common\Models\ModelLoader.cs" />
     <Compile Include="Common\Input\KeyboardManager.cs" />
+    <Compile Include="Common\ParticleSystem\ParticleSystemEffect.cs" />
+    <Compile Include="Common\ParticleSystem\ParticleSystemRender.cs" />
     <Compile Include="Common\Rendering2D\Rendering2DHelpers.cs" />
     <Compile Include="Common\Rendering2D\RenderingBrushes.cs" />
     <Compile Include="Common\Rendering2D\RenderingImage2D.cs" />
@@ -203,7 +206,8 @@
     <Compile Include="Simulator\OrbitSimulators\ForceModel.cs" />
     <Compile Include="Simulator\OrbitSimulators\HybridSimulator.cs" />
     <Compile Include="Simulator\PlanetObject.cs" />
-    <Compile Include="Simulator\Rocket\AscentControlProgram.cs" />
+    <Compile Include="Simulator\Rocket\AscentProgram.cs" />
+    <Compile Include="Simulator\Rocket\ExecuteManeuverProgram.cs" />
     <Compile Include="Simulator\Rocket\IRocketControlProgram.cs" />
     <Compile Include="Physics\Rocket\RocketStages.cs" />
     <Compile Include="Physics\SimplePhysicsObject.cs" />
@@ -231,6 +235,7 @@
     <Compile Include="Rendering\Sphere.cs" />
     <Compile Include="Simulator\PhysicsObject.cs" />
     <Compile Include="Simulator\RocketObject.cs" />
+    <Compile Include="Simulator\Rocket\PIDController.cs" />
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
@@ -276,6 +281,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Effects\Fire.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Effects\Orbit.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -283,6 +291,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Effects\LightHelper.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Textures\Effects\flare0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Textures\Planets\Earth.jpg">
@@ -350,5 +361,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -19,6 +19,7 @@ using SpaceSimulator.Rendering;
 using SpaceSimulator.Simulator;
 using SpaceSimulator.UI;
 using SpaceSimulator.Rendering.Plot;
+using SpaceSimulator.Common.ParticleSystem;
 
 namespace SpaceSimulator
 {
@@ -42,11 +43,14 @@ namespace SpaceSimulator
         private readonly UIStyle uiStyle;
         private readonly IList<UIComponent> uiComponents = new List<UIComponent>();
 
+        //private ShaderResourceView randomTextureView;
+        //private ParticleSystemRender fireParticleSystem;
+
         /// <summary>
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-            : base("SpaceSimulator", new OrbitCamera(0.001f, 10000.0f), "OrbitCamera")
+            : base("SpaceSimulator", new OrbitCamera(0.001f, 10000.0f * 1000), "OrbitCamera")
         {
             Console.WriteLine("");
 
@@ -179,6 +183,13 @@ namespace SpaceSimulator
             //    values.Add(new Vector2((float)altitude, (float)earthAtmosphericModel.DensityOfAir(altitude)));
             //}
             //this.plot2D = new Plot2D(this.RenderingManager2D, values, Color.Red, 500, 375, labelAxisX: "Altitude", labelAxisY: "Density of air");
+
+            //this.randomTextureView = TextureHelpers.CreateRandomTexture(this.GraphicsDevice);
+            //this.fireParticleSystem = new ParticleSystemRender(
+            //    500 * 2 * 5,
+            //    TextureHelpers.LoadTextureArray(this.GraphicsDevice, this.DeviceContext, new string[] { "Content/Textures/Effects/flare0.png" }),
+            //    this.randomTextureView);
+            //this.fireParticleSystem.Initialize(this.GraphicsDevice, "Content/Effects/Fire.fx");
         }
 
         protected override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)
@@ -230,6 +241,8 @@ namespace SpaceSimulator
             {
                 currentObject.Update(this.SimulatorEngine);
             }
+
+            //this.fireParticleSystem.Update(elapsed, this.TotalTime);
         }
 
         public override void BeforeFirstDraw()
@@ -274,6 +287,17 @@ namespace SpaceSimulator
                     this.RenderingObjects);
 
                 selectedObjectUI.DrawArrows(deviceContext, this.arrowEffect, this.SpaceCamera);
+
+                //var selectedObject = this.simulatorContainer.SelectedObject;
+                //this.fireParticleSystem.SetEmitPosition(this.SpaceCamera.ToDrawPosition(selectedObject.Position));
+                //this.fireParticleSystem.SetEmitDirection(MathHelpers.ToFloat(selectedObject.State.Retrograde));
+                //this.fireParticleSystem.SetEyePosition(this.ActiveCamera.Position);
+                //this.fireParticleSystem.Draw(deviceContext, this.ActiveCamera);
+
+                //var blendFactor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+                //deviceContext.Rasterizer.State = null;
+                //deviceContext.OutputMerger.SetDepthStencilState(null, 0);
+                //deviceContext.OutputMerger.SetBlendState(null, blendFactor, 0xffffffff);
             });
 
             this.renderingPasses.Add2D((deviceContext, deviceContext2D) =>

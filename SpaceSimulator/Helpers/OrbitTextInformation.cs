@@ -103,6 +103,7 @@ namespace SpaceSimulator.Helpers
                     state.Position - refPosition);
                 Vector3d? thrustAcceleration = null;
                 Vector3d? dragAcceleration = null;
+                var engineThrottle = 0.0;
 
                 if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
                 {
@@ -112,6 +113,7 @@ namespace SpaceSimulator.Helpers
                     if (physicsObject is RocketObject rocketObject)
                     {
                         thrustAcceleration = rocketObject.EngineAcceleration();
+                        engineThrottle = rocketObject.EngineThrottle;
                     }
                 }
 
@@ -124,7 +126,8 @@ namespace SpaceSimulator.Helpers
 
                     if (thrustAcceleration != null)
                     {
-                        AddBulletItem("Thrust: " + DataFormatter.Format((thrustAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration));
+                        var thrustText = DataFormatter.Format((thrustAcceleration ?? Vector3d.Zero).Length(), DataUnit.Acceleration);
+                        AddBulletItem($"Thrust: {thrustText} ({Math.Round(100 * engineThrottle, 1)}%)");
                     }
 
                     if (dragAcceleration != null)

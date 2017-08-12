@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Mathematics;
 using SpaceSimulator.Physics.Atmosphere;
 
 namespace SpaceSimulator.Physics.Rocket
@@ -51,6 +52,7 @@ namespace SpaceSimulator.Physics.Rocket
 
         private double totalThrust;
         private double totalMassFlowRate;
+        private double engineThrottle = 1.0;
 
         /// <summary>
         /// Creates a new stage with the given engines
@@ -179,7 +181,7 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double TotalThrust
         {
-            get { return this.totalThrust; }
+            get { return this.totalThrust * this.engineThrottle; }
         }
 
         /// <summary>
@@ -187,7 +189,19 @@ namespace SpaceSimulator.Physics.Rocket
         /// </summary>
         public double TotalMassFlowRate
         {
-            get { return this.totalMassFlowRate; }
+            get { return this.totalMassFlowRate * this.engineThrottle; }
+        }
+
+        /// <summary>
+        /// The engine throttle [0, 1]
+        /// </summary>
+        public double EngineThrottle
+        {
+            get { return this.engineThrottle; }
+            set
+            {
+                this.engineThrottle = MathHelpers.Clamp(0, 1, value);
+            }
         }
 
         /// <summary>

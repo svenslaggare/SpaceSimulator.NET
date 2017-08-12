@@ -535,14 +535,14 @@ namespace SpaceSimulator.UI
                 var bestPitchStart = 1E3;
                 var bestPitchEnd = 2.6E3;
 
-                rocketObject.SetControlProgram(new AscentControlProgram(
+                rocketObject.SetControlProgram(new AscentProgram(
                     rocketObject,
                     targetOrbit,
                     bestPitchStart,
                     bestPitchEnd,
                     this.SimulatorEngine.TextOutputWriter));
 
-                rocketObject.StartEngine();
+                rocketObject.StartProgram();
             }
         }
 

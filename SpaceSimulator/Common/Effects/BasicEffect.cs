@@ -40,15 +40,8 @@ namespace SpaceSimulator.Common.Effects
     /// <summary>
     /// Represents a basic effect
     /// </summary>
-    public class BasicEffect : IDisposable
+    public class BasicEffect : BaseEffect
     {
-        private readonly Device graphicsDevice;
-
-        private readonly CompilationResult effectByteCode;
-        protected readonly Effect effect;
-        private readonly EffectTechnique technique;
-        private readonly ShaderBytecode shaderBytecode;
-
         private readonly EffectVectorVariable eyePositionVariable;
         private readonly EffectVectorVariable pointLightSourceVariable;
 
@@ -81,23 +74,8 @@ namespace SpaceSimulator.Common.Effects
         /// <param name="techniqueName">The name of the technique to use</param>
         /// <param name="inputElements">The input elements</param>
         public BasicEffect(Device graphicsDevice, string effectName, string techniqueName, InputElement[] inputElements)
+            : base(graphicsDevice, effectName, techniqueName)
         {
-            this.graphicsDevice = graphicsDevice;
-
-            //Compile the effect
-            this.effectByteCode = ShaderBytecode.CompileFromFile(
-                effectName,
-                "fx_5_0",
-                ShaderFlags.None,
-                EffectFlags.None,
-                include: new IncludeEffect());
-            Debug.Write(this.effectByteCode.Message);
-
-            this.effect = new Effect(this.graphicsDevice, effectByteCode);
-            this.technique = effect.GetTechniqueByName(techniqueName);
-            var pass = technique.GetPassByIndex(0);
-            this.shaderBytecode = pass.Description.Signature;
-
             //Get the variables
             this.eyePositionVariable = this.effect.GetVariableByName("gEyePosW").AsVector();
             this.pointLightSourceVariable = this.effect.GetVariableByName("gPointLightSource").AsVector();
@@ -119,36 +97,6 @@ namespace SpaceSimulator.Common.Effects
             this.blurSizeYVariable = this.effect.GetVariableByName("gBlurSizeY").AsScalar();
 
             this.InputLayout = new InputLayout(this.graphicsDevice, this.ShaderBytecode, inputElements);
-        }
-
-        /// <summary>
-        /// Returns the technique
-        /// </summary>
-        public EffectTechnique Technique
-        {
-            get { return this.technique; }
-        }
-
-        /// <summary>
-        /// Returns the shader bytecode
-        /// </summary>
-        public ShaderBytecode ShaderBytecode
-        {
-            get { return this.shaderBytecode; }
-        }
-
-        /// <summary>
-        /// Returns the effect passes
-        /// </summary>
-        public IEnumerable<EffectPass> Passes
-        {
-            get
-            {
-                for (int i = 0; i < this.Technique.Description.PassCount; ++i)
-                {
-                    yield return this.Technique.GetPassByIndex(i);
-                }
-            }
         }
 
         /// <summary>
@@ -294,33 +242,12 @@ namespace SpaceSimulator.Common.Effects
             this.blurSizeYVariable.Set(amount);
         }
 
-        /// <summary>
-        /// Returns the given technique
-        /// </summary>
-        /// <param name="name">The name of the technique</param>
-        public EffectTechnique GetTechnique(string name)
-		{
-			return this.effect.GetTechniqueByName(name);
-		}
-
-		/// <summary>
-		/// Returns an effect variable of the given name
-		/// </summary>
-		/// <param name="name">The name of the variable</param>
-		public EffectVariable GetVariable(string name)
-		{
-			return this.effect.GetVariableByName(name);
-		}
-
 		/// <summary>
 		/// Disposes the resources
 		/// </summary>
-		public virtual void Dispose()
+		public override void Dispose()
 		{
-			this.effectByteCode.Dispose();
-			this.effect.Dispose();
-			this.shaderBytecode.Dispose();
-			this.technique.Dispose();
+            base.Dispose();
 
             this.eyePositionVariable?.Dispose();
             this.pointLightSourceVariable?.Dispose();

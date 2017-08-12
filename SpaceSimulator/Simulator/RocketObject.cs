@@ -81,13 +81,13 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Starts the rocket engine
+        /// Starts the current program
         /// </summary>
-        public void StartEngine()
+        public void StartProgram()
         {
             if (this.controlProgram != null)
             {
-                this.engineRunning = true;
+                this.StartEngine();
 
                 if (this.state.HasImpacted)
                 {
@@ -100,11 +100,28 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Starts the rocket engine
+        /// </summary>
+        public void StartEngine()
+        {
+            this.engineRunning = true;
+        }
+
+        /// <summary>
         /// Stops the engine
         /// </summary>
         public void StopEngine()
         {
             this.engineRunning = false;
+        }
+
+        /// <summary>
+        /// The engine throttle
+        /// </summary>
+        public double EngineThrottle
+        {
+            get { return this.Stages.CurrentStage.EngineThrottle; }
+            set { this.Stages.CurrentStage.EngineThrottle = value; }
         }
 
         /// <summary>
@@ -148,6 +165,8 @@ namespace SpaceSimulator.Simulator
         public override void ApplyBurn(double totalTime, Vector3d deltaV)
         {
             //base.ApplyBurn(totalTime, deltaV);
+            this.SetControlProgram(new ExecuteManeuverProgram(this, deltaV));
+            this.StartProgram();
         }
 
         /// <summary>

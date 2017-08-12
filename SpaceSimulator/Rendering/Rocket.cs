@@ -229,25 +229,60 @@ namespace SpaceSimulator.Rendering
             //Draw rocket
             SetEffectParameters(deviceContext, effect, camera, this.directionalLights);
 
+            //this.payload.Draw(
+            //    deviceContext,
+            //    effect,
+            //    camera,
+            //    world,
+            //    Matrix.Translation(Vector3.BackwardLH * 0.5f * ((currentStage?.MainBodyHeight ?? 0))));
+
+            //if (currentStage != null)
+            //{
+            //    currentStage.Draw(
+            //        deviceContext,
+            //        effect,
+            //        camera,
+            //        scale,
+            //        forward,
+            //        position,
+            //        world,
+            //        thrustDirection);
+            //}
+
+            var offset = 0.0f;
+            int i = 0;
+            //foreach (var stage in this.stages)
+            foreach (var stage in this.stages.Skip(rocketObject.Stages.CurrentStage.Number))
+            {
+                var stageWorld =
+                    Matrix.Translation(Vector3.BackwardLH * (offset + (offset != 0.0f ? stage.MainBodyHeight * 0.5f : 0.0f)))
+                    * Matrix.Scaling(scale)
+                    * facing
+                    * Matrix.Translation(position);
+
+                //if (i >= rocketObject.Stages.CurrentStage.Number)
+                {
+                    stage.Draw(
+                        deviceContext,
+                        effect,
+                        camera,
+                        scale,
+                        forward,
+                        position,
+                        stageWorld,
+                        thrustDirection);
+                }
+
+                offset += stage.MainBodyHeight * (offset == 0.0f ? 0.5f : 1.0f);
+                i++;
+            }
+
             this.payload.Draw(
                 deviceContext,
                 effect,
                 camera,
                 world,
-                Matrix.Translation(Vector3.BackwardLH * 0.5f * ((currentStage?.MainBodyHeight ?? 0))));
-
-            if (currentStage != null)
-            {
-                currentStage.Draw(
-                    deviceContext,
-                    effect,
-                    camera,
-                    scale,
-                    forward,
-                    position,
-                    world,
-                    thrustDirection);
-            }
+                Matrix.Translation(Vector3.BackwardLH * (offset)));
         }
 
         /// <summary>

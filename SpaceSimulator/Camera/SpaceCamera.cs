@@ -53,6 +53,7 @@ namespace SpaceSimulator.Camera
         public virtual void SetScaleFactor(NaturalSatelliteObject primaryBody)
         {
             this.scaleFactor = 1.0 / (5.0 * primaryBody.Radius);
+            //this.scaleFactor = 0.0001;
         }
 
         /// <summary>

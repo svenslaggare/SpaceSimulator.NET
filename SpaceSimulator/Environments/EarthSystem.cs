@@ -68,10 +68,10 @@ namespace SpaceSimulator.Environments
                 Color.Yellow,
                 Rendering.Rocket.CreateFalcon9(graphicsDevice)));
 
-            //var falcon9TargetAltitude = 300E3;
-            var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
-                earth.StandardGravitationalParameter, 
-                earth.RotationalPeriod) - earth.Radius;
+            var falcon9TargetAltitude = 300E3;
+            //var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
+            //    earth.StandardGravitationalParameter, 
+            //    earth.RotationalPeriod) - earth.Radius;
 
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
 
@@ -83,7 +83,7 @@ namespace SpaceSimulator.Environments
             var bestPitchStart = 1E3;
             var bestPitchEnd = 2.6E3;
 
-            falcon9Object.SetControlProgram(new AscentControlProgram(
+            falcon9Object.SetControlProgram(new AscentProgram(
                 falcon9Object,
                 falcon9TargetOrbit,
                 bestPitchStart,
@@ -91,7 +91,7 @@ namespace SpaceSimulator.Environments
                 simulatorEngine.TextOutputWriter));
 
             falcon9Object.CheckImpacted(0);
-            falcon9Object.StartEngine();
+            falcon9Object.StartProgram();
 
             var satellite1 = simulatorEngine.AddSatelliteInOrbit(
                 "Satellite 1",

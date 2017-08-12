@@ -19,7 +19,8 @@ namespace SpaceSimulator.Common
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="bitmap">The bitmap</param>
-        public static Texture2D FromBitmap(Device graphicsDevice, System.Drawing.Bitmap bitmap)
+        /// <param name="textureDescription">The texture description</param>
+        public static Texture2D FromBitmap(Device graphicsDevice, System.Drawing.Bitmap bitmap, Texture2DDescription? textureDescription = null)
         {
             var bitmapFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
             var bitmapRectangle = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
@@ -31,19 +32,22 @@ namespace SpaceSimulator.Common
 
             var data = bitmap.LockBits(bitmapRectangle, System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmapFormat);
 
-            var texture = new Texture2D(graphicsDevice, new Texture2DDescription()
+            var description = textureDescription ?? new Texture2DDescription()
             {
-                Width = bitmap.Width,
-                Height = bitmap.Height,
-                ArraySize = 1,
                 BindFlags = BindFlags.ShaderResource,
                 Usage = ResourceUsage.Immutable,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
-                MipLevels = 1,
                 OptionFlags = ResourceOptionFlags.None,
-                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
-            }, new DataRectangle(data.Scan0, data.Stride));
+            };
+
+            description.Width = bitmap.Width;
+            description.Height = bitmap.Height;
+            description.ArraySize = 1;
+            description.MipLevels = 1;
+            description.SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0);
+
+            var texture = new Texture2D(graphicsDevice, description, new DataRectangle(data.Scan0, data.Stride));
 
             bitmap.UnlockBits(data);
             return texture;
@@ -54,11 +58,12 @@ namespace SpaceSimulator.Common
         /// </summary>
         /// <param name="graphicsDevice">The graphics device</param>
         /// <param name="fileName">The path of the file</param>
-        public static Texture2D FromFile(Device graphicsDevice, string fileName)
+        /// <param name="textureDescription">The texture description</param>
+        public static Texture2D FromFile(Device graphicsDevice, string fileName, Texture2DDescription? textureDescription = null)
         {
             using (var bitmap = new System.Drawing.Bitmap(fileName))
             {
-                return FromBitmap(graphicsDevice, bitmap);
+                return FromBitmap(graphicsDevice, bitmap, textureDescription);
             }
         }
 
@@ -69,86 +74,97 @@ namespace SpaceSimulator.Common
         /// <param name="context">The context</param>
         /// <param name="textureNames">The name of the texture files</param>
         /// <param name="format">The format to use</param>
-        public static ShaderResourceView LoadTextureArray(Device graphicsDevice, DeviceContext context, string[] textureNames,
-            SharpDX.DXGI.Format format = SharpDX.DXGI.Format.R8G8B8A8_UNorm)
+        public static ShaderResourceView LoadTextureArray(
+            Device graphicsDevice,
+            DeviceContext context,
+            string[] textureNames,
+            SharpDX.DXGI.Format format = SharpDX.DXGI.Format.B8G8R8A8_UNorm)
         {
-            throw new NotImplementedException();
-            //int numTextures = textureNames.Length;
+            int numTextures = textureNames.Length;
 
-            ////Load the textures
-            //var textures = textureNames
-            //    .Select(textureName =>
-            //    {
-            //        var loadInfo = ImageLoadInformation.Default;
-            //        loadInfo.Usage = ResourceUsage.Staging;
-            //        loadInfo.BindFlags = BindFlags.None;
-            //        loadInfo.Format = format;
-            //        loadInfo.MipFilter = FilterFlags.Linear;
-            //        loadInfo.Filter = FilterFlags.None;
-            //        loadInfo.CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write;
-            //        loadInfo.FirstMipLevel = 0;
+            //Load the textures
+            var textures = textureNames
+                .Select(textureName =>
+                {
+                    //var loadInfo = ImageLoadInformation.Default;
+                    //loadInfo.Usage = ResourceUsage.Staging;
+                    //loadInfo.BindFlags = BindFlags.None;
+                    //loadInfo.Format = format;
+                    //loadInfo.MipFilter = FilterFlags.Linear;
+                    //loadInfo.Filter = FilterFlags.None;
+                    //loadInfo.CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write;
+                    //loadInfo.FirstMipLevel = 0;
 
-            //        return Texture2D.FromFile<Texture2D>(
-            //            graphicsDevice,
-            //            textureName,
-            //            loadInfo);
-            //    })
-            //    .ToArray();
+                    //return Texture2D.FromFile<Texture2D>(
+                    //    graphicsDevice,
+                    //    textureName,
+                    //    loadInfo);
 
-            //var elementDesc = textures[0].Description;
-            //var textureArrayDesc = new Texture2DDescription()
-            //{
-            //    Width = elementDesc.Width,
-            //    Height = elementDesc.Height,
-            //    MipLevels = elementDesc.MipLevels,
-            //    Format = elementDesc.Format,
-            //    SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
-            //    Usage = ResourceUsage.Default,
-            //    BindFlags = BindFlags.ShaderResource,
-            //    CpuAccessFlags = CpuAccessFlags.None,
-            //    ArraySize = numTextures
-            //};
+                    var textureDescription = new Texture2DDescription()
+                    {
+                        Usage = ResourceUsage.Staging,
+                        Format = format,
+                        CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write
+                    };
 
-            ////Create the texture array
-            //using (var textureArray = new Texture2D(graphicsDevice, textureArrayDesc))
-            //{
-            //    //Update the texture array
-            //    for (int textureIndex = 0; textureIndex < numTextures; textureIndex++)
-            //    {
-            //        var texture = textures[textureIndex];
-            //        int mipLevels = texture.Description.MipLevels;
+                    return FromFile(graphicsDevice, textureName, textureDescription);
+                })
+                .ToArray();
 
-            //        for (int mipLevel = 0; mipLevel < mipLevels; mipLevel++)
-            //        {
-            //            var subResource = context.MapSubresource(texture, mipLevel, MapMode.Read, MapFlags.None);
-            //            context.UpdateSubresource(
-            //                subResource,
-            //                textureArray,
-            //                Texture2D.CalculateSubResourceIndex(mipLevel, textureIndex, mipLevels));
-            //            context.UnmapSubresource(texture, mipLevel);
-            //        }
-            //    }
+            var elementDescription = textures[0].Description;
+            var textureArrayDescription = new Texture2DDescription()
+            {
+                Width = elementDescription.Width,
+                Height = elementDescription.Height,
+                MipLevels = elementDescription.MipLevels,
+                Format = elementDescription.Format,
+                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                Usage = ResourceUsage.Default,
+                BindFlags = BindFlags.ShaderResource,
+                CpuAccessFlags = CpuAccessFlags.None,
+                ArraySize = numTextures
+            };
 
-            //    //Dispose the loaded textures
-            //    foreach (var texture in textures)
-            //    {
-            //        texture.Dispose();
-            //    }
+            //Create the texture array
+            using (var textureArray = new Texture2D(graphicsDevice, textureArrayDescription))
+            {
+                //Update the texture array
+                for (int textureIndex = 0; textureIndex < numTextures; textureIndex++)
+                {
+                    var texture = textures[textureIndex];
+                    int mipLevels = texture.Description.MipLevels;
 
-            //    //Create the texture array resource view
-            //    return new ShaderResourceView(graphicsDevice, textureArray, new ShaderResourceViewDescription()
-            //    {
-            //        Format = textureArray.Description.Format,
-            //        Dimension = ShaderResourceViewDimension.Texture2DArray,
-            //        Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource()
-            //        {
-            //            MostDetailedMip = 0,
-            //            MipLevels = textureArray.Description.MipLevels,
-            //            FirstArraySlice = 0,
-            //            ArraySize = textureArray.Description.ArraySize
-            //        }
-            //    });
-            //}
+                    for (int mipLevel = 0; mipLevel < mipLevels; mipLevel++)
+                    {
+                        var subResource = context.MapSubresource(texture, mipLevel, MapMode.Read, MapFlags.None);
+                        context.UpdateSubresource(
+                            subResource,
+                            textureArray,
+                            Texture2D.CalculateSubResourceIndex(mipLevel, textureIndex, mipLevels));
+                        context.UnmapSubresource(texture, mipLevel);
+                    }
+                }
+
+                //Dispose the loaded textures
+                foreach (var texture in textures)
+                {
+                    texture.Dispose();
+                }
+
+                //Create the texture array resource view
+                return new ShaderResourceView(graphicsDevice, textureArray, new ShaderResourceViewDescription()
+                {
+                    Format = textureArray.Description.Format,
+                    Dimension = ShaderResourceViewDimension.Texture2DArray,
+                    Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource()
+                    {
+                        MostDetailedMip = 0,
+                        MipLevels = textureArray.Description.MipLevels,
+                        FirstArraySlice = 0,
+                        ArraySize = textureArray.Description.ArraySize
+                    }
+                });
+            }
         }
 
         /// <summary>

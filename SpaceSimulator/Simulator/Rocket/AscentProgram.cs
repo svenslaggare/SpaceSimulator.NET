@@ -14,7 +14,7 @@ namespace SpaceSimulator.Simulator.Rocket
     /// <summary>
     /// Represents a control program for ascent
     /// </summary>
-    public class AscentControlProgram : IRocketControlProgram
+    public class AscentProgram : IRocketControlProgram
     {
         private readonly RocketObject rocketObject;
         private readonly Orbit targetOrbit;
@@ -43,7 +43,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <param name="pitchEndAltitude">The altitude when to start the pitch maneuver</param>
         /// <param name="pitchStartAltitude">The altitude to stop the pitch maneuver</param>
         /// <param name="textOutputWriter">The text output writer</param>
-        public AscentControlProgram(RocketObject rocketObject, Orbit targetOrbit, double pitchStartAltitude, double pitchEndAltitude, ITextOutputWriter textOutputWriter)
+        public AscentProgram(RocketObject rocketObject, Orbit targetOrbit, double pitchStartAltitude, double pitchEndAltitude, ITextOutputWriter textOutputWriter)
         {
             this.rocketObject = rocketObject;
             this.targetOrbit = targetOrbit;
@@ -246,11 +246,11 @@ namespace SpaceSimulator.Simulator.Rocket
                 rocketObject.Stages.Clone(),
                 textOutputWriter);
 
-            var ascentProgram = new AscentControlProgram(currentObject, targetOrbit, pitchStart, pitchEnd, textOutputWriter);
+            var ascentProgram = new AscentProgram(currentObject, targetOrbit, pitchStart, pitchEnd, textOutputWriter);
             currentObject.SetControlProgram(ascentProgram);
 
             currentObject.CheckImpacted(rocketObject.State.Time);
-            currentObject.StartEngine();
+            currentObject.StartProgram();
 
             var otherObjects = new List<PhysicsObject>();
             var maxTime = rocketObject.State.Time + 2.0 * 60.0 * 60.0;
