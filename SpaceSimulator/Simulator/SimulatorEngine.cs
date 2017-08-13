@@ -762,45 +762,48 @@ namespace SpaceSimulator.Simulator
             {
                 foreach (var maneuver in this.maneuvers)
                 {
-                    if (this.totalTime >= maneuver.Maneuver.ManeuverTime - this.maneuverTimeEpsilon)
+                    if (maneuver.Object is ArtificialPhysicsObject artificialObject)
                     {
-                        this.executedManeuvers.Add(maneuver);
-                        maneuver.Object.ApplyBurn(this.totalTime, maneuver.Maneuver.DeltaVelocity);
-
-                        //If the current maneuver leads to a SOI change/crash, mark it
-                        if (maneuver.Maneuver.DeltaVelocity != Vector3d.Zero)
+                        if (this.totalTime >= maneuver.Maneuver.ManeuverTime - this.maneuverTimeEpsilon)
                         {
-                            var objectOrbitPosition = OrbitPosition.CalculateOrbitPosition(maneuver.Object);
+                            this.executedManeuvers.Add(maneuver);
+                            artificialObject.ApplyBurn(this.totalTime, maneuver.Maneuver.DeltaVelocity);
 
-                            var added = false;
-                            if (maneuver.Object.ReferenceOrbit.IsUnbound)
+                            //If the current maneuver leads to a SOI change/crash, mark it
+                            if (maneuver.Maneuver.DeltaVelocity != Vector3d.Zero)
                             {
-                                var soiChangeTime = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(objectOrbitPosition);
+                                var objectOrbitPosition = OrbitPosition.CalculateOrbitPosition(artificialObject);
 
-                                if (soiChangeTime != null)
+                                var added = false;
+                                if (artificialObject.ReferenceOrbit.IsUnbound)
                                 {
-                                    this.AddSOIChange(maneuver.Object, soiChangeTime ?? 0);
+                                    var soiChangeTime = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(objectOrbitPosition);
+
+                                    if (soiChangeTime != null)
+                                    {
+                                        this.AddSOIChange(artificialObject, soiChangeTime ?? 0);
+                                        added = true;
+                                    }
+                                }
+
+                                var timeToImpact = OrbitCalculators.TimeToImpact(objectOrbitPosition);
+                                if (timeToImpact != null)
+                                {
+                                    this.AddCrashEvent(artificialObject, timeToImpact ?? 0);
                                     added = true;
                                 }
-                            }
 
-                            var timeToImpact = OrbitCalculators.TimeToImpact(objectOrbitPosition);
-                            if (timeToImpact != null)
-                            {
-                                this.AddCrashEvent(maneuver.Object, timeToImpact ?? 0);
-                                added = true;
-                            }
-
-                            if (this.AddClosestApproachEvent(maneuver.Object))
-                            {
-                                added = true;
-                            }
-
-                            if (added)
-                            {
-                                if (this.TimeMode == SimulatorTimeMode.Interval)
+                                if (this.AddClosestApproachEvent(artificialObject))
                                 {
-                                    this.addedEvent = true;
+                                    added = true;
+                                }
+
+                                if (added)
+                                {
+                                    if (this.TimeMode == SimulatorTimeMode.Interval)
+                                    {
+                                        this.addedEvent = true;
+                                    }
                                 }
                             }
                         }

@@ -52,19 +52,24 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Indicates if the engine is running
+        /// Indicates if the engines are running
         /// </summary>
         public bool IsEngineRunning => this.engineRunning;
 
         /// <summary>
         /// Indicates if the rocket is idle
         /// </summary>
-        public bool IsIdle => this.controlProgram?.Completed ?? true;
+        public bool IsIdle => this.controlProgram?.IsCompleted ?? true;
 
         /// <summary>
         /// Returns the stages
         /// </summary>
         public RocketStages Stages => this.rocketStages;
+
+        /// <summary>
+        /// Returns the current stage
+        /// </summary>
+        public RocketStage CurrentStage => this.rocketStages.CurrentStage;
 
         /// <summary>
         /// Returns the atmospheric properties
@@ -87,7 +92,7 @@ namespace SpaceSimulator.Simulator
         {
             if (this.controlProgram != null)
             {
-                this.StartEngine();
+                this.StartEngines();
 
                 if (this.state.HasImpacted)
                 {
@@ -100,17 +105,27 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Starts the rocket engine
+        /// Starts the given program
         /// </summary>
-        public void StartEngine()
+        /// <param name="controlProgram">The control program</param>
+        public void StartProgram(IRocketControlProgram controlProgram)
+        {
+            this.SetControlProgram(controlProgram);
+            this.StartProgram();
+        }
+
+        /// <summary>
+        /// Starts the engines
+        /// </summary>
+        public void StartEngines()
         {
             this.engineRunning = true;
         }
 
         /// <summary>
-        /// Stops the engine
+        /// Stops the engines
         /// </summary>
-        public void StopEngine()
+        public void StopEngines()
         {
             this.engineRunning = false;
         }
@@ -120,8 +135,8 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public double EngineThrottle
         {
-            get { return this.Stages.CurrentStage.EngineThrottle; }
-            set { this.Stages.CurrentStage.EngineThrottle = value; }
+            get { return this.CurrentStage.EngineThrottle; }
+            set { this.CurrentStage.EngineThrottle = value; }
         }
 
         /// <summary>
@@ -148,6 +163,20 @@ namespace SpaceSimulator.Simulator
             return this.EngineThrust() / this.Mass;
         }
 
+        public override void ApplyBurn(double totalTime, Vector3d deltaV)
+        {
+            this.SetControlProgram(new ExecuteManeuverProgram(this, deltaV));
+            this.StartProgram();
+        }
+
+        /// <summary>
+        /// Marks that the orbit was updated
+        /// </summary>
+        public void UpdateOrbit()
+        {
+            this.updateOrbit = true;
+        }
+
         /// <summary>
         /// Handles what happens after the current rocket impulse
         /// </summary>
@@ -159,6 +188,11 @@ namespace SpaceSimulator.Simulator
             var deltaMass = this.rocketStages.UseFuel(time);
             if (deltaMass != null)
             {
+                this.UsedDeltaV += RocketFormulas.DeltaV(
+                    this.CurrentStage.Engines[0].EffectiveExhaustVelocity,
+                    this.Mass,
+                    this.Mass - deltaMass.Value);
+
                 this.Mass -= deltaMass.Value;
             }
             else
@@ -170,28 +204,32 @@ namespace SpaceSimulator.Simulator
             }
         }
 
-        public override void ApplyBurn(double totalTime, Vector3d deltaV)
-        {
-            //base.ApplyBurn(totalTime, deltaV);
-            this.SetControlProgram(new ExecuteManeuverProgram(this, deltaV));
-            this.StartProgram();
-        }
-
         /// <summary>
         /// Stages the current stage
         /// </summary>
+        /// <param name="applyToStaged">Appies to the new staged object</param>
         /// <returns>True if staged else false</returns>
-        public bool Stage()
+        public bool Stage(Action<RocketObject> applyToStaged = null)
         {
             if (this.rocketStages.Stage(out var oldStage))
             {
-                var spentStageObject = new SatelliteObject(
+                //var spentStageObject = new SatelliteObject(
+                //    $"{this.Name} - {oldStage.Name}",
+                //    oldStage.Mass,
+                //    this.AtmosphericProperties,
+                //    this.PrimaryBody,
+                //    this.ReferenceState,
+                //    this.ReferenceOrbit);
+                var spentStageObject = new RocketObject(
                     $"{this.Name} - {oldStage.Name}",
                     oldStage.Mass,
-                    this.AtmosphericProperties,
                     this.PrimaryBody,
                     this.ReferenceState,
-                    this.ReferenceOrbit);
+                    this.ReferenceOrbit,
+                    new RocketStages(new List<RocketStage>() { oldStage }),
+                    this.textOutputWriter);
+                applyToStaged?.Invoke(spentStageObject);
+
                 spentStageObject.SetNextState(this.ReferenceState);
                 this.toStage.Add(spentStageObject);
 
@@ -228,16 +266,21 @@ namespace SpaceSimulator.Simulator
             {
                 var primaryBodyState = this.PrimaryBody.State;
                 var state = this.State;
-
-                this.ReferencePrimaryBodyState = primaryBodyState;
-                this.ReferenceState = state;
-                this.ReferenceOrbit = Orbit.CalculateOrbit(this.PrimaryBody, ref primaryBodyState, ref state);
-                this.OrbitChanged();
-
+                this.UpdateReferenceOrbit();
                 this.updateOrbit = false;
             }
 
-            this.controlProgram?.Update(totalTime, timeStep);
+
+            if (this.controlProgram != null)
+            {
+                this.controlProgram.Update(totalTime, timeStep);
+
+                if (this.controlProgram.IsCompleted)
+                {
+                    this.controlProgram = null;
+                    this.StopEngines();
+                }
+            }
         }
     }
 }

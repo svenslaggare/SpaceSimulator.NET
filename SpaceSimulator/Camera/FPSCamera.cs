@@ -52,7 +52,7 @@ namespace SpaceSimulator.Camera
 		/// <param name="amount">The amount</param>
 		public void Walk(float amount)
 		{
-			this.position += amount * this.Look;
+			this.position += amount * this.Forward;
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace SpaceSimulator.Camera
 		{
 			var rotation = Matrix.RotationAxis(this.Right, angle);
 			this.up = Vector3.TransformNormal(this.Up, rotation);
-			this.look = Vector3.TransformNormal(this.Look, rotation);
+			this.forward = Vector3.TransformNormal(this.Forward, rotation);
 		}
 
 		/// <summary>
@@ -75,7 +75,7 @@ namespace SpaceSimulator.Camera
 			var rotation = Matrix.RotationY(angle);
 			this.right = Vector3.TransformNormal(this.Right, rotation);
 			this.up = Vector3.TransformNormal(this.Up, rotation);
-			this.look = Vector3.TransformNormal(this.Look, rotation);
+			this.forward = Vector3.TransformNormal(this.Forward, rotation);
 		}
 
 		/// <summary>
@@ -83,14 +83,14 @@ namespace SpaceSimulator.Camera
 		/// </summary>
 		public override void UpdateViewMatrix()
 		{
-			this.look.Normalize();
+			this.forward.Normalize();
 
-			this.up = Vector3.Cross(this.Look, this.Right);
+			this.up = Vector3.Cross(this.Forward, this.Right);
 			this.up.Normalize();
 
-			this.right = Vector3.Cross(this.Up, this.Look);
+			this.right = Vector3.Cross(this.Up, this.Forward);
 
-			this.view = Matrix.LookAtLH(this.Position, this.Position + this.Look, this.Up);
+			this.view = Matrix.LookAtLH(this.Position, this.Position + this.Forward, this.Up);
             this.UpdateViewProjection();
 		}
 

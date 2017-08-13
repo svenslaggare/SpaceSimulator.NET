@@ -83,7 +83,7 @@ namespace SpaceSimulator.Rendering
             });
 
             effect.SetEyePosition(camera.Position);
-            this.directionalLights[0].Direction = (-camera.Look + 0.2f * camera.Up).Normalized();
+            this.directionalLights[0].Direction = (-camera.Forward + 0.2f * camera.Up).Normalized();
             effect.SetDirectionalLights(this.directionalLights);
 
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;

@@ -25,8 +25,9 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
+        /// <param name="arrowEffect">The arrow effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="physicsObject">The physics object</param>
-        void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, PhysicsObject physicsObject);
+        void Draw(DeviceContext deviceContext, BasicEffect effect, BasicEffect arrowEffect, SpaceCamera camera, PhysicsObject physicsObject);
     }
 }

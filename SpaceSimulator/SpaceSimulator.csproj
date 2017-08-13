@@ -235,6 +235,7 @@
     <Compile Include="Rendering\Sphere.cs" />
     <Compile Include="Simulator\PhysicsObject.cs" />
     <Compile Include="Simulator\RocketObject.cs" />
+    <Compile Include="Simulator\Rocket\LandingProgram.cs" />
     <Compile Include="Simulator\Rocket\PIDController.cs" />
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />

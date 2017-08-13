@@ -465,12 +465,14 @@ namespace SpaceSimulator.Rendering
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
         /// <param name="textureEffect">The texture effect</param>
+        /// <param name="arrowEffect">The arrow effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="objects">The objects</param>
         public static void DrawObjects(
             DeviceContext deviceContext,
             BasicEffect effect,
             BasicEffect textureEffect,
+            BasicEffect arrowEffect,
             SpaceCamera camera,
             IList<RenderingObject> objects)
         {
@@ -481,6 +483,7 @@ namespace SpaceSimulator.Rendering
                     currentObject.Model.Draw(
                         deviceContext, 
                         currentObject.Model.IsTextured ? textureEffect : effect,
+                        arrowEffect,
                         camera, 
                         currentObject.PhysicsObject);
                 }

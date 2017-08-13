@@ -329,24 +329,6 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// Applies the burn
-        /// </summary>
-        /// <param name="totalTime">The total time</param>
-        /// <param name="deltaV">The delta V</param>
-        public virtual void ApplyBurn(double totalTime, Vector3d deltaV)
-        {
-            this.state.Velocity += deltaV;
-            this.state.HasImpacted = false;
-
-            this.ReferenceState = this.state;
-            this.ReferenceOrbit = Orbit.CalculateOrbit(this);
-            this.ReferencePrimaryBodyState = this.PrimaryBody.state;
-
-            this.UsedDeltaV += deltaV.Length();
-            this.OrbitChanged();
-        }
-
-        /// <summary>
         /// Changes the primary body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>

@@ -15,7 +15,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <summary>
         /// Indicates if the program is complete
         /// </summary>
-        bool Completed { get; }
+        bool IsCompleted { get; }
 
         /// <summary>
         /// The thrust direction

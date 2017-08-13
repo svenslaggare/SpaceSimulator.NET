@@ -205,6 +205,11 @@ namespace SpaceSimulator.Physics.Rocket
         }
 
         /// <summary>
+        /// Returns the ratio of the remaining fuel mass
+        /// </summary>
+        public double FuelMassRemainingRatio => this.FuelMassRemaining / this.InitialFuelMass;
+
+        /// <summary>
         /// Uses fuel in the stage for the given amount of time
         /// </summary>
         /// <param name="time">The time</param>

@@ -114,6 +114,8 @@ namespace SpaceSimulator.UI
                 }
             }
 
+            this.SimulatorContainer.IsSlowMotion = this.KeyboardManager.IsKeyDown(Key.LeftShift);
+
             this.simulationSpeedIndex = MathUtil.Clamp(this.simulationSpeedIndex + deltaSimulationSpeedIndex, 0, this.simulationSpeeds.Length - 1);
             var simulationSpeed = this.simulationSpeeds[this.simulationSpeedIndex];
             this.SimulatorEngine.SimulationSpeed = simulationSpeed.Speed;

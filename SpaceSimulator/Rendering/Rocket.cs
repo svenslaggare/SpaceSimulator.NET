@@ -110,7 +110,7 @@ namespace SpaceSimulator.Rendering
         {
             if (stageNumber == null)
             {
-                stageNumber = rocketObject.Stages.CurrentStage.Number;
+                stageNumber = rocketObject.CurrentStage.Number;
             }
 
             if (stageNumber < this.stages.Count)
@@ -131,7 +131,7 @@ namespace SpaceSimulator.Rendering
                 this.graphicsDevice,
                 this.CurrentStage(
                     rocketObject,
-                    rocketObject.Stages.CurrentStage.Number - 1).Clone());
+                    rocketObject.CurrentStage.Number - 1).Clone());
         }
 
         /// <summary>
@@ -186,8 +186,10 @@ namespace SpaceSimulator.Rendering
 
             effect.SetEyePosition(camera.Position);
 
+            //effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
+
             directionalLights[0].Direction = (camera.ToDrawPosition(Vector3d.Zero) - camera.Position).Normalized();
-            //this.directionalLights[0].Direction = (position - camera.ToDrawPosition(Vector3d.Zero)).Normalized();
+            //directionalLights[0].Direction = (-camera.Forward + 0.2f * camera.Up).Normalized();
             effect.SetDirectionalLights(directionalLights);
 
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
@@ -198,10 +200,11 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
+        /// <param name="arrowEffect">The arrow effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="rocketObject">The rocket object</param>
         /// <param name="scale">The scale to draw the rocket at</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, RocketObject rocketObject, float scale)
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, BasicEffect arrowEffect, SpaceCamera camera, RocketObject rocketObject, float scale)
         {
             var arrowScale = camera.ToDraw(1.5E4);
 
@@ -216,7 +219,7 @@ namespace SpaceSimulator.Rendering
             {
                 currentStage.Engines.DrawCenterThrustArrow(
                     deviceContext,
-                    effect,
+                    arrowEffect,
                     camera,
                     this.arrow,
                     arrowScale,
@@ -252,7 +255,7 @@ namespace SpaceSimulator.Rendering
             var offset = 0.0f;
             int i = 0;
             //foreach (var stage in this.stages)
-            foreach (var stage in this.stages.Skip(rocketObject.Stages.CurrentStage.Number))
+            foreach (var stage in this.stages.Skip(rocketObject.CurrentStage.Number))
             {
                 var stageWorld =
                     Matrix.Translation(Vector3.BackwardLH * (offset + (offset != 0.0f ? stage.MainBodyHeight * 0.5f : 0.0f)))
@@ -290,13 +293,14 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="deviceContext">The device context</param>
         /// <param name="effect">The effect</param>
+        /// <param name="arrowEffect">The arrow effect</param>
         /// <param name="camera">The camera</param>
         /// <param name="physicsObject">The physics object</param>
-        public void Draw(DeviceContext deviceContext, BasicEffect effect, SpaceCamera camera, PhysicsObject physicsObject)
+        public void Draw(DeviceContext deviceContext, BasicEffect effect, BasicEffect arrowEffect, SpaceCamera camera, PhysicsObject physicsObject)
         {
             if (physicsObject is RocketObject rocketObject)
             {
-                this.Draw(deviceContext, effect, camera, rocketObject, scale: camera.ToDraw(3E5));
+                this.Draw(deviceContext, effect, arrowEffect, camera, rocketObject, scale: camera.ToDraw(3E5));
             }
         }
 

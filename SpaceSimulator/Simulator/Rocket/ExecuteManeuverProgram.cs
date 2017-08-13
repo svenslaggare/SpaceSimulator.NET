@@ -41,11 +41,11 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <summary>
         /// Indicates if the program is completed
         /// </summary>
-        public bool Completed => this.isDone;
+        public bool IsCompleted => this.isDone;
 
         public void Start(double totalTime)
         {
-            this.rocketObject.StartEngine();
+            this.rocketObject.StartEngines();
             this.rocketObject.EngineThrottle = 0.2;
             Console.WriteLine("Engine start.");
         }
@@ -69,7 +69,7 @@ namespace SpaceSimulator.Simulator.Rocket
                 if (this.appliedDeltaVelocity >= this.deltaVelocity.Length())
                 {
                     this.isDone = true;
-                    this.rocketObject.StopEngine();
+                    this.rocketObject.StopEngines();
                     Console.WriteLine("Engine shutdown.");
                     this.rocketObject.EngineThrottle = 1.0;
                 }

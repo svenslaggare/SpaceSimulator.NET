@@ -36,14 +36,14 @@ namespace SpaceSimulator.Camera
 
                 //this.up = Vector3.Up;
                 this.up = MathHelpers.ToFloat(OrbitHelpers.SphereNormal(primaryBody, this.Latitude, this.Longitude, elevation));
-                this.look = targetPosition - this.position;
-                this.look.Normalize();
+                this.forward = targetPosition - this.position;
+                this.forward.Normalize();
 
                 //this.up = Vector3.Up;
                 //this.look = MathHelpers.ToFloat(OrbitHelpers.SphereNormal(primaryBody, this.Latitude, this.Longitude));
 
-                this.right = Vector3.Cross(this.Up, this.Look);
-                this.view = Matrix.LookAtLH(this.position, this.position + this.look, this.up);
+                this.right = Vector3.Cross(this.Up, this.Forward);
+                this.view = Matrix.LookAtLH(this.position, this.position + this.forward, this.up);
                 this.UpdateViewProjection();
             }
         }

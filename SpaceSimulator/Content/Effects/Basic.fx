@@ -335,7 +335,17 @@ technique11 PlanetNoLightTex
 	}
 }
 
-technique11 PlanetTex
+technique11 PlanetLight
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PlanetPS(true, false)));
+    }
+}
+
+technique11 PlanetTexLight
 {
 	pass P0
 	{

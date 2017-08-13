@@ -23,7 +23,8 @@ namespace SpaceSimulator.Rendering
         /// </summary>
         /// <param name="orbit">The orbit</param>
         /// <param name="relative">Indicates if the positions are relative</param>
-        private static IList<Orbit.Point> CreateForBound(Physics.Orbit orbit, bool relative)
+        /// <param name="deltaAngle">The difference in angle between two positions</param>
+        private static IList<Orbit.Point> CreateForBound(Physics.Orbit orbit, bool relative, double deltaAngle = 0.005 / 2.0)
         {
             var orbitPositions = new List<Orbit.Point>();
 
@@ -32,7 +33,6 @@ namespace SpaceSimulator.Rendering
                 return orbitPositions;
             }
 
-            var deltaAngle = 0.01 / 2.0;
             for (double trueAnomaly = 0; trueAnomaly <= MathUtild.TwoPi; trueAnomaly += deltaAngle)
             {
                 var primaryBodyState = relative ? new ObjectState() : orbit.PrimaryBody.State;

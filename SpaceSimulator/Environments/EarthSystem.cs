@@ -80,8 +80,11 @@ namespace SpaceSimulator.Environments
             //    falcon9Object,
             //    1E3,
             //    falcon9TargetOrbit);
+            //var bestPitchStart = 1E3;
+            //var bestPitchEnd = 2.8E3;
+
             var bestPitchStart = 1E3;
-            var bestPitchEnd = 2.8E3;
+            var bestPitchEnd = 2E3;
 
             falcon9Object.SetControlProgram(new AscentProgram(
                 falcon9Object,
@@ -93,49 +96,34 @@ namespace SpaceSimulator.Environments
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartProgram();
 
-            var satellite1 = simulatorEngine.AddSatelliteInOrbit(
-                "Satellite 1",
-                1000,
-                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                new OrbitPosition(
-                    Physics.Orbit.New(
-                        earth,
-                        semiMajorAxis: earth.Radius + 300E3,
-                        //semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
-                        //longitudeOfAscendingNode: 45.0 * MathUtild.Deg2Rad,
-                        inclination: 0.0 * MathUtild.Deg2Rad),
-                    0.0));
-            renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
+            //var satellite1 = simulatorEngine.AddSatelliteInOrbit(
+            //    "Satellite 1",
+            //    1000,
+            //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
+            //    new OrbitPosition(
+            //        Physics.Orbit.New(
+            //            earth,
+            //            semiMajorAxis: earth.Radius + 300E3,
+            //            //semiMajorAxis: OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(earth.StandardGravitationalParameter, Constants.SiderealDay),
+            //            //longitudeOfAscendingNode: 45.0 * MathUtild.Deg2Rad,
+            //            inclination: 0.0 * MathUtild.Deg2Rad),
+            //        0.0));
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, satellite1, Color.Yellow, baseDir + "Satellite.png"));
 
             //var orbitPosition2 = new OrbitPosition(
-            //    Physics.Orbit.New(
-            //        earth,
-            //        parameter: 3.0 * Simulator.Data.SolarSystemBodies.Earth.Radius,
-            //        eccentricity: 0.2,
-            //        inclination: 45 * MathUtild.Deg2Rad),
-            //    87.2 * MathUtild.Deg2Rad);
-            var orbitPosition2 = new OrbitPosition(
-              Physics.Orbit.New(
-                  earth,
-                  parameter: earth.Radius + 300E3,
-                  inclination: 45.0 * MathUtild.Deg2Rad),
-              0.0);
+            //  Physics.Orbit.New(
+            //      earth,
+            //      parameter: earth.Radius + 300E3,
+            //      inclination: 45.0 * MathUtild.Deg2Rad),
+            //  0.0);
 
-            var object2 = simulatorEngine.AddSatelliteInOrbit(
-                "Satellite 2",
-                1000,
-                new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-                orbitPosition2);
-
-            //var sphereNormal = OrbitHelpers.SphereNormal(earth, 0.0, 0.0);
-            //var object2 = simulatorEngine.AddSatellite(
-            //    earth,
+            //var satellite2 = simulatorEngine.AddSatelliteInOrbit(
             //    "Satellite 2",
             //    1000,
             //    new AtmosphericProperties(AtmosphericFormulas.CircleArea(10), 0.05),
-            //    earth.Position + sphereNormal * 1E8,
-            //    -sphereNormal * 3000.0);
-            renderingObjects.Add(new RenderingObject(graphicsDevice, object2, Color.Yellow, baseDir + "Satellite.png"));
+            //    orbitPosition2);
+
+            //renderingObjects.Add(new RenderingObject(graphicsDevice, satellite2, Color.Yellow, baseDir + "Satellite.png"));
 
             //var rocketObject = simulatorEngine.AddObject(
             //    PhysicsObjectType.ArtificialSatellite,

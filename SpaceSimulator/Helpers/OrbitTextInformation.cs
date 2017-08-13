@@ -90,7 +90,6 @@ namespace SpaceSimulator.Helpers
                     var gravityAccelerationDirection = (primaryBody.Position - state.Position).Normalized();
 
                     (var horizontalSpeed, var verticalSpeed) = OrbitHelpers.ComputeHorizontalAndVerticalVelocity(gravityAccelerationDirection, relativeVelocity);
-
                     AddBulletItem("Horizontal speed: " + DataFormatter.Format(horizontalSpeed, DataUnit.Velocity));
                     AddBulletItem("Vertical speed: " + DataFormatter.Format(verticalSpeed, DataUnit.Velocity));
                 }

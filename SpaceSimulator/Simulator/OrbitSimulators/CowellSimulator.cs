@@ -62,8 +62,18 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                 {
                     rocketObject.AfterImpulse(timeStep);
                 }
+                else if (rocketObject.PrimaryBody is PlanetObject planet && planet.InsideAtmosphere(rocketObject))
+                {
+                    rocketObject.UpdateOrbit();
+                }
 
                 rocketObject.ClearStagedObjects(addObject);
+            }
+            else if (currentObject is ArtificialPhysicsObject artificialObject
+                     && artificialObject.PrimaryBody is PlanetObject planet
+                     && planet.InsideAtmosphere(artificialObject))
+            {
+                artificialObject.UpdateReferenceOrbit();
             }
         }
 

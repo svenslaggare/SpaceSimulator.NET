@@ -64,7 +64,6 @@ namespace SpaceSimulator.Rendering.Plot
             this.CreatePlot();
 
             this.currentPositionBrush = this.renderingManager2D.CreateSolidColorBrush(Color.Red);
-            //this.primaryBodyImage = this.renderingManager2D.LoadImage("Content/Textures/Planets/Earth.jpg");
             this.primaryBodyImage = this.renderingManager2D.LoadImage(primaryBodyTexture);
 
             //this.projectedOrbitSphere = new Sphere(

@@ -27,11 +27,15 @@ namespace SpaceSimulator
         /// </summary>
         public int SimulationSpeedMultiplier { get; set; } = 1;
 
+        /// <summary>
+        /// Indicates if slow motion mode
+        /// </summary>
+        public bool IsSlowMotion { get; set; } = false;
+
         private bool isFrozen = false;
         private bool isPaused = false;
 
         private PhysicsObject selectedObject;
-
 
         /// <summary>
         /// Event for when the selected object changes

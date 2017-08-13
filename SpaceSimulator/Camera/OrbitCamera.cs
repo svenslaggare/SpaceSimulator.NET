@@ -134,9 +134,9 @@ namespace SpaceSimulator.Camera
             this.position.Y = (float)(this.radius * Math.Cos(this.phi));
 
             this.up = Vector3.Up;
-			this.look = this.position;
-			this.look.Normalize();
-			this.right = Vector3.Cross(this.Up, this.Look);
+			this.forward = this.position;
+			this.forward.Normalize();
+			this.right = Vector3.Cross(this.Up, this.Forward);
 
             var focusPosition = this.ToDrawPosition(this.FocusPosition);
             this.position = this.position + focusPosition;

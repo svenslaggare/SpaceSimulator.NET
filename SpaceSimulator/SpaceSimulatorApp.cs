@@ -31,10 +31,12 @@ namespace SpaceSimulator
         private readonly RenderingPasses renderingPasses = new RenderingPasses();
 
         private readonly SimulatorContainer simulatorContainer;
+        private int framesSinceLast = 0;
 
         private BasicEffect sunEffect;
         private BasicEffect planetNoLightEffect;
         private BasicEffect planetEffect;
+        private BasicEffect planetNoTextureEffect;
         private OrbitEffect orbitEffect;
         private OrbitEffect ringEffect;
         private BasicEffect arrowEffect;
@@ -100,7 +102,8 @@ namespace SpaceSimulator
         {
             this.sunEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "SunTex", BasicVertex.CreateInput());
             this.planetNoLightEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetNoLightTex", BasicVertex.CreateInput());
-            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetTex", BasicVertex.CreateInput());
+            this.planetEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetTexLight", BasicVertex.CreateInput());
+            this.planetNoTextureEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "PlanetLight", BasicVertex.CreateInput());
             this.orbitEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "Orbit", Rendering.OrbitVertex.CreateInput());
             this.ringEffect = new OrbitEffect(this.GraphicsDevice, "Content/Effects/Orbit.fx", "PlanetRing", Rendering.OrbitVertex.CreateInput());
             this.arrowEffect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light1", BasicVertex.CreateInput());
@@ -226,9 +229,22 @@ namespace SpaceSimulator
 
             if (!this.simulatorContainer.IsPaused)
             {
-                for (int i = 0; i < this.simulatorContainer.SimulationSpeedMultiplier; i++)
+                if (this.simulatorContainer.IsSlowMotion)
                 {
-                    this.SimulatorEngine.Update();
+                    this.framesSinceLast++;
+
+                    if (this.framesSinceLast >= 6)
+                    {
+                        this.SimulatorEngine.Update();
+                        this.framesSinceLast = 0;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < this.simulatorContainer.SimulationSpeedMultiplier; i++)
+                    {
+                        this.SimulatorEngine.Update();
+                    }
                 }
             }
 
@@ -282,7 +298,9 @@ namespace SpaceSimulator
                 RenderingObject.DrawObjects(
                     deviceContext,
                     this.arrowEffect,
+                    //this.planetNoTextureEffect,
                     this.planetEffect,
+                    this.arrowEffect,
                     this.SpaceCamera,
                     this.RenderingObjects);
 
@@ -366,6 +384,7 @@ namespace SpaceSimulator
             this.sunEffect.Dispose();
             this.planetEffect.Dispose();
             this.planetNoLightEffect.Dispose();
+            this.planetNoTextureEffect.Dispose();
             this.orbitEffect.Dispose();
             this.planetEffect.Dispose();
             this.arrowEffect.Dispose();

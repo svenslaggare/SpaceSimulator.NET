@@ -49,5 +49,29 @@ namespace SpaceSimulator.Simulator
         {
             return CollisionHelpers.SphereIntersection(primaryBodyPosition, primaryBody.Radius, position, 10);
         }
+
+        /// <summary>
+        /// Updates the reference orbit
+        /// </summary>
+        public void UpdateReferenceOrbit()
+        {
+            this.ReferenceState = this.state;
+            this.ReferenceOrbit = Orbit.CalculateOrbit(this);
+            this.ReferencePrimaryBodyState = this.PrimaryBody.State;
+            this.OrbitChanged();
+        }
+
+        /// <summary>
+        /// Applies the burn
+        /// </summary>
+        /// <param name="totalTime">The total time</param>
+        /// <param name="deltaV">The delta V</param>
+        public virtual void ApplyBurn(double totalTime, Vector3d deltaV)
+        {
+            this.state.Velocity += deltaV;
+            this.state.HasImpacted = false;
+            this.UpdateReferenceOrbit();
+            this.UsedDeltaV += deltaV.Length();
+        }
     }
 }

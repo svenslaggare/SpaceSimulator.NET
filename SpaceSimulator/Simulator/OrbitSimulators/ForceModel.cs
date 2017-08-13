@@ -44,7 +44,7 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
             if (artificialObject is RocketObject rocketObject && rocketObject.IsEngineRunning)
             {
                 acceleration += rocketObject.EngineThrust() / mass;
-                deltaMass = -rocketObject.Stages.CurrentStage.TotalMassFlowRate * integratorState.TimeStep;
+                deltaMass = -rocketObject.CurrentStage.TotalMassFlowRate * integratorState.TimeStep;
             }
 
             if (artificialObject.PrimaryBody is PlanetObject primaryPlanet

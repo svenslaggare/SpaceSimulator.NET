@@ -222,7 +222,7 @@ namespace SpaceSimulator.Rendering
 
                 if (this.RotateToFaceCamera)
                 {
-                    vertex.Normal = camera.Look;
+                    vertex.Normal = camera.Forward;
                 }
                 else
                 {

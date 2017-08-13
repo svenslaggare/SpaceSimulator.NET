@@ -51,8 +51,8 @@ namespace SpaceSimulator.Camera
             var targetDrawPosition = this.ToDrawPosition(targetPosition);
 
             this.up = (this.ToDrawPosition(this.FocusPosition + this.FromDraw(1.0f) * this.followNormal) - this.position).Normalized();
-            this.look = (targetDrawPosition - this.position).Normalized();
-            this.right = Vector3.Cross(this.Up, this.Look);
+            this.forward = (targetDrawPosition - this.position).Normalized();
+            this.right = Vector3.Cross(this.Up, this.Forward);
 
             this.view = Matrix.LookAtLH(this.position, targetDrawPosition, this.up);
             this.UpdateViewProjection();

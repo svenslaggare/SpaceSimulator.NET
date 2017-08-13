@@ -16,7 +16,7 @@ namespace SpaceSimulator.Common.Camera
         protected Vector3 position;
         protected Vector3 right;
         protected Vector3 up;
-        protected Vector3 look;
+        protected Vector3 forward;
 
         private float nearZ;
         private float farZ;
@@ -37,7 +37,7 @@ namespace SpaceSimulator.Common.Camera
         {
             this.right = Vector3.Right;
             this.up = Vector3.Up;
-            this.look = Vector3.ForwardLH;
+            this.forward = Vector3.ForwardLH;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SpaceSimulator.Common.Camera
             this.position = camera.position;
             this.right = camera.right;
             this.up = camera.up;
-            this.look = camera.look;
+            this.forward = camera.forward;
 
             this.nearZ = camera.nearZ;
             this.farZ = camera.farZ;
@@ -73,6 +73,14 @@ namespace SpaceSimulator.Common.Camera
         }
 
         /// <summary>
+        /// The forward vector
+        /// </summary>
+        public Vector3 Forward
+        {
+            get { return this.forward; }
+        }
+
+        /// <summary>
         /// The right vector
         /// </summary>
         public Vector3 Right
@@ -86,14 +94,6 @@ namespace SpaceSimulator.Common.Camera
         public Vector3 Up
         {
             get { return this.up; }
-        }
-
-        /// <summary>
-        /// The look vector
-        /// </summary>
-        public Vector3 Look
-        {
-            get { return this.look; }
         }
 
         /// <summary>
@@ -206,23 +206,6 @@ namespace SpaceSimulator.Common.Camera
 
             this.projection = Matrix.PerspectiveFovLH(this.fovY, this.AspectRatio, this.nearZ, this.farZ);
             this.UpdateViewProjection();
-        }
-
-        /// <summary>
-        /// Defines the camera space
-        /// </summary>
-        /// <param name="position">The position</param>
-        /// <param name="target">The target</param>
-        /// <param name="up">The up</param>
-        public virtual void LookAt(Vector3 position, Vector3 target, Vector3 up)
-        {
-            this.look = target - position;
-            this.look.Normalize();
-
-            this.right = Vector3.Cross(up, this.look);
-            this.right.Normalize();
-
-            this.up = Vector3.Cross(this.look, this.Right);
         }
 
         /// <summary>

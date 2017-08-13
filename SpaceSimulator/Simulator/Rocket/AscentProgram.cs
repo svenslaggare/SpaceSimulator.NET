@@ -83,7 +83,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <summary>
         /// Indicates if the program is completed
         /// </summary>
-        public bool Completed
+        public bool IsCompleted
         {
             get { return this.state == State.InOrbit || this.state == State.Failed; }
         }
@@ -181,16 +181,24 @@ namespace SpaceSimulator.Simulator.Rocket
 
                     if (currentOrbitPosition.Orbit.IsBound && currentOrbitPosition.Orbit.Apoapsis >= this.targetOrbit.Apoapsis)
                     {
-                        this.rocketObject.StopEngine();
+                        this.rocketObject.StopEngines();
                         this.state = State.Coast;
                         this.LogStatus("Engine shutdown.");
                         this.LogStatus("Coasting.");
+                    }
+
+                    if (this.rocketObject.CurrentStage.Number == 0 && this.rocketObject.CurrentStage.FuelMassRemainingRatio <= 0.10)
+                    {
+                        this.rocketObject.Stage(spentStageObject =>
+                        {
+                            spentStageObject.StartProgram(new LandingProgram(spentStageObject, this.textOutputWriter));
+                        });
                     }
                     break;
                 case State.Coast:
                     if (OrbitPosition.CalculateOrbitPosition(this.rocketObject).TimeToApoapsis() <= 10.0)
                     {
-                        this.rocketObject.StartEngine();
+                        this.rocketObject.StartEngines();
                         this.state = State.Circularizing;
                         this.LogStatus("Engine started.");
                         this.LogStatus("Circularizing.");
@@ -201,7 +209,7 @@ namespace SpaceSimulator.Simulator.Rocket
                     if (Math.Abs(currentOrbit.Orbit.Eccentricity - this.targetOrbit.Eccentricity) <= 0.01 &&
                         OrbitPosition.CalculateOrbitPosition(this.rocketObject).Orbit.RelativePeriapsis >= this.targetOrbit.RelativePeriapsis * 0.99)
                     {
-                        this.rocketObject.StopEngine();
+                        this.rocketObject.StopEngines();
                         this.LogStatus("Engine shutdown.");
                         this.LogStatus("In orbit.");
                         this.LogStatus(DataFormatter.Format(totalTime, DataUnit.Time));
@@ -212,16 +220,15 @@ namespace SpaceSimulator.Simulator.Rocket
                     break;
             }
 
-            if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
-            {
-                var thrustAngle = MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde));
-
-                if (thrustAngle >= 1E-4)
-                {
-                    this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * thrustAngle}");
-                    this.lastTime = DateTime.UtcNow;
-                }
-            }
+            //if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
+            //{
+            //    var thrustAngle = MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde));
+            //    if (thrustAngle >= 1E-4)
+            //    {
+            //        this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * thrustAngle}");
+            //        this.lastTime = DateTime.UtcNow;
+            //    }
+            //}
         }
 
         /// <summary>
@@ -260,7 +267,7 @@ namespace SpaceSimulator.Simulator.Rocket
                 orbitSimulator.Update(totalTime, timeStep, currentObject);
                 currentObject.Update(totalTime, timeStep);
 
-                if (ascentProgram.Completed)
+                if (ascentProgram.IsCompleted)
                 {
                     break;
                 }
