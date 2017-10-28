@@ -129,7 +129,7 @@ namespace SpaceSimulator.Simulator.Rocket
                     {
                         //var turnAmount = 0.70;
                         //this.ThrustDirection = Vector3d.Transform(
-                        //    this.HorizontalThrustDirection(), 
+                        //    this.HorizontalThrustDirection(),
                         //    Matrix3x3d.RotationY(MathUtild.Deg2Rad * turnAmount * 90.0));
 
                         var radial = Vector3d.Transform(prograde, Matrix3x3d.RotationY(MathUtild.Pi / 2));
@@ -187,7 +187,8 @@ namespace SpaceSimulator.Simulator.Rocket
                         this.LogStatus("Coasting.");
                     }
 
-                    if (this.rocketObject.CurrentStage.Number == 0 && this.rocketObject.CurrentStage.FuelMassRemainingRatio <= 0.10)
+                    if (this.rocketObject.CurrentStage.Number == 0 
+                        && this.rocketObject.CurrentStage.FuelMassRemainingRatio <= 0.1)
                     {
                         this.rocketObject.Stage(spentStageObject =>
                         {

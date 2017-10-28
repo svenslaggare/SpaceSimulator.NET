@@ -146,6 +146,16 @@ namespace SpaceSimulator.Helpers
                 infoBuilder.AppendLine("Latitude: " + DataFormatter.Format(latitude, DataUnit.Latitude, 2));
                 infoBuilder.AppendLine("Longitude: " + DataFormatter.Format(longitide, DataUnit.Longitude, 2));
                 infoBuilder.AppendLine("Altitude: " + DataFormatter.Format(primaryBody.Altitude(state.Position), DataUnit.Distance));
+
+                if (physicsObject is RocketObject rocketObject && rocketObject.LaunchCoordinates != null)
+                {
+                    var distance = OrbitHelpers.SphereDistance(
+                        rocketObject.PrimaryBody, 
+                        rocketObject.LaunchCoordinates.Value,
+                        (rocketObject.Latitude, rocketObject.Longitude));
+
+                    infoBuilder.AppendLine("Downrange distance: " + DataFormatter.Format(distance, DataUnit.Distance));
+                }
             }
 
             if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)

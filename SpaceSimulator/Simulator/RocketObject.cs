@@ -23,21 +23,31 @@ namespace SpaceSimulator.Simulator
         private IRocketControlProgram controlProgram;
         private bool updateOrbit = false;
 
+        /// <summary>
+        /// Returns the orientation
+        /// </summary>
+        public Vector3d Orientation { get; private set; }
+
         private readonly IList<PhysicsObject> toStage = new List<PhysicsObject>();
+
+        /// <summary>
+        /// The launch coordinates
+        /// </summary>
+        public (double, double)? LaunchCoordinates { get; private set; }
 
         private readonly ITextOutputWriter textOutputWriter;
 
-        /// <summary>
-        /// Creates a new rocket object
-        /// </summary>
-        /// <param name="name">The name of the object</param>
-        /// <param name="mass">The mass of the object</param>
-        /// <param name="primaryBody">The primary body</param>
-        /// <param name="initialState">The initial state</param>
-        /// <param name="initialOrbit">The initial orbit</param>
-        /// <param name="rocketStages">The rocket stages</param>
-        /// <param name="textOutputWriter">The text output writer</param>
-        public RocketObject(
+    /// <summary>
+    /// Creates a new rocket object
+    /// </summary>
+    /// <param name="name">The name of the object</param>
+    /// <param name="mass">The mass of the object</param>
+    /// <param name="primaryBody">The primary body</param>
+    /// <param name="initialState">The initial state</param>
+    /// <param name="initialOrbit">The initial orbit</param>
+    /// <param name="rocketStages">The rocket stages</param>
+    /// <param name="textOutputWriter">The text output writer</param>
+    public RocketObject(
             string name,
             double mass,
             NaturalSatelliteObject primaryBody,
@@ -97,6 +107,14 @@ namespace SpaceSimulator.Simulator
                 if (this.state.HasImpacted)
                 {
                     this.state.HasImpacted = false;
+                    this.LaunchCoordinates = (this.Latitude, this.Longitude);
+
+                    //var surfaceSpeedDir = Vector3d.Cross(
+                    //    OrbitHelpers.SphereNormal(this.PrimaryBody, this.Latitude, this.Longitude),
+                    //    this.PrimaryBody.AxisOfRotation);
+                    //surfaceSpeedDir.Normalize();
+                    //var surfaceVelocity = OrbitHelpers.SurfaceSpeedDueToRotation(this.PrimaryBody, Math.PI / 2.0 - this.Latitude) * surfaceSpeedDir;
+
                     this.state.Velocity = this.PrimaryBody.Velocity;
                 }
 
@@ -227,7 +245,11 @@ namespace SpaceSimulator.Simulator
                     this.ReferenceState,
                     this.ReferenceOrbit,
                     new RocketStages(new List<RocketStage>() { oldStage }),
-                    this.textOutputWriter);
+                    this.textOutputWriter)
+                {
+                    LaunchCoordinates = this.LaunchCoordinates
+                };
+
                 applyToStaged?.Invoke(spentStageObject);
 
                 spentStageObject.SetNextState(this.ReferenceState);
@@ -270,7 +292,6 @@ namespace SpaceSimulator.Simulator
                 this.updateOrbit = false;
             }
 
-
             if (this.controlProgram != null)
             {
                 this.controlProgram.Update(totalTime, timeStep);
@@ -281,6 +302,17 @@ namespace SpaceSimulator.Simulator
                     this.StopEngines();
                 }
             }
+
+            if (!this.HasImpacted)
+            {
+                var state = this.state;
+                state.MakeRelative(this.PrimaryBody.State);
+                this.Orientation = state.Prograde;
+            }
+            //else
+            //{
+            //    this.Orientation = OrbitHelpers.SphereNormal(this.PrimaryBody, this.Latitude, this.Longitude);
+            //}
         }
     }
 }

@@ -97,10 +97,9 @@ namespace SpaceSimulator.Helpers
     {
         private static readonly IList<KeyValuePair<string, double>> negativePrefixes = new List<KeyValuePair<string, double>>
         {
-           //new KeyValuePair<string, double>("n", 10E-9),
-           new KeyValuePair<string, double>("µ", 10E-6),
-           new KeyValuePair<string, double>("m", 10E-3),
-           new KeyValuePair<string, double>("c", 10E-2),
+           new KeyValuePair<string, double>("µ", 1E-6),
+           new KeyValuePair<string, double>("m", 1E-3),
+           new KeyValuePair<string, double>("c", 1E-2),
            new KeyValuePair<string, double>("", 0),
         };
 
@@ -217,20 +216,18 @@ namespace SpaceSimulator.Helpers
             {
                 if (absValue < 1 && absValue != 0.0)
                 {
-                    for (int i = negativePrefixes.Count - 1; i >= 0; i--)
+                    var power = Math.Round(Math.Log10(absValue));
+                    prefix = negativePrefixes[0];
+                    foreach (var currentPrefix in negativePrefixes)
                     {
-                        var j = i - 1;
-                        if (j >= 0)
+                        var bestPower = Math.Log10(prefix.Value);
+                        var bestPowerDiff = Math.Abs(bestPower - power);
+                        var currentPower = Math.Log10(currentPrefix.Value);
+                        var currentPowerDiff = Math.Abs(currentPower - power);
+
+                        if (currentPowerDiff < bestPowerDiff)
                         {
-                            if (absValue >= negativePrefixes[j].Value && absValue < negativePrefixes[i].Value)
-                            {
-                                prefix = negativePrefixes[i];
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            prefix = negativePrefixes[0];
+                            prefix = currentPrefix;
                         }
                     }
                 }

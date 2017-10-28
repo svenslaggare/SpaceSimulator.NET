@@ -24,7 +24,7 @@ using SpaceSimulator.Common.ParticleSystem;
 namespace SpaceSimulator
 {
     /// <summary>
-    /// The main entry class for the space simulator
+    /// The main class for the space simulator
     /// </summary>
     public class SpaceSimulatorApp : D3DApp
     {

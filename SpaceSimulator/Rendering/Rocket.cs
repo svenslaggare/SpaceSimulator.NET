@@ -154,20 +154,17 @@ namespace SpaceSimulator.Rendering
         /// Computes transformations and vectors
         /// </summary>
         /// <param name="camera">The camera</param>
-        /// <param name="physicsObject">The physics object</param>
+        /// <param name="rocketObject">The rocket object</param>
         /// <param name="scale">The scale</param>
         public static (Vector3 position, Vector3 forward, Matrix facing, Matrix world) ComputeTransformations(
             SpaceCamera camera, 
-            PhysicsObject physicsObject,
+            RocketObject rocketObject,
             float scale)
         {
-            var position = camera.ToDrawPosition(physicsObject.Position);
-            var state = physicsObject.State;
-            state.MakeRelative(physicsObject.PrimaryBody.State);
+            var position = camera.ToDrawPosition(rocketObject.Position);
 
-            var forward = MathHelpers.ToFloat(state.Prograde);
+            var forward = MathHelpers.ToFloat(rocketObject.Orientation);
             var facing = MathHelpers.FaceDirection(forward);
-
             var world = Matrix.Scaling(scale) * facing * Matrix.Translation(position);
 
             return (position, forward, facing, world);

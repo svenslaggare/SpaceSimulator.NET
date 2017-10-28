@@ -78,6 +78,10 @@ namespace SpaceSimulator.Simulator.Rocket
                     if (Math.Abs(horizontalSpeed) >= 20.0)
                     {
                         this.ThrustDirection = state.Retrograde;
+                        //(var launchLatitude, var launchLongitude) = this.rocketObject.LaunchCoordinates.Value;
+                        //this.ThrustDirection = (
+                        //    OrbitHelpers.FromCoordinates(this.rocketObject.PrimaryBody, launchLatitude, launchLongitude) 
+                        //    - this.rocketObject.Position).Normalized();
                     }
                     else
                     {
@@ -95,7 +99,6 @@ namespace SpaceSimulator.Simulator.Rocket
                     }
                     break;
                 case State.LandingBurn:
-                    //this.ThrustDirection = state.Retrograde;
                     this.ThrustDirection = OrbitHelpers.SphereNormal(
                         this.rocketObject.PrimaryBody,
                         this.rocketObject.Latitude, 
@@ -103,11 +106,16 @@ namespace SpaceSimulator.Simulator.Rocket
 
                     if (verticalSpeed > 0)
                     {
-                        //this.LogStatus(altitude.ToString());
                         this.rocketObject.StopEngines();
+                        this.LogStatus("Killing engines.");
                     }
 
-                    if (altitude <= 11.0)
+                    //if (altitude <= 20.0)
+                    //{
+                    //    this.LogStatus(state.Velocity.Length().ToString());
+                    //}
+
+                    if (altitude <= 11.1)
                     {
                         this.state = State.Landed;
                         this.LogStatus($"Landed (alt: {altitude}, speed: {state.Velocity.Length()})");

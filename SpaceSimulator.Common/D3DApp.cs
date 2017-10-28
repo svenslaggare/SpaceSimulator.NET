@@ -79,12 +79,14 @@ namespace SpaceSimulator.Common
         /// <param name="title">The title of the application</param>
         /// <param name="camera">The default camera</param>
         /// <param name="cameraName">The name of the default camera</param>
-        public D3DApp(string title, BaseCamera camera, string cameraName = "Default")
+        /// <param name="width">The width of the window</param>
+        /// <param name="height">The height of the window</param>
+        public D3DApp(string title, BaseCamera camera, string cameraName = "Default", int width = 1440, int height = 900)
         {
             this.title = title;
             this.renderForm = new RenderForm(title)
             {
-                ClientSize = new System.Drawing.Size(1440, 900)
+                ClientSize = new System.Drawing.Size(width, height)
             };
 
             this.renderingManager2D = new RenderingManager2D(this.renderForm);

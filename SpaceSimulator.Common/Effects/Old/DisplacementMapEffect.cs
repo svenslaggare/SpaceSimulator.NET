@@ -254,11 +254,11 @@ namespace SpaceSimulator.Common.Old
 			this.maxTessFactorVariable.Set(factor);
 		}
 
-		/// <summary>
-		/// Sets the diffuse map
-		/// </summary>
-		/// <param name="cubeMap">The diffuse map</param>
-		public void SetDiffuseMap(ShaderResourceView diffuseMap)
+        /// <summary>
+        /// Sets the diffuse map
+        /// </summary>
+        /// <param name="diffuseMap">The diffuse map</param>
+        public void SetDiffuseMap(ShaderResourceView diffuseMap)
 		{
 			this.diffuseMapVariable.SetResource(diffuseMap);
 		}
@@ -272,11 +272,11 @@ namespace SpaceSimulator.Common.Old
 			this.cubeMapMapVariable.SetResource(cubeMap);
 		}
 
-		/// <summary>
-		/// Sets the normal map
-		/// </summary>
-		/// <param name="diffuseMap">The normal map</param>
-		public void SetNormalMap(ShaderResourceView normalMap)
+        /// <summary>
+        /// Sets the normal map
+        /// </summary>
+        /// <param name="normalMap">The normal map</param>
+        public void SetNormalMap(ShaderResourceView normalMap)
 		{
 			this.normalMapMapVariable.SetResource(normalMap);
 		}

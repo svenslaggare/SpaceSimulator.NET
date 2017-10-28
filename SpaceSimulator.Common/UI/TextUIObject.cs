@@ -29,7 +29,6 @@ namespace SpaceSimulator.Common.UI
         /// <param name="renderingManager2D">The 2D rendering manager</param>
         /// <param name="name">The name of the object</param>
         /// <param name="position">The position of the object</param>
-        /// <param name="size">The size of the object</param>
         /// <param name="text">The text</param>
         /// <param name="textColor">The color of the text</param>
         /// <param name="positionRelationX">The x-axis position relation</param>

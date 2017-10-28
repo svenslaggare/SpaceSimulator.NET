@@ -34,7 +34,7 @@ namespace SpaceSimulator.Common.Effects
 		/// </summary>
 		/// <typeparam name="T">The type of the struct</typeparam>
 		/// <param name="variable">The variable to set</param>
-		/// <param name="value">The array of values</param>
+		/// <param name="values">The array of values</param>
 		public static void SetStructArray<T>(this EffectVariable variable, T[] values) where T : struct
 		{
 			using (var buffer = new DataStream(Utilities.SizeOf<T>() * values.Length, false, true))

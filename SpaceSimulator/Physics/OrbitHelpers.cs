@@ -207,7 +207,24 @@ namespace SpaceSimulator.Physics
         {
             return FromCoordinates(primaryBody, primaryBody.State.Rotation, latitude, longitude, elevation);
         }
-        
+
+        /// <summary>
+        /// Returns the distance between the two points on the given sphere
+        /// </summary>
+        /// <param name="primaryBody">The primary body</param>
+        /// <param name="point1">The coordinates of the first point</param>
+        /// <param name="point2">The coordinates of the second point</param>
+        public static double SphereDistance(IPrimaryBodyObject primaryBody, (double latitude, double longitude) point1, (double latitude, double longitude) point2)
+        {
+            //var deltaLatitude = point2.latitude - point1.latitude;
+            var deltaLongitude = point2.longitude - point1.longitude;
+            var centralAngle = Math.Acos(
+                Math.Sin(point1.latitude) * Math.Sin(point2.latitude)
+                + Math.Cos(point1.latitude) * Math.Cos(point2.latitude)
+                * Math.Cos(deltaLongitude));
+            return centralAngle * primaryBody.Radius;
+        }
+
         /// <summary>
         /// Computes the normal for a sphere at the given latitude, longitude and elevation
         /// </summary>

@@ -68,10 +68,10 @@ namespace SpaceSimulator.Environments
                 Color.Yellow,
                 Rendering.Rocket.CreateFalcon9(graphicsDevice)));
 
-            var falcon9TargetAltitude = 300E3;
-            //var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
-            //    earth.StandardGravitationalParameter,
-            //    earth.RotationalPeriod) - earth.Radius;
+            //var falcon9TargetAltitude = 300E3;
+            var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
+                earth.StandardGravitationalParameter,
+                earth.RotationalPeriod) - earth.Radius;
 
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
 
@@ -80,8 +80,6 @@ namespace SpaceSimulator.Environments
             //    falcon9Object,
             //    1E3,
             //    falcon9TargetOrbit);
-            //var bestPitchStart = 1E3;
-            //var bestPitchEnd = 2.8E3;
 
             var bestPitchStart = 1E3;
             var bestPitchEnd = 2E3;

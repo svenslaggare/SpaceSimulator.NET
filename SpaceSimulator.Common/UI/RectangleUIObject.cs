@@ -24,7 +24,6 @@ namespace SpaceSimulator.Common.UI
         /// <param name="renderingManager2D">The 2D rendering manager</param>
         /// <param name="name">The name of the element</param>
         /// <param name="position">The position</param>
-        /// <param name="image">The name of the image</param>
         /// <param name="size">The size of the object</param>
         /// <param name="fillBrush">The fill brush</param>
         /// <param name="borderBrush">The border brush</param>

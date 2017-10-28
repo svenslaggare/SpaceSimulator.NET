@@ -139,11 +139,21 @@ namespace SpaceSimulator.Common.Rendering2D
         /// <param name="deviceContext">The device context</param>
         /// <param name="position">The position</param>
         /// <param name="brush">The brush</param>
-        public void DrawOutline(DeviceContext deviceContext, Vector2 position, Brush brush)
+        /// <param name="strokeWidth">The width of the stoke</param>
+        public void DrawOutline(DeviceContext deviceContext, Vector2 position, Brush brush, float? strokeWidth = null)
         {
             var originalTransform = deviceContext.Transform;
             deviceContext.Transform = Matrix3x2.Translation(position);
-            deviceContext.DrawGeometry(this.pathGeometry, brush);
+
+            if (strokeWidth != null)
+            {
+                deviceContext.DrawGeometry(this.pathGeometry, brush, strokeWidth.Value);
+            }
+            else
+            {
+                deviceContext.DrawGeometry(this.pathGeometry, brush);
+            }
+
             deviceContext.Transform = originalTransform;
         }
 

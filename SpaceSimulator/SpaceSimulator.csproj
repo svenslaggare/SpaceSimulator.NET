@@ -93,55 +93,9 @@
   <ItemGroup>
     <Compile Include="Camera\FollowCamera.cs" />
     <Compile Include="Camera\GroundCamera.cs" />
-    <Compile Include="Common\BitmapHelpers.cs" />
-    <Compile Include="Common\Camera\BaseCamera.cs" />
-    <Compile Include="Common\Camera\CameraHelpers.cs" />
     <Compile Include="Camera\FPSCamera.cs" />
     <Compile Include="Camera\OrbitCamera.cs" />
     <Compile Include="Camera\SpaceCamera.cs" />
-    <Compile Include="Common\Camera\CameraManager.cs" />
-    <Compile Include="Common\D3DApp.cs" />
-    <Compile Include="Common\Effects\BaseEffect.cs" />
-    <Compile Include="Common\Effects\BasicEffect.cs" />
-    <Compile Include="Common\Effects\BlendStates.cs" />
-    <Compile Include="Common\Effects\DepthStencilStates.cs" />
-    <Compile Include="Common\Effects\Old\DisplacementMapEffect.cs" />
-    <Compile Include="Common\Effects\EffectExtensions.cs" />
-    <Compile Include="Common\Effects\IncludeEffect.cs" />
-    <Compile Include="Common\Effects\LightHelpers.cs" />
-    <Compile Include="Common\Effects\RasterizerStates.cs" />
-    <Compile Include="Common\Effects\Old\Sky.cs" />
-    <Compile Include="Common\Effects\Old\SkyEffect.cs" />
-    <Compile Include="Common\Effects\Old\TerrainEffect.cs" />
-    <Compile Include="Common\Effects\Old\TerrainRender.cs" />
-    <Compile Include="Common\Effects\Old\TreeEffect.cs" />
-    <Compile Include="Common\Effects\Old\Waves.cs" />
-    <Compile Include="Common\Input\MouseManager.cs" />
-    <Compile Include="Common\Models\GeometryGenerator.cs" />
-    <Compile Include="Common\Models\ModelLoader.cs" />
-    <Compile Include="Common\Input\KeyboardManager.cs" />
-    <Compile Include="Common\ParticleSystem\ParticleSystemEffect.cs" />
-    <Compile Include="Common\ParticleSystem\ParticleSystemRender.cs" />
-    <Compile Include="Common\Rendering2D\Rendering2DHelpers.cs" />
-    <Compile Include="Common\Rendering2D\RenderingBrushes.cs" />
-    <Compile Include="Common\Rendering2D\RenderingImage2D.cs" />
-    <Compile Include="Common\Rendering2D\RenderingManager2D.cs" />
-    <Compile Include="Common\Rendering2D\RenderingPathGeometry.cs" />
-    <Compile Include="Common\RenderingPasses.cs" />
-    <Compile Include="Common\RenderToTexture.cs" />
-    <Compile Include="Common\TextureHelpers.cs" />
-    <Compile Include="Common\UI\ButtonUIObject.cs" />
-    <Compile Include="Common\UI\ImageUIObject.cs" />
-    <Compile Include="Common\UI\ListBoxUIObject.cs" />
-    <Compile Include="Common\UI\PathGeometryUIObject.cs" />
-    <Compile Include="Common\UI\RectangleUIObject.cs" />
-    <Compile Include="Common\UI\TextInputUIObject.cs" />
-    <Compile Include="Common\UI\TextUIObject.cs" />
-    <Compile Include="Common\UI\UIElement.cs" />
-    <Compile Include="Common\UI\UIGroup.cs" />
-    <Compile Include="Common\UI\UIHelpers.cs" />
-    <Compile Include="Common\UI\UIManager.cs" />
-    <Compile Include="Common\UI\UIObject.cs" />
     <Compile Include="Environments\EnvironmentHelpers.cs" />
     <Compile Include="Environments\Horizons.cs" />
     <Compile Include="Environments\IEnvironment.cs" />
@@ -267,7 +221,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -354,7 +310,10 @@
     <Content Include="Content\Textures\UI\ButtonBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="sharpdx_direct3d11_1_effects_arm.dll" />
+    <Content Include="License.txt" />
+    <Content Include="sharpdx_direct3d11_1_effects_arm.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="sharpdx_direct3d11_1_effects_x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -362,6 +321,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SpaceSimulator.Common\SpaceSimulator.Common.csproj">
+      <Project>{69700e4f-a39e-4563-915d-300e8bcb3222}</Project>
+      <Name>SpaceSimulator.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

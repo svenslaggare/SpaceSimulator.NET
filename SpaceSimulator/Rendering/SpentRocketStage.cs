@@ -57,24 +57,27 @@ namespace SpaceSimulator.Rendering
         /// <param name="physicsObject">The physics object</param>
         public void Draw(DeviceContext deviceContext, BasicEffect effect, BasicEffect arrowEffect, SpaceCamera camera, PhysicsObject physicsObject)
         {
-            var scale = camera.ToDraw(3E5);
+            if (physicsObject is RocketObject rocketObject)
+            {
+                var scale = camera.ToDraw(3E5);
 
-            //Compute transformations
-            (var position, var forward, var facing, var world) = Rocket.ComputeTransformations(camera, physicsObject, scale);
+                //Compute transformations
+                (var position, var forward, var facing, var world) = Rocket.ComputeTransformations(camera, rocketObject, scale);
 
-            //Set effect parameters
-            Rocket.SetEffectParameters(deviceContext, effect, camera, this.directionalLights);
+                //Set effect parameters
+                Rocket.SetEffectParameters(deviceContext, effect, camera, this.directionalLights);
 
-            //Draw
-            this.stage.Draw(
-                deviceContext,
-                effect,
-                camera,
-                scale,
-                forward,
-                position,
-                world,
-                forward);
+                //Draw
+                this.stage.Draw(
+                    deviceContext,
+                    effect,
+                    camera,
+                    scale,
+                    forward,
+                    position,
+                    world,
+                    forward);
+            }
         }
 
         public void Dispose()

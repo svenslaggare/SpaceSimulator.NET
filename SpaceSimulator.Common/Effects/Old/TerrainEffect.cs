@@ -244,13 +244,13 @@ namespace SpaceSimulator.Common.Old
 		public void SetDirectionalLights(DirectionalLight[] lights)
 		{
 			this.dirLightsVariable.SetStructArray(lights);
-		} 
+		}
 
-		/// <summary>
-		/// Sets the height map
-		/// </summary>
-		/// <param name="blendMap">The height map</param>
-		public void SetHeightMap(ShaderResourceView heightMap)
+        /// <summary>
+        /// Sets the height map
+        /// </summary>
+        /// <param name="heightMap">The height map</param>
+        public void SetHeightMap(ShaderResourceView heightMap)
 		{
 			this.heightMapVariable.SetResource(heightMap);
 		}
@@ -264,11 +264,11 @@ namespace SpaceSimulator.Common.Old
 			this.layerMapArrayMapVariable.SetResource(layerMapArray);
 		}
 
-		/// <summary>
-		/// Sets the blend map
-		/// </summary>
-		/// <param name="heightMap">The blend map</param>
-		public void SetBlendMap(ShaderResourceView blendMap)
+        /// <summary>
+        /// Sets the blend map
+        /// </summary>
+        /// <param name="blendMap">The blend map</param>
+        public void SetBlendMap(ShaderResourceView blendMap)
 		{
 			this.blendMapVariable.SetResource(blendMap);
 		}
