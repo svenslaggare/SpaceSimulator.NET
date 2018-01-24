@@ -141,6 +141,16 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Normalizes the given quaternion
+        /// </summary>
+        /// <param name="quaternion">The quaternion</param>
+        public static Quaterniond Normalized(this Quaterniond quaternion)
+        {
+            quaternion.Normalize();
+            return quaternion;
+        }
+
+        /// <summary>
         /// Returns the radial vector
         /// </summary>
         /// <param name="forward">The forward vector</param>
@@ -408,6 +418,15 @@ namespace SpaceSimulator.Mathematics
         public static Vector3d ToDouble(Vector3 vector)
         {
             return new Vector3d(vector.X, vector.Y, vector.Z);
+        }
+
+        /// <summary>
+        /// Converts between the given quaternion types
+        /// </summary>
+        /// <param name="vector">The quaternion</param>
+        public static Quaternion ToFloat(Quaterniond quaternion)
+        {
+            return new Quaternion((float)quaternion.X, (float)quaternion.Y, (float)quaternion.Z, (float)quaternion.W);
         }
 
         /// <summary>

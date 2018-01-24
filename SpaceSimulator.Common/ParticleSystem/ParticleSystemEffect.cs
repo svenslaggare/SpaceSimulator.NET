@@ -22,7 +22,7 @@ namespace SpaceSimulator.Common.ParticleSystem
         private readonly EffectVectorVariable emitPositionVariable;
         private readonly EffectVectorVariable emitDirectionVariable;
 
-        private readonly EffectShaderResourceVariable texutreMapArrayVariable;
+        private readonly EffectShaderResourceVariable textureMapArrayVariable;
         private readonly EffectShaderResourceVariable randomTextureVariable;
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace SpaceSimulator.Common.ParticleSystem
             this.eyePositionVariable = this.effect.GetVariableByName("gEyePosW").AsVector();
             this.emitPositionVariable = this.effect.GetVariableByName("gEmitPosW").AsVector();
             this.emitDirectionVariable = this.effect.GetVariableByName("gEmitDirW").AsVector();
-            this.texutreMapArrayVariable = this.effect.GetVariableByName("gTexArray").AsShaderResource();
+            this.textureMapArrayVariable = this.effect.GetVariableByName("gTexArray").AsShaderResource();
             this.randomTextureVariable = this.effect.GetVariableByName("gRandomTex").AsShaderResource();
         }
 
@@ -105,7 +105,7 @@ namespace SpaceSimulator.Common.ParticleSystem
         /// <param name="textureMapArray">The texture map array</param>
         public void SetTextureMapArray(ShaderResourceView textureMapArray)
         {
-            this.texutreMapArrayVariable.SetResource(textureMapArray);
+            this.textureMapArrayVariable.SetResource(textureMapArray);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace SpaceSimulator.Common.ParticleSystem
             this.eyePositionVariable.Dispose();
             this.emitPositionVariable.Dispose();
             this.emitDirectionVariable.Dispose();
-            this.texutreMapArrayVariable.Dispose();
+            this.textureMapArrayVariable.Dispose();
             this.randomTextureVariable.Dispose();
         }
     }

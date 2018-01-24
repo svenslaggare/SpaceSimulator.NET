@@ -25,7 +25,7 @@ namespace SpaceSimulator.Camera
 		/// </summary>
 		public FPSCamera()
 		{
-			this.Speed = 50;
+			this.Speed = 20;
 		}
 
 		/// <summary>
@@ -124,7 +124,18 @@ namespace SpaceSimulator.Camera
 				this.Strafe(-speed);
 			}
 
-			this.UpdateViewMatrix();
+            if (keyboardState.IsPressed(Key.Up))
+            {
+                this.position += speed * this.Up;
+            }
+
+            if (keyboardState.IsPressed(Key.Down))
+            {
+                this.position -= speed * this.Up;
+            }
+
+
+            this.UpdateViewMatrix();
 		}
 
 		/// <summary>

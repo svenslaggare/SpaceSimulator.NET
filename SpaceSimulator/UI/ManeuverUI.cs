@@ -549,6 +549,11 @@ namespace SpaceSimulator.UI
         public override void Update(TimeSpan elapsed)
         {
             this.RunScheduledTasks();
+
+            if (this.KeyboardManager.IsKeyPressed(SharpDX.DirectInput.Key.Escape))
+            {
+                this.showDeltaVChart = false;
+            }
         }
 
         /// <summary>
@@ -602,11 +607,11 @@ namespace SpaceSimulator.UI
         {
             this.DrawManeuverTexts(deviceContext);
 
-            //if (this.showDeltaVChart)
-            //{
-            //    this.deltaVChart.SetMousePosition(this.MouseManager.MousePosition);
-            //    this.deltaVChart.Draw(deviceContext);
-            //}
+            if (this.showDeltaVChart)
+            {
+                this.deltaVChart.SetMousePosition(this.MouseManager.MousePosition);
+                this.deltaVChart.Draw(deviceContext);
+            }
         }
     }
 }
