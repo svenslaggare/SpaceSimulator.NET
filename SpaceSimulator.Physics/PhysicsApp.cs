@@ -34,13 +34,17 @@ namespace SpaceSimulator.PhysicsTest
         private double totalTime = 0.0;
         private readonly double deltaTime = 1.0 / 60.0;
 
-        private ObjectState state = new ObjectState(0.0, Vector3d.Zero, Vector3d.Zero);
-        private readonly double mass = 10.0;
+        private ObjectState state = new ObjectState(0.0, 10.0, CalculateMomentOfIntertia(10.0, 1.0), Vector3d.Zero, Vector3d.Zero);
 
         public PhysicsApp()
             : base("Physics", new FPSCamera())
         {
 
+        }
+
+        private static double CalculateMomentOfIntertia(double mass, double side)
+        {
+            return (1.0 / 6.0) * (mass * side * side);
         }
 
         public override void LoadContent()
@@ -76,7 +80,7 @@ namespace SpaceSimulator.PhysicsTest
         {
             base.Update(elapsed);
 
-            this.integrator.Solve(this.mass, ref this.state, this.totalTime, this.deltaTime, (ref IntegratorState integratorState, ref ObjectState state) =>
+            this.integrator.Solve(ref this.state, this.totalTime, this.deltaTime, (ref IntegratorState integratorState, ref ObjectState state) =>
             {
                 var acceleration = Vector3d.Zero;
                 var torque = Vector3d.Zero;
@@ -95,7 +99,7 @@ namespace SpaceSimulator.PhysicsTest
                     //acceleration = (applyPoint - state.Position).Normalized() * 10;
 
                     var relativeApplyPoint = applyPoint - state.Position;
-                    torque = Vector3d.Cross(acceleration * this.mass, relativeApplyPoint);
+                    torque = Vector3d.Cross(acceleration * state.Mass, relativeApplyPoint);
 
                     //Console.WriteLine(acceleration);
                     //Console.WriteLine(relativeApplyPoint);

@@ -18,6 +18,16 @@ namespace SpaceSimulator.PhysicsTest
         public double Time { get; set; }
 
         /// <summary>
+        /// The mass
+        /// </summary>
+        public double Mass { get; set; }
+
+        /// <summary>
+        /// The moment-of-inertia
+        /// </summary>
+        public double MomentOfInertia { get; set; }
+
+        /// <summary>
         /// The position
         /// </summary>
         public Vector3d Position { get; set; }
@@ -38,26 +48,24 @@ namespace SpaceSimulator.PhysicsTest
         public Vector3d AngularMomentum { get; set; }
 
         /// <summary>
-        /// The moment-of-inertia
-        /// </summary>
-        public double MomentOfInertia { get; set; }
-
-        /// <summary>
         /// Creates a new state
         /// </summary>
         /// <param name="time">The time</param>
+        /// <param name="mass">The mass of the object</param>
+        /// <param name="momentOfInertia">The moment of intertia</param>
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
         /// <param name="orientation">The orientation</param>
-        /// <param name="angularVelocity">The angular momentum</param>
-        public ObjectState(double time, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, Vector3d? angularMomentum = null)
+        /// <param name="angularMomentum">The angular momentum</param>
+        public ObjectState(double time, double mass, double momentOfInertia, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, Vector3d? angularMomentum = null)
         {
             this.Time = time;
+            this.Mass = mass;
+            this.MomentOfInertia = momentOfInertia;
             this.Position = position;
             this.Velocity = velocity;
             this.Orientation = orientation ?? Quaterniond.Identity;
             this.AngularMomentum = angularMomentum ?? Vector3d.Zero;
-            this.MomentOfInertia = (1.0 / 6.0) * (10.0 * 1.0 * 1.0);
         }
 
         /// <summary>
@@ -213,23 +221,24 @@ namespace SpaceSimulator.PhysicsTest
         /// </summary>
         private DerivativeState Evaluate(
             ref ObjectState initial,
-            ref double mass,
             double totalTime,
             double deltaTime,
             ref DerivativeState derivative,
             CalculateAcceleration calculateAcceleration)
         {
-            var integratorState = new IntegratorState(mass, totalTime, deltaTime);
+            var integratorState = new IntegratorState(initial.Mass, totalTime, deltaTime);
 
             var state = new ObjectState(
                 initial.Time + deltaTime,
+                initial.Mass,
+                initial.MomentOfInertia,
                 initial.Position + derivative.Velocity * deltaTime,
                 initial.Velocity + derivative.Acceleration * deltaTime,
                 initial.Orientation + derivative.Spin * deltaTime,
                 initial.AngularMomentum + derivative.Torque * deltaTime);
 
             var accelerationState = calculateAcceleration(ref integratorState, ref state);
-            mass += accelerationState.DeltaMass;
+            state.Mass += accelerationState.DeltaMass;
 
             return new DerivativeState(
                 state.Velocity,
@@ -241,22 +250,20 @@ namespace SpaceSimulator.PhysicsTest
         /// <summary>
         /// Solves the given integration problem
         /// </summary>
-        /// <param name="mass">The mass of the object</param>
         /// <param name="state">The state</param>
         /// <param name="totalTime">The total time</param>
         /// <param name="deltaTime">The delta time</param>
         /// <param name="calculateAcceleration">Calculates the acceleration</param>
         public ObjectState Solve(
-            double mass,
             ref ObjectState state,
             double totalTime,
             double deltaTime,
             CalculateAcceleration calculateAcceleration)
         {
-            var k0 = this.Evaluate(ref state, ref mass, totalTime, 0, ref zero, calculateAcceleration);
-            var k1 = this.Evaluate(ref state, ref mass, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
-            var k2 = this.Evaluate(ref state, ref mass, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
-            var k3 = this.Evaluate(ref state, ref mass, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
+            var k0 = this.Evaluate(ref state, totalTime, 0, ref zero, calculateAcceleration);
+            var k1 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k0, calculateAcceleration);
+            var k2 = this.Evaluate(ref state, totalTime + deltaTime * 0.5, deltaTime * 0.5, ref k1, calculateAcceleration);
+            var k3 = this.Evaluate(ref state, totalTime + deltaTime, deltaTime, ref k2, calculateAcceleration);
 
             var velocity = (1.0 / 6.0) * (k0.Velocity + 2 * (k1.Velocity + k2.Velocity) + k3.Velocity);
             var acceleration = (1.0 / 6.0) * (k0.Acceleration + 2 * (k1.Acceleration + k2.Acceleration) + k3.Acceleration);
