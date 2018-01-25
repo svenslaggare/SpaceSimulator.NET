@@ -33,9 +33,9 @@ namespace SpaceSimulator.PhysicsTest
         public Quaterniond Orientation { get; set; }
 
         /// <summary>
-        /// The angular velocity
+        /// The angular momentum
         /// </summary>
-        public Vector3d AngularVelocity { get; set; }
+        public Vector3d AngularMomentum { get; set; }
 
         /// <summary>
         /// The moment-of-inertia
@@ -49,16 +49,21 @@ namespace SpaceSimulator.PhysicsTest
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
         /// <param name="orientation">The orientation</param>
-        /// <param name="angularVelocity">The angular velocity</param>
-        public ObjectState(double time, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, Vector3d? angularVelocity = null)
+        /// <param name="angularVelocity">The angular momentum</param>
+        public ObjectState(double time, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, Vector3d? angularMomentum = null)
         {
             this.Time = time;
             this.Position = position;
             this.Velocity = velocity;
             this.Orientation = orientation ?? Quaterniond.Identity;
-            this.AngularVelocity = angularVelocity ?? Vector3d.Zero;
+            this.AngularMomentum = angularMomentum ?? Vector3d.Zero;
             this.MomentOfInertia = (1.0 / 6.0) * (10.0 * 1.0 * 1.0);
         }
+
+        /// <summary>
+        /// Returns the angular velocity
+        /// </summary>
+        public Vector3d AngularVelocity => this.AngularMomentum / this.MomentOfInertia;
 
         /// <summary>
         /// Calculates the distance to the given state
@@ -200,7 +205,7 @@ namespace SpaceSimulator.PhysicsTest
         /// <param name="angularVelocity">The angular velocity</param>
         private Quaterniond CalculateSpin(Quaterniond orientation, Vector3d angularVelocity)
         {
-            return 0.5f * new Quaterniond(0.0, angularVelocity.X, angularVelocity.Y, angularVelocity.Z) * orientation;
+            return 0.5 * new Quaterniond(angularVelocity.X, angularVelocity.Y, angularVelocity.Z, 0) * orientation;
         }
 
         /// <summary>
@@ -216,14 +221,12 @@ namespace SpaceSimulator.PhysicsTest
         {
             var integratorState = new IntegratorState(mass, totalTime, deltaTime);
 
-            var angularMomentum = initial.AngularVelocity * initial.MomentOfInertia;
-
             var state = new ObjectState(
                 initial.Time + deltaTime,
                 initial.Position + derivative.Velocity * deltaTime,
                 initial.Velocity + derivative.Acceleration * deltaTime,
-                (initial.Orientation + derivative.Spin * deltaTime).Normalized(),
-                (angularMomentum + derivative.Torque * deltaTime) / initial.MomentOfInertia);
+                initial.Orientation + derivative.Spin * deltaTime,
+                initial.AngularMomentum + derivative.Torque * deltaTime);
 
             var accelerationState = calculateAcceleration(ref integratorState, ref state);
             mass += accelerationState.DeltaMass;
@@ -264,8 +267,8 @@ namespace SpaceSimulator.PhysicsTest
             state.Time += deltaTime;
             state.Position += velocity * deltaTime;
             state.Velocity += acceleration * deltaTime;
-            state.Orientation += spin * deltaTime;
-            state.AngularVelocity = (state.AngularVelocity * state.MomentOfInertia + torque * deltaTime) / state.MomentOfInertia;
+            state.Orientation = (state.Orientation + spin * deltaTime).Normalized();
+            state.AngularMomentum = state.AngularMomentum + torque * deltaTime;
             return state;
         }
     }

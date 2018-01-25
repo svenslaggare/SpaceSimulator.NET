@@ -88,8 +88,21 @@ namespace SpaceSimulator.PhysicsTest
 
                 if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Space))
                 {
-                    //acceleration += 50.0 * Vector3d.Up;
-                    torque = Vector3d.Right - state.AngularVelocity * 0.1f;
+                    acceleration += 10.0 * Vector3d.Up;
+                    var applyPoint = state.Position + new Vector3d(0.1, 0.5, 0.0);
+
+                    //var applyPoint = state.Position + new Vector3d(0, 1.0, 0.5);
+                    //acceleration = (applyPoint - state.Position).Normalized() * 10;
+
+                    var relativeApplyPoint = applyPoint - state.Position;
+                    torque = Vector3d.Cross(acceleration * this.mass, relativeApplyPoint);
+
+                    //Console.WriteLine(acceleration);
+                    //Console.WriteLine(relativeApplyPoint);
+                    //Console.WriteLine(torque);
+                    //Console.WriteLine("");
+
+                    //torque = new Vector3d(0.5, 1, 0.37);
                 }
 
                 return new AccelerationState(acceleration, torque, 0.0);
