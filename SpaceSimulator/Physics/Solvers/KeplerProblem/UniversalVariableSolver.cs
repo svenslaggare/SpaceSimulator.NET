@@ -168,14 +168,26 @@ namespace SpaceSimulator.Physics.Solvers
             var fp = (sqrtMu / (r0Length * rLength)) * x * (z * Sz - 1);
             var v = fp * r0 + gp * v0;
 
-            var rotation = SolverHelpers.CalculateRotation(physicsObject.RotationalPeriod, initialState.Rotation, time);
+            var orientation = Quaterniond.Identity;
+            if (physicsObject.RotationalPeriod != 0.0)
+            {
+                orientation = SolverHelpers.RotateNaturalSatelliteAroundAxis(
+                    physicsObject.AxisOfRotation,
+                    physicsObject.RotationalPeriod,
+                    initialState.Orientation,
+                    time);
+            }
+            else
+            {
+                orientation = physicsObject.State.Orientation;
+            }
 
             //The acceleration is merely used for display
             return new ObjectState(
                 initialState.Time + time,
                 primaryBodyStateAtTime.Position + r,
                 primaryBodyStateAtTime.Velocity + v,
-                rotation);
+                orientation);
         }
     }
 }

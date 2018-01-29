@@ -849,9 +849,10 @@ namespace SpaceSimulator.Simulator
                     var nextState = currentObject.NextState;
                     nextState.Time += deltaTime;
 
-                    currentObject.SetNextState(nextState.WithRotation(SolverHelpers.CalculateRotation(
+                    currentObject.SetNextState(nextState.WithOrientation(SolverHelpers.RotateNaturalSatelliteAroundAxis(
+                        currentObject.AxisOfRotation,
                         currentObject.RotationalPeriod,
-                        currentObject.NextState.Rotation,
+                        currentObject.NextState.Orientation,
                         deltaTime)));
                 }
             }

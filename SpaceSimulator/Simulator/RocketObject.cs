@@ -24,9 +24,9 @@ namespace SpaceSimulator.Simulator
         private bool updateOrbit = false;
 
         /// <summary>
-        /// Returns the orientation
+        /// Returns the forward direction of the rocket
         /// </summary>
-        public Vector3d Orientation { get; private set; }
+        public Vector3d RocketForward { get; private set; }
 
         private readonly IList<PhysicsObject> toStage = new List<PhysicsObject>();
 
@@ -307,12 +307,17 @@ namespace SpaceSimulator.Simulator
             {
                 var state = this.state;
                 state.MakeRelative(this.PrimaryBody.State);
-                this.Orientation = state.Prograde;
+                this.RocketForward = state.Prograde;
             }
             //else
             //{
-            //    this.Orientation = OrbitHelpers.SphereNormal(this.PrimaryBody, this.Latitude, this.Longitude);
+            //    this.RocketOrientation = OrbitHelpers.SphereNormal(this.PrimaryBody, this.Latitude, this.Longitude);
             //}
+        }
+
+        public void SetState(ObjectState state)
+        {
+            this.state = state;
         }
     }
 }

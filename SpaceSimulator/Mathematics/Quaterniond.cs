@@ -762,9 +762,9 @@ namespace SpaceSimulator.Mathematics
             Vector3d normalized;
             Vector3d.Normalize(ref axis, out normalized);
 
-            double half = angle * 0.5f;
-            double sin = (double)Math.Sin(half);
-            double cos = (double)Math.Cos(half);
+            double half = angle * 0.5;
+            double sin = Math.Sin(half);
+            double cos = Math.Cos(half);
 
             result.X = normalized.X * sin;
             result.Y = normalized.Y * sin;
@@ -798,9 +798,9 @@ namespace SpaceSimulator.Mathematics
 
             if (scale > 0.0)
             {
-                sqrt = (double)Math.Sqrt(scale + 1.0);
-                result.W = sqrt * 0.5f;
-                sqrt = 0.5f / sqrt;
+                sqrt = Math.Sqrt(scale + 1.0);
+                result.W = sqrt * 0.5;
+                sqrt = 0.5 / sqrt;
 
                 result.X = (matrix.M23 - matrix.M32) * sqrt;
                 result.Y = (matrix.M31 - matrix.M13) * sqrt;
@@ -808,10 +808,10 @@ namespace SpaceSimulator.Mathematics
             }
             else if ((matrix.M11 >= matrix.M22) && (matrix.M11 >= matrix.M33))
             {
-                sqrt = (double)Math.Sqrt(1.0 + matrix.M11 - matrix.M22 - matrix.M33);
-                half = 0.5f / sqrt;
+                sqrt = Math.Sqrt(1.0 + matrix.M11 - matrix.M22 - matrix.M33);
+                half = 0.5 / sqrt;
 
-                result.X = 0.5f * sqrt;
+                result.X = 0.5 * sqrt;
                 result.Y = (matrix.M12 + matrix.M21) * half;
                 result.Z = (matrix.M13 + matrix.M31) * half;
                 result.W = (matrix.M23 - matrix.M32) * half;
@@ -819,21 +819,21 @@ namespace SpaceSimulator.Mathematics
             else if (matrix.M22 > matrix.M33)
             {
                 sqrt = (double)Math.Sqrt(1.0 + matrix.M22 - matrix.M11 - matrix.M33);
-                half = 0.5f / sqrt;
+                half = 0.5 / sqrt;
 
                 result.X = (matrix.M21 + matrix.M12) * half;
-                result.Y = 0.5f * sqrt;
+                result.Y = 0.5 * sqrt;
                 result.Z = (matrix.M32 + matrix.M23) * half;
                 result.W = (matrix.M31 - matrix.M13) * half;
             }
             else
             {
                 sqrt = (double)Math.Sqrt(1.0 + matrix.M33 - matrix.M11 - matrix.M22);
-                half = 0.5f / sqrt;
+                half = 0.5 / sqrt;
 
                 result.X = (matrix.M31 + matrix.M13) * half;
                 result.Y = (matrix.M32 + matrix.M23) * half;
-                result.Z = 0.5f * sqrt;
+                result.Z = 0.5 * sqrt;
                 result.W = (matrix.M12 - matrix.M21) * half;
             }
         }
@@ -851,9 +851,9 @@ namespace SpaceSimulator.Mathematics
 
             if (scale > 0.0)
             {
-                sqrt = (double)Math.Sqrt(scale + 1.0);
-                result.W = sqrt * 0.5f;
-                sqrt = 0.5f / sqrt;
+                sqrt = Math.Sqrt(scale + 1.0);
+                result.W = sqrt * 0.5;
+                sqrt = 0.5 / sqrt;
 
                 result.X = (matrix.M23 - matrix.M32) * sqrt;
                 result.Y = (matrix.M31 - matrix.M13) * sqrt;
@@ -861,10 +861,10 @@ namespace SpaceSimulator.Mathematics
             }
             else if ((matrix.M11 >= matrix.M22) && (matrix.M11 >= matrix.M33))
             {
-                sqrt = (double)Math.Sqrt(1.0 + matrix.M11 - matrix.M22 - matrix.M33);
-                half = 0.5f / sqrt;
+                sqrt = Math.Sqrt(1.0 + matrix.M11 - matrix.M22 - matrix.M33);
+                half = 0.5 / sqrt;
 
-                result.X = 0.5f * sqrt;
+                result.X = 0.5 * sqrt;
                 result.Y = (matrix.M12 + matrix.M21) * half;
                 result.Z = (matrix.M13 + matrix.M31) * half;
                 result.W = (matrix.M23 - matrix.M32) * half;
@@ -872,21 +872,21 @@ namespace SpaceSimulator.Mathematics
             else if (matrix.M22 > matrix.M33)
             {
                 sqrt = (double)Math.Sqrt(1.0 + matrix.M22 - matrix.M11 - matrix.M33);
-                half = 0.5f / sqrt;
+                half = 0.5 / sqrt;
 
                 result.X = (matrix.M21 + matrix.M12) * half;
-                result.Y = 0.5f * sqrt;
+                result.Y = 0.5 * sqrt;
                 result.Z = (matrix.M32 + matrix.M23) * half;
                 result.W = (matrix.M31 - matrix.M13) * half;
             }
             else
             {
                 sqrt = (double)Math.Sqrt(1.0 + matrix.M33 - matrix.M11 - matrix.M22);
-                half = 0.5f / sqrt;
+                half = 0.5 / sqrt;
 
                 result.X = (matrix.M31 + matrix.M13) * half;
                 result.Y = (matrix.M32 + matrix.M23) * half;
-                result.Z = 0.5f * sqrt;
+                result.Z = 0.5 * sqrt;
                 result.W = (matrix.M12 - matrix.M21) * half;
             }
         }
@@ -1078,9 +1078,9 @@ namespace SpaceSimulator.Mathematics
         /// <param name="result">When the method completes, contains the newly created quaternion.</param>
         public static void RotationYawPitchRoll(double yaw, double pitch, double roll, out Quaterniond result)
         {
-            double halfRoll = roll * 0.5f;
-            double halfPitch = pitch * 0.5f;
-            double halfYaw = yaw * 0.5f;
+            double halfRoll = roll * 0.5;
+            double halfPitch = pitch * 0.5;
+            double halfYaw = yaw * 0.5;
 
             double sinRoll = (double)Math.Sin(halfRoll);
             double cosRoll = (double)Math.Cos(halfRoll);
@@ -1209,8 +1209,8 @@ namespace SpaceSimulator.Mathematics
             Exponential(ref q2, out q2Exp);
 
             Quaterniond[] results = new Quaterniond[3];
-            results[0] = q1 * Exponential(-0.25f * (Logarithm(q1Exp * q2) + Logarithm(q1Exp * q0)));
-            results[1] = q2 * Exponential(-0.25f * (Logarithm(q2Exp * q3) + Logarithm(q2Exp * q1)));
+            results[0] = q1 * Exponential(-0.25 * (Logarithm(q1Exp * q2) + Logarithm(q1Exp * q0)));
+            results[1] = q2 * Exponential(-0.25 * (Logarithm(q2Exp * q3) + Logarithm(q2Exp * q1)));
             results[2] = q2;
 
             return results;

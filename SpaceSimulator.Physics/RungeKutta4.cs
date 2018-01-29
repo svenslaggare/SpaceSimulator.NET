@@ -207,7 +207,7 @@ namespace SpaceSimulator.PhysicsTest
         }
 
         /// <summary>
-        /// Calculates the spin
+        /// Calculates the spin (time derivative of the orientation)
         /// </summary>
         /// <param name="orientation">The orientation</param>
         /// <param name="angularVelocity">The angular velocity</param>
@@ -275,7 +275,7 @@ namespace SpaceSimulator.PhysicsTest
             state.Position += velocity * deltaTime;
             state.Velocity += acceleration * deltaTime;
             state.Orientation = (state.Orientation + spin * deltaTime).Normalized();
-            state.AngularMomentum = state.AngularMomentum + torque * deltaTime;
+            state.AngularMomentum += torque * deltaTime;
             return state;
         }
     }

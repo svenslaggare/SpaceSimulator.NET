@@ -13,20 +13,21 @@ namespace SpaceSimulator.Physics.Solvers
     public static class SolverHelpers
     {
         /// <summary>
-        /// Calculates the rotation of an object
+        /// Rotates a natural satellite around its axis-of-oration
         /// </summary>
+        /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="rotationalPeriod">The rotational period</param>
-        /// <param name="rotation">The current rotation</param>
+        /// <param name="orientation">The current orientation</param>
         /// <param name="time">The amount of time to rotate for</param>
-        public static double CalculateRotation(double rotationalPeriod, double rotation, double time)
+        public static Quaterniond RotateNaturalSatelliteAroundAxis(Vector3d axisOfRotation, double rotationalPeriod, Quaterniond orientation, double time)
         {
             if (rotationalPeriod == 0)
             {
-                return rotation;
+                return orientation;
             }
 
             var rotationalSpeed = (2.0 * Math.PI) / rotationalPeriod;
-            return MathHelpers.ClampAngle(rotation + rotationalSpeed * time);
+            return (orientation * Quaterniond.RotationAxis(axisOfRotation, rotationalSpeed * time)).Normalized();
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace SpaceSimulator.Physics.Solvers
                 nextPrimaryBodyState.Time + time,
                 nextPrimaryBodyState.Position + nextPosition,
                 nextPrimaryBodyState.Velocity + velocity,
-                rotation: state.Rotation,
+                orientation: state.Orientation,
                 impacted: state.HasImpacted);
         }
 

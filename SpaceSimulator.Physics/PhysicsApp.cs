@@ -12,34 +12,46 @@ using SpaceSimulator.Common;
 using SpaceSimulator.Common.Effects;
 using SpaceSimulator.Common.Models;
 using SpaceSimulator.Common.Rendering2D;
+using SpaceSimulator.Helpers;
 using SpaceSimulator.Mathematics;
+using SpaceSimulator.Physics.Atmosphere;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace SpaceSimulator.PhysicsTest
 {
     public class PhysicsApp : D3DApp
     {
-        private BasicVertex[] vertices;
-        private Buffer vertexBuffer;
-        private VertexBufferBinding vertexBufferBinding;
-
-        private int[] indices;
-        private Buffer indexBuffer;
+        private GeometryObject groundPlane;
+        private GeometryObject boxObject;
+        private GeometryObject forceOrigin;
+        private GeometryObject forceTarget;
 
         private BasicEffect effect;
 
         private RenderingSolidColorBrush colorBrush;
+        private RasterizerStates rasterizerStates;
 
         private RungeKutta4Integrator integrator = new RungeKutta4Integrator();
         private double totalTime = 0.0;
         private readonly double deltaTime = 1.0 / 60.0;
 
-        private ObjectState state = new ObjectState(0.0, 10.0, CalculateMomentOfIntertia(10.0, 1.0), Vector3d.Zero, Vector3d.Zero);
+        private readonly double side = 1.0;
+        private ObjectState state;
+
+        private Vector3d forceOriginPosition = new Vector3d(0, 0, -2);
+        private Vector3d forceTargetPosition = new Vector3d(0.5, 0.5, -0.5);
+
+        //private Vector3d forceOriginPosition = new Vector3d(-0.5, 0, -2);
+        //private Vector3d forceTargetPosition = new Vector3d(-0.5, 0.0, -0.5);
+
+        //private Vector3d forceOriginPosition = new Vector3d(0, -2.5, 0);
+        //private Vector3d forceTargetPosition = new Vector3d(0.1, -0.5, 0.0);
 
         public PhysicsApp()
             : base("Physics", new FPSCamera())
         {
-
+            var mass = 10.0;
+            this.state = new ObjectState(0.0, mass, CalculateMomentOfIntertia(mass, side), Vector3d.Zero, Vector3d.Zero);
         }
 
         private static double CalculateMomentOfIntertia(double mass, double side)
@@ -49,30 +61,16 @@ namespace SpaceSimulator.PhysicsTest
 
         public override void LoadContent()
         {
-            GeometryGenerator.CreateBox(1, 1, 1, out var geometryVertices, out this.indices);
-            this.vertices = geometryVertices.Select(vertex => new BasicVertex()
-            {
-                Position = vertex.Position,
-                Normal = vertex.Normal,
-                TextureCoordinates = vertex.TextureCoordinates
-            }).ToArray();
-
-            this.vertexBuffer = Buffer.Create(
-                this.GraphicsDevice,
-                BindFlags.VertexBuffer,
-                this.vertices);
-
-            this.vertexBufferBinding = new VertexBufferBinding(this.vertexBuffer, Utilities.SizeOf<BasicVertex>(), 0);
-
-            this.indexBuffer = Buffer.Create(
-                this.GraphicsDevice,
-                BindFlags.IndexBuffer,
-                this.indices);
+            this.groundPlane = GeometryObject.Plane(this.GraphicsDevice, 1.0f, 1.0f);
+            this.boxObject = GeometryObject.Box(this.GraphicsDevice, 1, 1, 1);
+            this.forceOrigin = GeometryObject.Sphere(this.GraphicsDevice, 1);
+            this.forceTarget = GeometryObject.Sphere(this.GraphicsDevice, 1);
 
             this.effect = new BasicEffect(this.GraphicsDevice, "Content/Effects/Basic.fx", "Light0", BasicVertex.CreateInput());
 
             this.colorBrush = this.RenderingManager2D.CreateSolidColorBrush(Color.Yellow);
 
+            this.rasterizerStates = new RasterizerStates(this.GraphicsDevice);
             base.LoadContent();
         }
 
@@ -90,24 +88,22 @@ namespace SpaceSimulator.PhysicsTest
                     acceleration += 9.81 * Vector3d.Down;
                 }
 
+                var dragForce = AtmosphericFormulas.Drag(state.Velocity, 1.225, this.side * this.side, 1.0);
+
                 if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Space))
                 {
-                    acceleration += 10.0 * Vector3d.Up;
-                    var applyPoint = state.Position + new Vector3d(0.1, 0.5, 0.0);
+                    //acceleration += 10.0 * Vector3d.Up;
+                    //var applyPoint = state.Position + new Vector3d(0.1, 0.5, 0.0);
 
-                    //var applyPoint = state.Position + new Vector3d(0, 1.0, 0.5);
-                    //acceleration = (applyPoint - state.Position).Normalized() * 10;
+                    var applyPoint = this.forceTargetPosition;
+                    acceleration = (this.forceTargetPosition - this.forceOriginPosition).Normalized() * 10;
 
                     var relativeApplyPoint = applyPoint - state.Position;
-                    torque = Vector3d.Cross(acceleration * state.Mass, relativeApplyPoint);
-
-                    //Console.WriteLine(acceleration);
-                    //Console.WriteLine(relativeApplyPoint);
-                    //Console.WriteLine(torque);
-                    //Console.WriteLine("");
-
-                    //torque = new Vector3d(0.5, 1, 0.37);
+                    torque = -Vector3d.Cross(acceleration * state.Mass, relativeApplyPoint);
                 }
+
+                acceleration += dragForce / state.Mass;
+                torque += AtmosphericFormulas.AngularDrag(state.AngularVelocity, 1.225, this.side * this.side, 1.0);
 
                 return new AccelerationState(acceleration, torque, 0.0);
             });
@@ -139,46 +135,49 @@ namespace SpaceSimulator.PhysicsTest
             //Clear views
             this.DeviceContext.ClearDepthStencilView(this.BackBufferDepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             this.DeviceContext.ClearRenderTargetView(this.BackBufferRenderView, Color.CornflowerBlue);
+            this.DeviceContext.Rasterizer.State = this.rasterizerStates.NoCull;
 
             //Draw
-            var camera = this.ActiveCamera;
-            var color = Color.Gray;
             var world =
                 Matrix.RotationQuaternion(MathHelpers.ToFloat(this.state.Orientation)) 
                 * Matrix.Translation(MathHelpers.ToFloat(this.state.Position));
 
-            //Set input assembler
-            this.DeviceContext.InputAssembler.InputLayout = effect.InputLayout;
-            this.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            this.DeviceContext.InputAssembler.SetVertexBuffers(0, this.vertexBufferBinding);
-            this.DeviceContext.InputAssembler.SetIndexBuffer(this.indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+            //this.groundPlane.Draw(
+            //    this.DeviceContext,
+            //    this.effect,
+            //    this.ActiveCamera,
+            //    Matrix.Scaling(100.0f),
+            //    Color.Green);
 
-            effect.SetMaterial(new Material()
-            {
-                Ambient = color.ToVector4() * 0.25f,
-                Diffuse = color.ToVector4(),
-                Specular = new Vector4(0.6f, 0.6f, 0.6f, 16.0f)
-            });
+            this.boxObject.Draw(
+                this.DeviceContext,
+                this.effect,
+                this.ActiveCamera,
+                world,
+                Color.Gray);
 
-            effect.SetEyePosition(camera.Position);
-            effect.SetTransform(camera.ViewProjection, world);
-            //effect.SetPointLightSource(Vector3.Zero);
+            this.forceOrigin.Draw(
+                this.DeviceContext,
+                this.effect,
+                this.ActiveCamera,
+                Matrix.Scaling(0.01f) * Matrix.Translation(MathHelpers.ToFloat(this.forceOriginPosition)),
+                Color.Yellow);
 
-            //Draw
-            foreach (var pass in effect.Passes)
-            {
-                pass.Apply(this.DeviceContext);
-                this.DeviceContext.DrawIndexed(this.indices.Length, 0, 0);
-            }
+            this.forceTarget.Draw(
+                this.DeviceContext,
+                this.effect,
+                this.ActiveCamera,
+                Matrix.Scaling(0.01f) * Matrix.Translation(MathHelpers.ToFloat(this.forceTargetPosition)),
+                Color.Red);
 
             this.DeviceContext2D.BeginDraw();
 
             this.colorBrush.DrawText(
                 this.DeviceContext2D,
-                $"Position: {this.state.Position}, " +
-                $"Velocity: {this.state.Velocity}, " +
-                $"Orientation: {Math.Round(MathUtild.Rad2Deg * this.state.Orientation.Angle, 2)} @ {this.state.Orientation.Axis}, " +
-                $"Angular velocity: {Math.Round(MathUtild.Rad2Deg * this.state.AngularVelocity.Length(), 2)} @ {this.state.AngularVelocity.Normalized()}",
+                $"Position: {DataFormatter.Format(this.state.Position)}, " +
+                $"Velocity: {DataFormatter.Format(this.state.Velocity)}, " +
+                $"Orientation: {Math.Round(MathUtild.Rad2Deg * this.state.Orientation.Angle, 2)} @ {DataFormatter.Format(this.state.Orientation.Axis)}, " +
+                $"Angular velocity: {Math.Round(MathUtild.Rad2Deg * this.state.AngularVelocity.Length(), 2)} @ {DataFormatter.Format(this.state.AngularVelocity.Normalized())}",
                 this.RenderingManager2D.DefaultTextFormat,
                 this.RenderingManager2D.TextPosition(new Vector2(10, 10)));
 

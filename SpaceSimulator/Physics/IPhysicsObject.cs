@@ -78,7 +78,7 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetRotationalTransform(this IPhysicsObject physicsObject)
         {
-            return Matrix3x3d.RotationAxis(physicsObject.AxisOfRotation, physicsObject.State.Rotation);
+            return Matrix3x3d.RotationQuaternion(physicsObject.State.Orientation);
         }
 
         /// <summary>
@@ -87,7 +87,9 @@ namespace SpaceSimulator.Physics
         /// <param name="physicsObject">The physics object</param>
         public static Matrix3x3d GetInverseRotationalTransform(this IPhysicsObject physicsObject)
         {
-             return Matrix3x3d.RotationAxis(physicsObject.AxisOfRotation, -physicsObject.State.Rotation);
+            var orientation = physicsObject.State.Orientation;
+            orientation.Invert();
+            return Matrix3x3d.RotationQuaternion(orientation);
         }
 
         /// <summary>

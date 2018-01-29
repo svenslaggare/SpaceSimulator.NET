@@ -192,6 +192,7 @@
     <Compile Include="Simulator\Rocket\LandingProgram.cs" />
     <Compile Include="Simulator\Rocket\PIDController.cs" />
     <Compile Include="Simulator\Rocket\Rockets.cs" />
+    <Compile Include="Simulator\Rocket\ManualControlProgram.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />
     <Compile Include="Simulator\SimulatorEngine.cs" />
     <Compile Include="Simulator\Data\SolarSystemBodies.cs" />

@@ -476,5 +476,15 @@ namespace SpaceSimulator.Mathematics
         {
             x = Mod(x + 1, n);
         }
+
+        /// <summary>
+        /// Inverts the angle of the given quaternion
+        /// </summary>
+        /// <returns></returns>
+        /// <param name="quaternion">The </param>
+        public static Quaterniond InvertAngle(Quaterniond quaternion)
+        {
+            return Quaterniond.RotationAxis(quaternion.Axis, -quaternion.Angle);
+        }
     }
 }

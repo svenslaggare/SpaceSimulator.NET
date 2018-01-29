@@ -159,14 +159,18 @@ namespace SpaceSimulator.Rendering.Plot
             //}
 
             var deltaTime = 100.0;
-            var startPrimaryRotation = primaryBody.Rotation;
+            var startPrimaryOrientation = primaryBody.Orientation;
 
             var pastValues = new List<Vector2>();
 
-            //for (double t = 0.0; t <= orbit.Period * numOrbits; t += deltaTime)
             for (double t = -orbit.Period; t <= orbit.Period * numOrbits; t += deltaTime)
             {
-                var primaryRotation = MathHelpers.ClampAngle(startPrimaryRotation + primaryBody.RotationalSpeed() * t);
+                var primaryOrientation = SolverHelpers.RotateNaturalSatelliteAroundAxis(
+                    primaryBody.AxisOfRotation,
+                    primaryBody.RotationalPeriod,
+                    Quaterniond.Identity, 
+                    t);
+
                 var nextState = this.keplerProblemSolver.Solve(
                     this.physicsObject,
                     primaryBody.State,
@@ -174,7 +178,7 @@ namespace SpaceSimulator.Rendering.Plot
                     orbit,
                     t);
 
-                Physics.OrbitHelpers.GetCoordinates(primaryBody, primaryRotation, nextState.Position, out var latitude, out var longitude);
+                Physics.OrbitHelpers.GetCoordinates(primaryBody, primaryOrientation, nextState.Position, out var latitude, out var longitude);
                 var projectedPosition = new Vector2((float)longitude, (float)latitude);
 
                 if (t < 0)

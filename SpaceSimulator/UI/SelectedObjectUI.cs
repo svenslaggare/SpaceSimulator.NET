@@ -30,7 +30,7 @@ namespace SpaceSimulator.UI
         private readonly Arrow arrow;
 
         private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
-        private readonly bool showGroundTracks = true;
+        private readonly bool showGroundTracks = false;
 
         private OrbitCalculators.ApproachData closestApproachData;
         private DateTime lastClosestApproachUpdate;

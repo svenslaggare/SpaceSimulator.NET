@@ -55,7 +55,8 @@ namespace SpaceSimulator.Physics.Solvers
             var state = new ObjectState(
                 initial.Time + deltaTime,
                 initial.Position + derivative.Velocity * deltaTime,
-                initial.Velocity + derivative.Acceleration * deltaTime);
+                initial.Velocity + derivative.Acceleration * deltaTime,
+                initial.Orientation);
 
             var accelerationState = calculateAcceleration(ref integratorState, ref state);
             mass += accelerationState.DeltaMass;
@@ -105,7 +106,7 @@ namespace SpaceSimulator.Physics.Solvers
             state.Time += deltaTime;
             state.Position += velocity * deltaTime;
             state.Velocity += acceleration * deltaTime;
-            state.Rotation = SolverHelpers.CalculateRotation(physicsObject.RotationalPeriod, state.Rotation, deltaTime);
+            state.Orientation = SolverHelpers.RotateNaturalSatelliteAroundAxis(physicsObject.AxisOfRotation, physicsObject.RotationalPeriod, state.Orientation, deltaTime);
             return state;
         }
     }

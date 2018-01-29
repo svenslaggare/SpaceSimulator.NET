@@ -262,12 +262,14 @@ namespace SpaceSimulator.Physics.Maneuvers
                 var solution1State = new ObjectState(
                     objectLaunchState.Time,
                     objectLaunchState.Position,
-                    solution1.Velocity1);
+                    solution1.Velocity1,
+                    objectLaunchState.Orientation);
 
                 var solution2State = new ObjectState(
                     objectLaunchState.Time,
                     objectLaunchState.Position,
-                    solution2.Velocity1);
+                    solution2.Velocity1,
+                    objectLaunchState.Orientation);
 
                 if (deltaV1.Length() < deltaV2.Length() && this.IsValidLaunch(ref solution1State, ref primaryBodyStateAtLaunch))
                 {

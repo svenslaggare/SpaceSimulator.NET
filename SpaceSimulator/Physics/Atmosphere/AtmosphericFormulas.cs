@@ -13,7 +13,7 @@ namespace SpaceSimulator.Physics.Atmosphere
     public static class AtmosphericFormulas
     {
         /// <summary>
-        /// Calculates the drag force using the drag equation
+        /// Calculates the (linear) drag force using the drag equation
         /// </summary>
         /// <param name="velocity">The velcoity (in m/s)</param>
         /// <param name="densityOfAir">The density of the air (kg/m^3)</param>
@@ -23,6 +23,19 @@ namespace SpaceSimulator.Physics.Atmosphere
         public static Vector3d Drag(Vector3d velocity, double densityOfAir, double referenceArea, double dragCoefficient)
         {
             return -0.5 * densityOfAir * velocity * velocity.Length() * dragCoefficient * referenceArea;
+        }
+
+        /// <summary>
+        /// Computes the angular drag (torque)
+        /// </summary>
+        /// <param name="angularVelocity">The angular velocity (in radians/second)</param>
+        /// <param name="densityOfAir">The density of the air (kg/m^3)</param>
+        /// <param name="referenceArea">The reference area (m)</param>
+        /// <param name="dragCoefficient">The drag coefficent</param>
+        /// <returns>The torque</returns>
+        public static Vector3d AngularDrag(Vector3d angularVelocity, double densityOfAir, double referenceArea, double dragCoefficient)
+        {
+            return -0.5 * densityOfAir * angularVelocity * angularVelocity.Length() * dragCoefficient * referenceArea;
         }
 
         /// <summary>

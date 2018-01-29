@@ -204,11 +204,11 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
-        /// The rotation of the object
+        /// The orientation of the object
         /// </summary>
-        public double Rotation
+        public Quaterniond Orientation
         {
-            get { return this.state.Rotation; }
+            get { return this.state.Orientation; }
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public Matrix3x3d RotationalTransform
         {
-            get { return Matrix3x3d.RotationAxis(this.AxisOfRotation, this.Rotation); }
+            get { return Matrix3x3d.RotationQuaternion(this.Orientation); }
         }
 
         /// <summary>
@@ -248,7 +248,12 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         public Matrix3x3d InverseRotationalTransform
         {
-            get { return Matrix3x3d.RotationAxis(this.AxisOfRotation, -this.Rotation); }
+            get
+            {
+                var orientation = this.Orientation;
+                orientation.Invert();
+                return Matrix3x3d.RotationQuaternion(orientation);
+            }
         }
 
         /// <summary>

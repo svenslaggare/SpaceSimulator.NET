@@ -56,12 +56,12 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            var environment = new Environments.SolarSystem(coplanar: false);
-            //var environment = new Environments.EarthSystem();
+            //var environment = new Environments.SolarSystem(coplanar: false);
+            var environment = new Environments.EarthSystem();
             //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
             this.simulatorContainer = environment.Create(this.GraphicsDevice);
-            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.KeplerProblemUniversalVariable;
+            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {

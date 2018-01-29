@@ -173,10 +173,13 @@ namespace SpaceSimulator.Rendering
             effect.SetPointLightSource(camera.ToDrawPosition(Vector3d.Zero));
             deviceContext.InputAssembler.InputLayout = effect.InputLayout;
 
+            var orientation = physicsObject.Orientation;
+            orientation.Invert();
+
             var world =
                 this.ScalingMatrix(camera, physicsObject)
                 * this.Transform
-                * Matrix.RotationY(-(float)physicsObject.Rotation)
+                * Matrix.RotationQuaternion(MathHelpers.ToFloat(orientation))
                 * Matrix.Translation(camera.ToDrawPosition(physicsObject.Position));
 
             foreach (var pass in effect.Passes)

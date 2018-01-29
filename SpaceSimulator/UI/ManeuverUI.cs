@@ -554,6 +554,15 @@ namespace SpaceSimulator.UI
             {
                 this.showDeltaVChart = false;
             }
+
+            if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Space))
+            {
+                if (this.SelectedObject is RocketObject rocketObject)
+                {
+                    rocketObject.SetState(rocketObject.State.WithOrientation(
+                        rocketObject.Orientation * Quaterniond.RotationAxis(Vector3d.Up, MathUtild.Deg2Rad * 10)));
+                }
+            }
         }
 
         /// <summary>

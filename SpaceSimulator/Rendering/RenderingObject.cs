@@ -290,7 +290,9 @@ namespace SpaceSimulator.Rendering
             var transform = Matrix.Identity;
             if (this.PhysicsObject.HasImpacted)
             {
-                transform *= Matrix.RotationY(-(float)primaryBody.Rotation);
+                var orientation = primaryBody.Orientation;
+                orientation.Invert();
+                transform *= Matrix.RotationQuaternion(MathHelpers.ToFloat(orientation));
             }
 
             transform *= Matrix.Translation(camera.ToDrawPosition(primaryBody.Position, relativeToFocus: relativeToFocus));
@@ -327,6 +329,9 @@ namespace SpaceSimulator.Rendering
         {
             if (this.Model is Sphere sphere)
             {
+                var orientation = this.PhysicsObject.Orientation;
+                orientation.Invert();
+
                 sphere.Draw(
                     deviceContext,
                     planetEffect,
@@ -334,7 +339,7 @@ namespace SpaceSimulator.Rendering
                     camera,
                     sphere.ScalingMatrix(camera, this.PhysicsObject)
                     * sphere.Transform
-                    * Matrix.RotationY(-(float)this.PhysicsObject.Rotation)
+                    * Matrix.RotationQuaternion(MathHelpers.ToFloat(orientation))
                     * Matrix.Translation(position ?? this.DrawPosition(camera)));
             }
         }

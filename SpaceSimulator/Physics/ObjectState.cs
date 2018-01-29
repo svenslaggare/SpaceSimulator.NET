@@ -28,9 +28,9 @@ namespace SpaceSimulator.Physics
         public Vector3d Velocity { get; set; }
 
         /// <summary>
-        /// The rotation
+        /// The orientation
         /// </summary>
-        public double Rotation { get; set; }
+        public Quaterniond Orientation { get; set; }
 
         /// <summary>
         /// Indicates if the object has impacted the primary body
@@ -43,14 +43,14 @@ namespace SpaceSimulator.Physics
         /// <param name="time">The time</param>
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
-        /// <param name="rotation">The rotation</param>
+        /// <param name="orientation">The orientation</param>
         /// <param name="impacted">Indicates if the object has impacted the primary body</param>
-        public ObjectState(double time, Vector3d position, Vector3d velocity, double rotation = 0.0, bool impacted = false)
+        public ObjectState(double time, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, bool impacted = false)
         {
             this.Time = time;
             this.Position = position;
             this.Velocity = velocity;
-            this.Rotation = rotation;
+            this.Orientation = orientation ?? Quaterniond.Identity;
             this.HasImpacted = impacted;
         }
 
@@ -86,18 +86,18 @@ namespace SpaceSimulator.Physics
                 this.Time,
                 this.Position + position,
                 this.Velocity + velocity,
-                this.Rotation,
+                this.Orientation,
                 this.HasImpacted);
         }
 
         /// <summary>
-        /// Returns a new state with the given rotation
+        /// Returns a new state with the given orientation
         /// </summary>
-        /// <param name="rotation">The rotation</param>
-        public ObjectState WithRotation(double rotation)
+        /// <param name="orientation">The orientation</param>
+        public ObjectState WithOrientation(Quaterniond orientation)
         {
             var copy = this;
-            copy.Rotation = rotation;
+            copy.Orientation = orientation;
             return copy;
         }
 

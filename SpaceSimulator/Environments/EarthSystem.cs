@@ -35,7 +35,9 @@ namespace SpaceSimulator.Environments
                 Simulator.Data.SolarSystemBodies.Earth.AxisOfRotation,
                 new EarthAtmosphericModel(),
                 null,
-                new ObjectState(),
+                new ObjectState().WithOrientation(Quaterniond.RotationAxis(
+                    Simulator.Data.SolarSystemBodies.Earth.AxisOfRotation,
+                    0.0)),
                 new Physics.Orbit());
 
             var earthRenderingObject = new RenderingObject(
@@ -62,16 +64,17 @@ namespace SpaceSimulator.Environments
                 OrbitHelpers.FromCoordinates(earth, 28.524058 * MathUtild.Deg2Rad, -80.65085 * MathUtild.Deg2Rad),
                 //OrbitHelpers.FromCoordinates(earth, 0, -80.65085 * MathUtild.Deg2Rad),
                 Vector3d.Zero);
+
             renderingObjects.Add(new RenderingObject(
                 graphicsDevice, 
                 falcon9Object, 
                 Color.Yellow,
                 Rendering.Rocket.CreateFalcon9(graphicsDevice)));
 
-            //var falcon9TargetAltitude = 300E3;
-            var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
-                earth.StandardGravitationalParameter,
-                earth.RotationalPeriod) - earth.Radius;
+            var falcon9TargetAltitude = 300E3;
+            //var falcon9TargetAltitude = OrbitFormulas.SemiMajorAxisFromOrbitalPeriod(
+            //    earth.StandardGravitationalParameter,
+            //    earth.RotationalPeriod) - earth.Radius;
 
             var falcon9TargetOrbit = Physics.Orbit.New(earth, semiMajorAxis: earth.Radius + falcon9TargetAltitude, eccentricity: 0.0);
 
@@ -84,12 +87,13 @@ namespace SpaceSimulator.Environments
             var bestPitchStart = 1E3;
             var bestPitchEnd = 2E3;
 
-            falcon9Object.SetControlProgram(new AscentProgram(
-                falcon9Object,
-                falcon9TargetOrbit,
-                bestPitchStart,
-                bestPitchEnd,
-                simulatorEngine.TextOutputWriter));
+            //falcon9Object.SetControlProgram(new AscentProgram(
+            //    falcon9Object,
+            //    falcon9TargetOrbit,
+            //    bestPitchStart,
+            //    bestPitchEnd,
+            //    simulatorEngine.TextOutputWriter));
+            falcon9Object.SetControlProgram(new ManualControlProgram(falcon9Object, simulatorEngine.TextOutputWriter));
 
             falcon9Object.CheckImpacted(0);
             falcon9Object.StartProgram();

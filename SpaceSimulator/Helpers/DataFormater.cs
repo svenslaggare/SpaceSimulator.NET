@@ -318,11 +318,10 @@ namespace SpaceSimulator.Helpers
         /// Formats the given vector
         /// </summary>
         /// <param name="value">The value</param>
-        public static string Format(Vector3d value)
+        /// <param name="numDecimals">The number of decimals</param>
+        public static string Format(Vector3d value, int numDecimals = 2)
         {
-            value /= Constants.AstronomicalUnit;
-            var numDecimals = 5;
-            value.X = Math.Round(value.X, 5);
+            value.X = Math.Round(value.X, numDecimals);
             value.Y = Math.Round(value.Y, numDecimals);
             value.Z = Math.Round(value.Z, numDecimals);
             return $"X: {value.X}, Y: {value.Y}, Z: {value.Z}";
