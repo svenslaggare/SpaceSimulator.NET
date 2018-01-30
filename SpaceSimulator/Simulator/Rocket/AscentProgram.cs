@@ -14,18 +14,12 @@ namespace SpaceSimulator.Simulator.Rocket
     /// <summary>
     /// Represents a control program for ascent
     /// </summary>
-    public class AscentProgram : IRocketControlProgram
+    public class AscentProgram : BaseControlProgram
     {
-        private readonly RocketObject rocketObject;
         private readonly Orbit targetOrbit;
         private readonly ITextOutputWriter textOutputWriter;
 
         private State state;
-
-        /// <summary>
-        /// Returns the thrust direction
-        /// </summary>
-        public Vector3d ThrustDirection { get; private set; }
 
         private readonly double pitchManeuverStartAltitude;
         private readonly double pitchManeuverStopAltitude;
@@ -44,8 +38,8 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <param name="pitchStartAltitude">The altitude to stop the pitch maneuver</param>
         /// <param name="textOutputWriter">The text output writer</param>
         public AscentProgram(RocketObject rocketObject, Orbit targetOrbit, double pitchStartAltitude, double pitchEndAltitude, ITextOutputWriter textOutputWriter)
+            : base(rocketObject)
         {
-            this.rocketObject = rocketObject;
             this.targetOrbit = targetOrbit;
             this.state = State.InitialAscent;
             this.textOutputWriter = textOutputWriter;
@@ -83,7 +77,7 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <summary>
         /// Indicates if the program is completed
         /// </summary>
-        public bool IsCompleted
+        public override bool IsCompleted
         {
             get { return this.state == State.InOrbit || this.state == State.Failed; }
         }
@@ -92,9 +86,9 @@ namespace SpaceSimulator.Simulator.Rocket
         /// Starts the program
         /// </summary>
         /// <param name="totalTime">The current time</param>
-        public void Start(double totalTime)
+        public override void Start(double totalTime)
         {
-            this.ThrustDirection = this.VerticalThrustDirection();
+            this.absoluteThrustDirection = this.VerticalThrustDirection();
         }
 
         /// <summary>
@@ -106,11 +100,11 @@ namespace SpaceSimulator.Simulator.Rocket
             textOutputWriter.WriteLine(this.rocketObject.Name, message);
         }
 
-        public void Update(double totalTime, double timeStep)
+        public override void Update(double totalTime, double timeStep)
         {
             var prograde = (this.rocketObject.Velocity - this.rocketObject.PrimaryBody.Velocity).Normalized();
             var gravityAccelerationDir = (this.rocketObject.Position - this.rocketObject.PrimaryBody.Position).Normalized();
-            this.ThrustDirection = prograde;
+            this.absoluteThrustDirection = prograde;
 
             switch (this.state)
             {
@@ -135,7 +129,7 @@ namespace SpaceSimulator.Simulator.Rocket
                         var radial = Vector3d.Transform(prograde, Matrix3x3d.RotationY(MathUtild.Pi / 2));
                         var pitchAxis = Vector3d.Cross(radial, prograde);
                         var turnAngle = 4.0 * MathUtild.Deg2Rad;
-                        this.ThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(pitchAxis, turnAngle));
+                        this.absoluteThrustDirection = Vector3d.Transform(prograde, Matrix3x3d.RotationAxis(pitchAxis, turnAngle));
 
                         if (!this.pitchStarted)
                         {
@@ -153,11 +147,11 @@ namespace SpaceSimulator.Simulator.Rocket
 
                         if (altitude >= 0.9 * currentOrbitPosition.Orbit.RelativeApoapsis && currentOrbitPosition.TimeToApoapsis() <= 100.0)
                         {
-                            this.ThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
+                            this.absoluteThrustDirection = (prograde + 0.1 * gravityAccelerationDir).Normalized();
                         }
                         else
                         {
-                            this.ThrustDirection = prograde;
+                            this.absoluteThrustDirection = prograde;
                         }
 
                         //var minTime = 200.0;
@@ -220,6 +214,8 @@ namespace SpaceSimulator.Simulator.Rocket
                     }
                     break;
             }
+
+            this.SetFaceThrustDirection();
 
             //if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
             //{

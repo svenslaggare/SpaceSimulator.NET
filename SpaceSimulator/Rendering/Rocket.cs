@@ -164,14 +164,13 @@ namespace SpaceSimulator.Rendering
             var position = camera.ToDrawPosition(rocketObject.Position);
 
             var forward = MathHelpers.ToFloat(rocketObject.RocketForward);
-            if (rocketObject.IsIdle)
+            //if (rocketObject.IsIdle)
             {
-                Console.WriteLine(rocketObject.Orientation);
-                forward = MathHelpers.ToFloat(Vector3d.Transform(Vector3d.ForwardLH, rocketObject.Orientation));
+                forward = MathHelpers.ToFloat(Vector3d.Transform(Vector3d.ForwardRH, rocketObject.Orientation));
             }
 
             var facing = MathHelpers.FaceDirection(forward);
-            var world = Matrix.Scaling(scale) * facing * Matrix.Translation(position);
+            var world = facing * Matrix.Scaling(scale) * Matrix.Translation(position);
 
             return (position, forward, facing, world);
         }
@@ -260,10 +259,10 @@ namespace SpaceSimulator.Rendering
             foreach (var stage in this.stages.Skip(rocketObject.CurrentStage.Number))
             {
                 var stageWorld =
-                    Matrix.Translation(Vector3.BackwardLH * (offset + (offset != 0.0f ? stage.MainBodyHeight * 0.5f : 0.0f)))
-                    * Matrix.Scaling(scale)
-                    * facing
-                    * Matrix.Translation(position);
+                     Matrix.Translation(Vector3.BackwardLH * (offset + (offset != 0.0f ? stage.MainBodyHeight * 0.5f : 0.0f)))
+                     * facing
+                     * Matrix.Scaling(scale)
+                     * Matrix.Translation(position);
 
                 //if (i >= rocketObject.Stages.CurrentStage.Number)
                 {

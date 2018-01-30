@@ -11,9 +11,8 @@ namespace SpaceSimulator.Simulator.Rocket
     /// <summary>
     /// Represents a control program for landing a rocket
     /// </summary>
-    public sealed class LandingProgram : IRocketControlProgram
+    public sealed class LandingProgram : BaseControlProgram
     {
-        private readonly RocketObject rocketObject;
         private readonly ITextOutputWriter textOutputWriter;
 
         private State state;
@@ -27,27 +26,22 @@ namespace SpaceSimulator.Simulator.Rocket
         }
 
         /// <summary>
-        /// Returns the thrust direction
-        /// </summary>
-        public Vector3d ThrustDirection { get; private set; }
-
-        /// <summary>
         /// Creates a new landing program for the given rocket
         /// </summary>
         /// <param name="rocketObject">The rocket object</param>
         /// <param name="textOutputWriter">The text output writer</param>
         public LandingProgram(RocketObject rocketObject, ITextOutputWriter textOutputWriter)
+            : base(rocketObject)
         {
-            this.rocketObject = rocketObject;
             this.textOutputWriter = textOutputWriter;
         }
 
         /// <summary>
         /// Indicates if the program is completed
         /// </summary>
-        public bool IsCompleted => this.state == State.Landed;
+        public override bool IsCompleted => this.state == State.Landed;
 
-        public void Start(double totalTime)
+        public override void Start(double totalTime)
         {
             this.rocketObject.StartEngines();
             this.state = State.BoostbackBurn;
@@ -63,7 +57,7 @@ namespace SpaceSimulator.Simulator.Rocket
             this.textOutputWriter.WriteLine(this.rocketObject.Name, message);
         }
 
-        public void Update(double totalTime, double timeStep)
+        public override void Update(double totalTime, double timeStep)
         {
             var state = this.rocketObject.State;
             state.MakeRelative(this.rocketObject.PrimaryBody.State);
@@ -77,7 +71,7 @@ namespace SpaceSimulator.Simulator.Rocket
                 case State.BoostbackBurn:
                     if (Math.Abs(horizontalSpeed) >= 20.0)
                     {
-                        this.ThrustDirection = state.Retrograde;
+                        this.absoluteThrustDirection = state.Retrograde;
                         //(var launchLatitude, var launchLongitude) = this.rocketObject.LaunchCoordinates.Value;
                         //this.ThrustDirection = (
                         //    OrbitHelpers.FromCoordinates(this.rocketObject.PrimaryBody, launchLatitude, launchLongitude) 
@@ -99,7 +93,7 @@ namespace SpaceSimulator.Simulator.Rocket
                     }
                     break;
                 case State.LandingBurn:
-                    this.ThrustDirection = OrbitHelpers.SphereNormal(
+                    this.absoluteThrustDirection = OrbitHelpers.SphereNormal(
                         this.rocketObject.PrimaryBody,
                         this.rocketObject.Latitude, 
                         this.rocketObject.Longitude);
@@ -127,6 +121,8 @@ namespace SpaceSimulator.Simulator.Rocket
                 default:
                     break;
             }
+
+            this.SetFaceThrustDirection();
         }
     }
 }

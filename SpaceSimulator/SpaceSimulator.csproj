@@ -155,6 +155,7 @@
     <Compile Include="Physics\Rocket\RocketFormulas.cs" />
     <Compile Include="Physics\Rocket\RocketStage.cs" />
     <Compile Include="Rendering\Plot\Function2D.cs" />
+    <Compile Include="Simulator\BaseControlProgram.cs" />
     <Compile Include="Simulator\ITextOutputWriter.cs" />
     <Compile Include="Simulator\NaturalSatelliteObject.cs" />
     <Compile Include="Simulator\OrbitSimulators\ForceModel.cs" />
@@ -191,6 +192,7 @@
     <Compile Include="Simulator\RocketObject.cs" />
     <Compile Include="Simulator\Rocket\LandingProgram.cs" />
     <Compile Include="Simulator\Rocket\PIDController.cs" />
+    <Compile Include="Simulator\Rocket\RocketHelpers.cs" />
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\Rocket\ManualControlProgram.cs" />
     <Compile Include="Simulator\SatelliteObject.cs" />

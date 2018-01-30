@@ -10,9 +10,8 @@ namespace SpaceSimulator.Simulator.Rocket
     /// <summary>
     /// Represents a control program for executing a maneuver
     /// </summary>
-    public sealed class ExecuteManeuverProgram : IRocketControlProgram
+    public sealed class ExecuteManeuverProgram : BaseControlProgram
     {
-        private readonly RocketObject rocketObject;
         private readonly Vector3d deltaVelocity;
         private double appliedDeltaVelocity;
         private bool isDone;
@@ -20,18 +19,13 @@ namespace SpaceSimulator.Simulator.Rocket
         private readonly PIDController thrustThrottleController;
 
         /// <summary>
-        /// Returns the thrust direction
-        /// </summary>
-        public Vector3d ThrustDirection { get; private set; }
-
-        /// <summary>
         /// Creates a new maneuver program
         /// </summary>
         /// <param name="rocketObject">The rocket object</param>
         /// <param name="deltaVelocity">The maneuver</param>
         public ExecuteManeuverProgram(RocketObject rocketObject, Vector3d deltaVelocity)
+            : base(rocketObject)
         {
-            this.rocketObject = rocketObject;
             this.deltaVelocity = deltaVelocity;
             this.isDone = false;
             this.appliedDeltaVelocity = 0.0;
@@ -41,20 +35,20 @@ namespace SpaceSimulator.Simulator.Rocket
         /// <summary>
         /// Indicates if the program is completed
         /// </summary>
-        public bool IsCompleted => this.isDone;
+        public override bool IsCompleted => this.isDone;
 
-        public void Start(double totalTime)
+        public override void Start(double totalTime)
         {
             this.rocketObject.StartEngines();
             this.rocketObject.EngineThrottle = 0.2;
             Console.WriteLine("Engine start.");
         }
 
-        public void Update(double totalTime, double timeStep)
+        public override void Update(double totalTime, double timeStep)
         {
             if (!this.isDone)
             {
-                this.ThrustDirection = this.deltaVelocity.Normalized();
+                this.absoluteThrustDirection = this.deltaVelocity.Normalized();
                 this.appliedDeltaVelocity += this.rocketObject.EngineAcceleration().Length() * timeStep;
                 this.rocketObject.EngineThrottle = this.thrustThrottleController.ComputeCommand(
                     this.deltaVelocity.Length() - this.appliedDeltaVelocity, 
@@ -66,6 +60,7 @@ namespace SpaceSimulator.Simulator.Rocket
                     this.rocketObject.EngineThrottle = minThrottle;
                 }
 
+                this.SetFaceThrustDirection();
                 if (this.appliedDeltaVelocity >= this.deltaVelocity.Length())
                 {
                     this.isDone = true;

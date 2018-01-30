@@ -164,7 +164,8 @@ namespace SpaceSimulator.Simulator
         {
             if (this.engineRunning)
             {
-                var direction = this.controlProgram.ThrustDirection;
+                //var direction = this.controlProgram.ThrustDirection;
+                var direction = RocketHelpers.RelativeToAbsoluteThrustDirection(this, this.controlProgram.ThrustDirection);
                 return this.rocketStages.CurrentStage.TotalThrust * direction;
             }
             else

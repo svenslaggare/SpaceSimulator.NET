@@ -555,12 +555,55 @@ namespace SpaceSimulator.UI
                 this.showDeltaVChart = false;
             }
 
-            if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Space))
+            if (this.SelectedObject is RocketObject rocketObject)
             {
-                if (this.SelectedObject is RocketObject rocketObject)
+                var rotation = Quaterniond.Identity;
+
+                //if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Space))
+                //{
+                //    rotation = Quaterniond.RotationAxis(Vector3d.Right, MathUtild.Deg2Rad * 2.5);
+                //}
+
+                var amount = 0.5f;
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.LeftShift)
+                    || this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.RightShift))
                 {
-                    rocketObject.SetState(rocketObject.State.WithOrientation(
-                        rocketObject.Orientation * Quaterniond.RotationAxis(Vector3d.Up, MathUtild.Deg2Rad * 10)));
+                    amount = 0.05f;
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Up))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.Right, MathUtild.Deg2Rad * amount);
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Down))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.Right, -MathUtild.Deg2Rad * amount);
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Right))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.Up, MathUtild.Deg2Rad * amount);
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Left))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.Up, -MathUtild.Deg2Rad * amount);
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.Q))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.ForwardLH, MathUtild.Deg2Rad * amount);
+                }
+
+                if (this.KeyboardManager.IsKeyDown(SharpDX.DirectInput.Key.E))
+                {
+                    rotation = Quaterniond.RotationAxis(Vector3d.ForwardLH, -MathUtild.Deg2Rad * amount);
+                }
+
+                if (rotation != Quaterniond.Identity)
+                {
+                    rocketObject.SetState(rocketObject.State.WithOrientation((rocketObject.Orientation * rotation).Normalized()));
                 }
             }
         }

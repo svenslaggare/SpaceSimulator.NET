@@ -32,12 +32,13 @@ namespace SpaceSimulator.Simulator.Rocket
 
         public void Start(double totalTime)
         {
-            this.thrustDirection = OrbitHelpers.SphereNormal(this.rocketObject.PrimaryBody, this.rocketObject.Latitude, this.rocketObject.Longitude);
+            //this.thrustDirection = OrbitHelpers.SphereNormal(this.rocketObject.PrimaryBody, this.rocketObject.Latitude, this.rocketObject.Longitude);
         }
 
         public void Update(double totalTime, double timeStep)
         {
-           
+            //this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, this.rocketObject.Orientation);
+            this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Right, 30.0 * MathUtild.Deg2Rad));
         }
     }
 }

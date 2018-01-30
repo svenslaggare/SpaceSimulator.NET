@@ -460,6 +460,8 @@ namespace SpaceSimulator.Simulator
             Vector3d velocity)
         {
             var initialState = new ObjectState(this.totalTime, position, velocity);
+            OrbitHelpers.GetCoordinates(primaryBody, position, out var latitude, out var longitude);
+            initialState.Orientation = MathHelpers.FaceDirectionQuaternion(OrbitHelpers.SphereNormal(primaryBody, latitude, longitude));
 
             var newObject = new RocketObject(
                 name,

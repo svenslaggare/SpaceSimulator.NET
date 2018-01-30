@@ -160,12 +160,30 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Returns the radial vector
+        /// </summary>
+        /// <param name="forward">The forward vector</param>
+        public static Vector3d Radial(Vector3d forward)
+        {
+            return Normalized(Vector3d.Transform(forward, Matrix3x3d.RotationY(MathUtild.Pi / 2)));
+        }
+
+        /// <summary>
         /// Returns the pseudo normal vector
         /// </summary>
         /// <param name="forward">The forward vector</param>
         public static Vector3 Normal(Vector3 forward)
         {
             return Vector3.Cross(forward, Radial(forward));
+        }
+
+        /// <summary>
+        /// Returns the pseudo normal vector
+        /// </summary>
+        /// <param name="forward">The forward vector</param>
+        public static Vector3d Normal(Vector3d forward)
+        {
+            return Vector3d.Cross(forward, Radial(forward));
         }
 
         /// <summary>
@@ -387,9 +405,9 @@ namespace SpaceSimulator.Mathematics
         public static Matrix FaceDirection(Vector3 forward, Vector3 up, Vector3? right = null)
         {
             var matrix = Matrix.Identity;
-            matrix.Forward = forward;
-            matrix.Up = up;
-            matrix.Right = right ?? Vector3.Cross(forward, up);
+            matrix.Forward = forward.Normalized();
+            matrix.Up = up.Normalized();
+            matrix.Right = (right ?? Vector3.Cross(forward, up)).Normalized();
             return matrix;
         }
 
@@ -400,6 +418,39 @@ namespace SpaceSimulator.Mathematics
         public static Matrix FaceDirection(Vector3 forward)
         {
             return FaceDirection(forward, Normal(forward));
+        }
+
+        /// <summary>
+        /// Returns a matrix that faces the given direction
+        /// </summary>
+        /// <param name="forward">The forward direction</param>
+        /// <param name="up">The up direction</param>
+        /// <param name="right">the right direction</param>
+        public static Matrixd FaceDirection(Vector3d forward, Vector3d up, Vector3d? right = null)
+        {
+            var matrix = Matrixd.Identity;
+            matrix.Forward = forward;
+            matrix.Up = up;
+            matrix.Right = right ?? Vector3d.Cross(forward, up);
+            return matrix;
+        }
+
+        /// <summary>
+        /// Returns a matrix that faces the given direction
+        /// </summary>
+        /// <param name="forward">The forward direction</param>
+        public static Matrixd FaceDirection(Vector3d forward)
+        {
+            return FaceDirection(forward, Normal(forward));
+        }
+
+        /// <summary>
+        /// Returns a auaternion that faces the give direction
+        /// </summary>
+        /// <param name="forward">The forward direction</param>
+        public static Quaterniond FaceDirectionQuaternion(Vector3d forward)
+        {
+            return Quaterniond.RotationMatrix(FaceDirection(forward)).Normalized();
         }
 
         /// <summary>
