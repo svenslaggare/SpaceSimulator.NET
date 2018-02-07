@@ -21,6 +21,11 @@ namespace SpaceSimulator.Physics
         public double Mass { get; }
 
         /// <summary>
+        /// The moment-of-inertia
+        /// </summary>
+        public double MomentOfInertia { get; }
+
+        /// <summary>
         /// The rotational period
         /// </summary>
         public double RotationalPeriod { get; }
@@ -40,12 +45,20 @@ namespace SpaceSimulator.Physics
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="mass">The mass of the object</param>
+        /// <param name="momentOfInertia">The moment of inertia</param>
         /// <param name="rotationalPeriod">The rotational period</param>
         /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="initialState">The initial state</param>
-        public SimplePhysicsObject(IPrimaryBodyObject primaryBody, double mass, double rotationalPeriod, Vector3d axisOfRotation, ObjectState initialState)
+        public SimplePhysicsObject(
+            IPrimaryBodyObject primaryBody,
+            double mass, 
+            double momentOfInertia,
+            double rotationalPeriod, 
+            Vector3d axisOfRotation, 
+            ObjectState initialState)
         {
             this.Mass = mass;
+            this.MomentOfInertia = momentOfInertia;
             this.RotationalPeriod = rotationalPeriod;
             this.AxisOfRotation = axisOfRotation;
             this.PrimaryBody = primaryBody;

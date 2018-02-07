@@ -50,6 +50,11 @@ namespace SpaceSimulator.Simulator
         public double Mass { get; protected set; }
 
         /// <summary>
+        /// The moment-of-inertia
+        /// </summary>
+        public double MomentOfInertia { get; protected set; }
+
+        /// <summary>
         /// The rotational period
         /// </summary>
         public double RotationalPeriod { get; }
@@ -105,6 +110,7 @@ namespace SpaceSimulator.Simulator
         /// <param name="name">The name of the object</param>
         /// <param name="type">The type of the object</param>
         /// <param name="mass">The mass of the object</param>
+        /// <param name="momentOfInertia">The moment of inertia of the object</param>
         /// <param name="rotationalPeriod">The rotational period</param>
         /// <param name="axisOfRotation">The axis-of-rotation</param>
         /// <param name="primaryBody">The primary body</param>
@@ -114,6 +120,7 @@ namespace SpaceSimulator.Simulator
             string name,
             PhysicsObjectType type,
             double mass,
+            double momentOfInertia,
             double rotationalPeriod,
             Vector3d axisOfRotation,
             NaturalSatelliteObject primaryBody,
@@ -123,6 +130,7 @@ namespace SpaceSimulator.Simulator
             this.Name = name;
             this.Type = type;
             this.Mass = mass;
+            this.MomentOfInertia = momentOfInertia;
             this.RotationalPeriod = rotationalPeriod;
             this.AxisOfRotation = axisOfRotation;
             this.state = initialState;
@@ -212,6 +220,14 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Returns the angular velocity
+        /// </summary>
+        public Vector3d AngularVelocity
+        {
+            get { return this.state.AngularVelocity(this); }
+        }
+
+        /// <summary>
         /// Indicates if the object has impacted any object
         /// </summary>
         public bool HasImpacted
@@ -251,7 +267,8 @@ namespace SpaceSimulator.Simulator
             get
             {
                 var orientation = this.Orientation;
-                orientation.Invert();
+                orientation.Conjugate();
+                orientation.Normalize();
                 return Matrix3x3d.RotationQuaternion(orientation);
             }
         }

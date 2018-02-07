@@ -33,10 +33,16 @@ namespace SpaceSimulator.Physics.Atmosphere
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
         /// <param name="primaryBodyState">The state of the primary body</param>
+        /// <param name="physicsObject">The physics object</param>
         /// <param name="properties">The atmospheric properties of the object</param>
         /// <param name="state">The state of the object</param>
-        /// <returns>The drag force</returns>
-        Vector3d CalculateDrag(IPrimaryBodyObject primaryBody, ref ObjectState primaryBodyState, AtmosphericProperties properties, ref ObjectState state);
+        /// <returns>The drag force and torque</returns>
+        (Vector3d, Vector3d) CalculateDrag(
+            IPrimaryBodyObject primaryBody,
+            ref ObjectState primaryBodyState,
+            IPhysicsObject physicsObject,
+            AtmosphericProperties properties,
+            ref ObjectState state);
     }
 
     /// <summary>

@@ -257,7 +257,7 @@ namespace SpaceSimulator.Mathematics
                 return 0;
             }
 
-            //return Math.Acos(Vector3d.Dot(Normalized(u), Normalized(v)));
+            //return Math.Acos(Clamp(-1.0, 1.0, Vector3d.Dot(Normalized(u), Normalized(v))));
             return Math.Atan2(Vector3d.Cross(u, v).Length(), Vector3d.Dot(u, v));
         }
 
@@ -445,7 +445,7 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
-        /// Returns a auaternion that faces the give direction
+        /// Returns a quaternion that faces the give direction
         /// </summary>
         /// <param name="forward">The forward direction</param>
         public static Quaterniond FaceDirectionQuaternion(Vector3d forward)
@@ -536,6 +536,17 @@ namespace SpaceSimulator.Mathematics
         public static Quaterniond InvertAngle(Quaterniond quaternion)
         {
             return Quaterniond.RotationAxis(quaternion.Axis, -quaternion.Angle);
+        }
+
+        /// <summary>
+        /// Inverts the given quaternion
+        /// </summary>
+        /// <param name="quaternion">The quaternion</param>
+        public static Quaterniond Invert(Quaterniond quaternion)
+        {
+            quaternion.Conjugate();
+            quaternion.Normalize();
+            return quaternion;
         }
     }
 }

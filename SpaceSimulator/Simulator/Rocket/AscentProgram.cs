@@ -217,15 +217,22 @@ namespace SpaceSimulator.Simulator.Rocket
 
             this.SetFaceThrustDirection();
 
-            //if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
-            //{
-            //    var thrustAngle = MathHelpers.AngleBetween(this.ThrustDirection, MathHelpers.Normalized(prograde));
-            //    if (thrustAngle >= 1E-4)
-            //    {
-            //        this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * thrustAngle}");
-            //        this.lastTime = DateTime.UtcNow;
-            //    }
-            //}
+            if ((DateTime.UtcNow - this.lastTime).TotalSeconds >= 0.25 && this.rocketObject.IsEngineRunning)
+            {
+                var thrustAngle = MathHelpers.AngleBetween(this.absoluteThrustDirection, MathHelpers.Normalized(prograde));
+                if (thrustAngle >= 1E-4)
+                {
+                    this.LogStatus($"Thrust angle: {MathUtild.Rad2Deg * thrustAngle}");
+                    this.lastTime = DateTime.UtcNow;
+                }
+
+                var gimbalAngle = MathHelpers.AngleBetween(this.ThrustDirection, Vector3d.ForwardRH);
+                if (gimbalAngle >= 1E-4)
+                {
+                    this.LogStatus($"Gimbal angle: {MathUtild.Rad2Deg * gimbalAngle}");
+                    this.lastTime = DateTime.UtcNow;
+                }
+            }
         }
 
         /// <summary>

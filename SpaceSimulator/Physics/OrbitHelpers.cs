@@ -155,8 +155,7 @@ namespace SpaceSimulator.Physics
         /// <param name="longitude">The longitude (in radians)</param>
         public static void GetCoordinates(IPhysicsObject primaryBody, Quaterniond primaryOrientation, Vector3d position, out double latitude, out double longitude)
         {
-            primaryOrientation.Invert();
-            var inverseRotationalTransform = Matrix3x3d.RotationQuaternion(primaryOrientation);
+            var inverseRotationalTransform = Matrix3x3d.RotationQuaternion(MathHelpers.Invert(primaryOrientation));
             GetSphericalCoordinates(
                 inverseRotationalTransform * (position - primaryBody.State.Position),
                 out latitude,

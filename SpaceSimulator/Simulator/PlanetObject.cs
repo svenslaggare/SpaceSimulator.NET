@@ -53,12 +53,13 @@ namespace SpaceSimulator.Simulator
         /// </summary>
         /// <param name="physicsObject">The object</param>
         /// <param name="state">The state of the object</param>
-        public Vector3d DragOnObject(ArtificialPhysicsObject physicsObject, ref ObjectState state)
+        public (Vector3d, Vector3d) DragOnObject(ArtificialPhysicsObject physicsObject, ref ObjectState state)
         {
             var primaryState = this.State;
             return this.AtmosphericModel.CalculateDrag(
                 this,
                 ref primaryState,
+                physicsObject,
                 physicsObject.AtmosphericProperties,
                 ref state);
         }

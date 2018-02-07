@@ -163,11 +163,8 @@ namespace SpaceSimulator.Rendering
         {
             var position = camera.ToDrawPosition(rocketObject.Position);
 
-            var forward = MathHelpers.ToFloat(rocketObject.RocketForward);
-            //if (rocketObject.IsIdle)
-            {
-                forward = MathHelpers.ToFloat(Vector3d.Transform(Vector3d.ForwardRH, rocketObject.Orientation));
-            }
+            //var forward = MathHelpers.ToFloat(rocketObject.RocketForward);
+            var forward = MathHelpers.ToFloat(Vector3d.Transform(Vector3d.ForwardRH, rocketObject.Orientation));
 
             var facing = MathHelpers.FaceDirection(forward);
             var world = facing * Matrix.Scaling(scale) * Matrix.Translation(position);

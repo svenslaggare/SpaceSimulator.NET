@@ -107,7 +107,7 @@ namespace SpaceSimulator.Helpers
                 if (physicsObject is ArtificialPhysicsObject artificialPhysicsObject)
                 {
                     var primaryPlanet = primaryBody as PlanetObject;
-                    dragAcceleration = primaryPlanet.DragOnObject(artificialPhysicsObject, ref state) / artificialPhysicsObject.Mass;
+                    dragAcceleration = primaryPlanet.DragOnObject(artificialPhysicsObject, ref state).Item1 / artificialPhysicsObject.Mass;
 
                     if (physicsObject is RocketObject rocketObject)
                     {
@@ -161,6 +161,17 @@ namespace SpaceSimulator.Helpers
             if (physicsObject != null && physicsObject.Type == PhysicsObjectType.ArtificialSatellite)
             {
                 infoBuilder.AppendLine("Used Δv: " + DataFormatter.Format(physicsObject.UsedDeltaV, DataUnit.Velocity));
+            }
+
+            {
+                if (physicsObject is RocketObject rocketObject)
+                {
+                    infoBuilder.AppendLine(
+                        $"Orientation: { DataFormatter.Format(rocketObject.Orientation.Angle, DataUnit.Angle)} @ {DataFormatter.Format(rocketObject.Orientation.Axis)}");
+
+                    infoBuilder.AppendLine(
+                        $"Angular velocity: { DataFormatter.Format(rocketObject.AngularVelocity.Length(), DataUnit.Angle)} @ {DataFormatter.Format(rocketObject.AngularVelocity.Normalized())}");
+                }
             }
 
             {

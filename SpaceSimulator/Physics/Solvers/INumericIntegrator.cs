@@ -17,6 +17,11 @@ namespace SpaceSimulator.Physics.Solvers
         public Vector3d Acceleration { get; set; }
 
         /// <summary>
+        /// The torque
+        /// </summary>
+        public Vector3d Torque { get; set; }
+
+        /// <summary>
         /// The change in mass of the object
         /// </summary>
         public double DeltaMass { get; set; }
@@ -25,10 +30,12 @@ namespace SpaceSimulator.Physics.Solvers
         /// Creates a new acceleration state
         /// </summary>
         /// <param name="acceleration">The acceleration</param>
+        /// <param name="torque">The torque</param>
         /// <param name="deltaMass">The change in mass of the object</param>
-        public AccelerationState(Vector3d acceleration, double deltaMass)
+        public AccelerationState(Vector3d acceleration, Vector3d torque, double deltaMass)
         {
             this.Acceleration = acceleration;
+            this.Torque = torque;
             this.DeltaMass = deltaMass;
         }
     }

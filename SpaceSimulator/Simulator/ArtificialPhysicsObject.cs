@@ -34,7 +34,16 @@ namespace SpaceSimulator.Simulator
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, PhysicsObjectType.ArtificialSatellite, mass, 0, Vector3d.Zero, primaryBody, initialState, initialOrbit)
+            : base(
+                  name, 
+                  PhysicsObjectType.ArtificialSatellite, 
+                  mass,
+                  PhysicsFormulas.MomentOfInertiaForSphere(mass, 20.0),
+                  0,
+                  Vector3d.Zero, 
+                  primaryBody, 
+                  initialState,
+                  initialOrbit)
         {
 
         }

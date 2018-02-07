@@ -23,11 +23,6 @@ namespace SpaceSimulator.Simulator
         private IRocketControlProgram controlProgram;
         private bool updateOrbit = false;
 
-        /// <summary>
-        /// Returns the forward direction of the rocket
-        /// </summary>
-        public Vector3d RocketForward { get; private set; }
-
         private readonly IList<PhysicsObject> toStage = new List<PhysicsObject>();
 
         /// <summary>
@@ -175,6 +170,19 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Returns the rotation torque
+        /// </summary>
+        public Vector3d RotationTorque()
+        {
+            if (this.controlProgram is null)
+            {
+                return Vector3d.Zero;
+            }
+
+            return this.controlProgram.Torque;
+        }
+
+        /// <summary>
         /// Returns the acceleration produced by the engines
         /// </summary>
         public Vector3d EngineAcceleration()
@@ -308,7 +316,6 @@ namespace SpaceSimulator.Simulator
             {
                 var state = this.state;
                 state.MakeRelative(this.PrimaryBody.State);
-                this.RocketForward = state.Prograde;
             }
             //else
             //{
@@ -316,9 +323,13 @@ namespace SpaceSimulator.Simulator
             //}
         }
 
-        public void SetState(ObjectState state)
+        /// <summary>
+        /// Sets the orientation of the rocket
+        /// </summary>
+        /// <param name="orientation">The orientation</param>
+        public void SetOrientation(Quaterniond orientation)
         {
-            this.state = state;
+            this.state.Orientation = orientation;
         }
     }
 }

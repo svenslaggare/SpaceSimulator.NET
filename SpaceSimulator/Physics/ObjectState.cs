@@ -33,6 +33,11 @@ namespace SpaceSimulator.Physics
         public Quaterniond Orientation { get; set; }
 
         /// <summary>
+        /// The angular momentum
+        /// </summary>
+        public Vector3d AngularMomentum { get; set; }
+
+        /// <summary>
         /// Indicates if the object has impacted the primary body
         /// </summary>
         public bool HasImpacted { get; set; }
@@ -44,15 +49,29 @@ namespace SpaceSimulator.Physics
         /// <param name="position">The position</param>
         /// <param name="velocity">The velocity</param>
         /// <param name="orientation">The orientation</param>
+        /// <param name="angularMomentum">The angular momentum</param>
         /// <param name="impacted">Indicates if the object has impacted the primary body</param>
-        public ObjectState(double time, Vector3d position, Vector3d velocity, Quaterniond? orientation = null, bool impacted = false)
+        public ObjectState(
+            double time, 
+            Vector3d position, 
+            Vector3d velocity, 
+            Quaterniond? orientation = null,
+            Vector3d? angularMomentum = null,
+            bool impacted = false)
         {
             this.Time = time;
             this.Position = position;
             this.Velocity = velocity;
             this.Orientation = orientation ?? Quaterniond.Identity;
+            this.AngularMomentum = angularMomentum ?? Vector3d.Zero;
             this.HasImpacted = impacted;
         }
+
+        /// <summary>
+        /// Returns the angular velocity
+        /// </summary>
+        /// <param name="physicsObject">The object for the state</param>
+        public Vector3d AngularVelocity(IPhysicsObject physicsObject) => this.AngularMomentum / physicsObject.MomentOfInertia;
 
         /// <summary>
         /// Returns the prograde vector
@@ -73,22 +92,6 @@ namespace SpaceSimulator.Physics
         /// Returns the radial vector
         /// </summary>
         public Vector3d Radial => OrbitHelpers.Radial(this.Position);
-
-        /// <summary>
-        /// Adds the given values to the current state, returning a new state
-        /// </summary>
-        /// <param name="position">The position</param>
-        /// <param name="velocity">The velocity</param>
-        /// <returns>The modified state</returns>
-        public ObjectState Add(Vector3d position = new Vector3d(), Vector3d velocity = new Vector3d())
-        {
-            return new ObjectState(
-                this.Time,
-                this.Position + position,
-                this.Velocity + velocity,
-                this.Orientation,
-                this.HasImpacted);
-        }
 
         /// <summary>
         /// Returns a new state with the given orientation

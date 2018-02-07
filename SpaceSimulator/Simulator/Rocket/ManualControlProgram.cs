@@ -15,6 +15,18 @@ namespace SpaceSimulator.Simulator.Rocket
         private readonly ITextOutputWriter textOutputWriter;
         private Vector3d thrustDirection;
 
+        private bool runEngine = false;
+
+        /// <summary>
+        /// Indicates if the program is completed
+        /// </summary>
+        public bool IsCompleted { get; private set; } = false;
+
+        /// <summary>
+        /// The none-force torque
+        /// </summary>
+        public Vector3d Torque { get; private set; }
+
         /// <summary>
         /// Creates a new manual control program
         /// </summary>
@@ -26,19 +38,52 @@ namespace SpaceSimulator.Simulator.Rocket
             this.textOutputWriter = textOutputWriter;
         }
 
-        public bool IsCompleted => false;
-
         public Vector3d ThrustDirection => this.thrustDirection;
 
         public void Start(double totalTime)
         {
-            //this.thrustDirection = OrbitHelpers.SphereNormal(this.rocketObject.PrimaryBody, this.rocketObject.Latitude, this.rocketObject.Longitude);
+            this.runEngine = true;
         }
 
         public void Update(double totalTime, double timeStep)
         {
-            //this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, this.rocketObject.Orientation);
-            this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Right, 30.0 * MathUtild.Deg2Rad));
+            if (this.runEngine)
+            {
+                var altitude = this.rocketObject.PrimaryBody.Altitude(this.rocketObject.Position);
+
+                var pitchAltitude = 18750.0;
+                var pitchAmount = 2000.0;
+
+                if (altitude >= pitchAltitude && altitude <= pitchAltitude + pitchAmount)
+                {
+                    this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Up, 1.0 * MathUtild.Deg2Rad));
+                }
+                else
+                {
+                    this.thrustDirection = Vector3d.ForwardRH;
+                }
+
+                var thrustAngle = MathHelpers.AngleBetween(
+                    RocketHelpers.RelativeToAbsoluteThrustDirection(this.rocketObject, this.thrustDirection),
+                    this.rocketObject.State.Prograde);
+
+                //Console.WriteLine(thrustAngle * MathHelpers.Rad2Deg);
+                if (thrustAngle * MathHelpers.Rad2Deg >= 2.0 && altitude > 200E3)
+                {
+
+                }
+            }
+
+            var orbit = Orbit.CalculateOrbit(this.rocketObject);
+            if (orbit.RelativePeriapsis >= 300E3)
+            {
+                this.thrustDirection = Vector3d.Zero;
+                this.runEngine = false;
+                this.rocketObject.StopEngines();
+
+                //this.IsCompleted = true;
+                //this.Torque = -this.rocketObject.AngularVelocity.Normalized() * 100;
+            }
         }
     }
 }

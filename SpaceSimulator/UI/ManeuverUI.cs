@@ -603,7 +603,7 @@ namespace SpaceSimulator.UI
 
                 if (rotation != Quaterniond.Identity)
                 {
-                    rocketObject.SetState(rocketObject.State.WithOrientation((rocketObject.Orientation * rotation).Normalized()));
+                    rocketObject.SetOrientation((rocketObject.Orientation * rotation).Normalized());
                 }
             }
         }

@@ -18,6 +18,11 @@ namespace SpaceSimulator.Physics
         double Mass { get; }
 
         /// <summary>
+        /// The moment-of-inertia
+        /// </summary>
+        double MomentOfInertia { get; }
+
+        /// <summary>
         /// The rotational period (time to complete one rotation around its axis) of the object
         /// </summary>
         double RotationalPeriod { get; }

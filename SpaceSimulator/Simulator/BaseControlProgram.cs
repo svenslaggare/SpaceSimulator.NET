@@ -36,11 +36,16 @@ namespace SpaceSimulator.Simulator
         public Vector3d ThrustDirection => RocketHelpers.AbsoluteToRelativeThrustDirection(this.rocketObject, this.absoluteThrustDirection);
 
         /// <summary>
+        /// The none-force torque
+        /// </summary>
+        public Vector3d Torque { get; protected set; }
+
+        /// <summary>
         /// Sets the orientation to face the thrust direction
         /// </summary>
         protected void SetFaceThrustDirection()
         {
-            this.rocketObject.SetState(this.rocketObject.State.WithOrientation(MathHelpers.FaceDirectionQuaternion(this.absoluteThrustDirection)));
+            this.rocketObject.SetOrientation(MathHelpers.FaceDirectionQuaternion(this.absoluteThrustDirection));
         }
 
         /// <summary>

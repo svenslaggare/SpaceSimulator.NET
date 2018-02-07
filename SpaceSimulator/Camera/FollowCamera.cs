@@ -21,7 +21,7 @@ namespace SpaceSimulator.Camera
         /// <summary>
         /// The follow mode
         /// </summary>
-        public enum Mode { FollowNormal, FollowRadial, FollowAscent }
+        public enum Mode { FollowNormal, FollowRadial, FollowAscent, FollowOrientation }
 
         /// <summary>
         /// The follow mode
@@ -82,15 +82,19 @@ namespace SpaceSimulator.Camera
                     this.followNormal = state.Radial;
                     break;
                 case Mode.FollowAscent:
-                    //var pseudoRadial = MathHelpers.Normalized(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationY(Math.PI / 2)));
-                    //var pseudoNormal = Vector3d.Cross(state.Prograde, pseudoRadial);
                     var sphereNormal = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude);
                     var sphereTangent = OrbitHelpers.SphereNormal(this.Focus.PrimaryBody, this.Focus.Latitude, this.Focus.Longitude + Math.PI / 2);
 
                     this.followNormal = sphereNormal;
                     this.followForward = sphereTangent;
-                    //this.followNormal = pseudoNormal;
-                    //this.followForward = state.Prograde;
+                    break;
+                case Mode.FollowOrientation:
+                    {
+                        var orientation = state.Orientation;
+
+                        this.followForward = Vector3d.Transform(Vector3d.ForwardRH, orientation);
+                        this.followNormal = Vector3d.Transform(Vector3d.Up, orientation);
+                    }
                     break;
             }
         }

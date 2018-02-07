@@ -61,7 +61,7 @@ namespace SpaceSimulator
             //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
             this.simulatorContainer = environment.Create(this.GraphicsDevice);
-            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
+            this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -71,6 +71,8 @@ namespace SpaceSimulator
             this.CameraManager.AddCamera("FollowCameraNormal", new FollowCamera(FollowCamera.Mode.FollowNormal));
             this.CameraManager.AddCamera("FollowCameraRadial", new FollowCamera(FollowCamera.Mode.FollowRadial));
             this.CameraManager.AddCamera("FollowCameraAscent", new FollowCamera(FollowCamera.Mode.FollowAscent));
+            this.CameraManager.AddCamera("FollowCameraOrientation", new FollowCamera(FollowCamera.Mode.FollowOrientation));
+
             //this.CameraManager.AddCamera("GroundCamera", new GroundCamera()
             //{
             //    Latitude = 28.524058 * MathUtild.Deg2Rad * 0,

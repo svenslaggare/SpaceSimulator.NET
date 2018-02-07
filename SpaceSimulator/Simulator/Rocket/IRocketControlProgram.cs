@@ -23,6 +23,11 @@ namespace SpaceSimulator.Simulator.Rocket
         Vector3d ThrustDirection { get; }
 
         /// <summary>
+        /// The none-force torque
+        /// </summary>
+        Vector3d Torque { get; }
+
+        /// <summary>
         /// Starts the program
         /// </summary>
         /// <param name="totalTime">The total time</param>

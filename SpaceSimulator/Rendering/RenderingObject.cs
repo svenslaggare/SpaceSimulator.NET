@@ -330,7 +330,8 @@ namespace SpaceSimulator.Rendering
             if (this.Model is Sphere sphere)
             {
                 var orientation = this.PhysicsObject.Orientation;
-                orientation.Invert();
+                orientation.Conjugate();
+                orientation.Normalize();
 
                 sphere.Draw(
                     deviceContext,

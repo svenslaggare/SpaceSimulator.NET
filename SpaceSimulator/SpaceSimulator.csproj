@@ -106,6 +106,7 @@
     <Compile Include="Physics\Maneuvers\InterceptManeuver.cs" />
     <Compile Include="Physics\Maneuvers\PlanetaryTransfer.cs" />
     <Compile Include="Physics\Orbits.cs" />
+    <Compile Include="Physics\PhysicsFormulas.cs" />
     <Compile Include="Physics\TimeConstants.cs" />
     <Compile Include="Rendering\Arrow.cs" />
     <Compile Include="Rendering\Cylinder.cs" />

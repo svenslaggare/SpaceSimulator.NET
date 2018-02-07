@@ -41,7 +41,16 @@ namespace SpaceSimulator.Simulator
             NaturalSatelliteObject primaryBody,
             ObjectState initialState,
             Orbit initialOrbit)
-            : base(name, type, mass, rotationalPeriod, axisOfRotation, primaryBody, initialState, initialOrbit)
+            : base(
+                  name, 
+                  type,
+                  mass, 
+                  PhysicsFormulas.MomentOfInertiaForSphere(mass, radius),
+                  rotationalPeriod,
+                  axisOfRotation, 
+                  primaryBody,
+                  initialState, 
+                  initialOrbit)
         {
             this.Radius = radius;
         }
