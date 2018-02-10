@@ -14,7 +14,7 @@ namespace SpaceSimulator.Physics.Maneuvers
     public static class HohmannTransferOrbit
     {
         /// <summary>
-        /// Calculates the time left to apply a Hohmann transfer orbit in order to rendevouz with the target orbit
+        /// Calculates the time left before applying Hohmann transfer orbit in order to rendevouz with the target orbit
         /// </summary>
         /// <param name="orbit">The current orbit</param>
         /// <param name="targetOrbit">The target orbit</param>

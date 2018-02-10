@@ -52,8 +52,6 @@ namespace SpaceSimulator.UI
             this.focusObjectIndex = this.SimulatorEngine.Objects.Count - 1;
             this.focusObject = this.SimulatorEngine.Objects[this.focusObjectIndex];
 
-            //this.SetScaleFactorFromFocusObject();
-            //this.orbitCamera.SetScaleFactor(SimulatorContainer.SimulatorEngine.ObjectOfReference);
             foreach (var spaceCamera in this.cameraManager.Cameras.OfType<SpaceCamera>())
             {
                 spaceCamera.SetScaleFactor(SimulatorContainer.SimulatorEngine.ObjectOfReference);

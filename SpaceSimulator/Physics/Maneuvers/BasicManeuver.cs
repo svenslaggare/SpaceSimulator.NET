@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceSimulator.Physics.Solvers;
 
 namespace SpaceSimulator.Physics.Maneuvers
 {
@@ -100,6 +101,36 @@ namespace SpaceSimulator.Physics.Maneuvers
             //        physicsObject, 
             //        deltaV, 
             //        OrbitalManeuverTime.TimeFromNow(orbitPosition.TimeToTrueAnomaly(ascendingNodePosition.TrueAnomaly))));
+        }
+
+        /// <summary>
+        /// Circularizes the current orbit
+        /// </summary>
+        /// <param name="simulatorEngine">The simulation engine</param>
+        /// <param name="physicsObject">The object to apply for</param>
+        public static OrbitalManeuvers Circularize(ISimulatorEngine simulatorEngine, IPhysicsObject physicsObject)
+        {
+            var physicsObjectState = physicsObject.State;
+            var physicsObjectOrbitPosition = OrbitPosition.CalculateOrbitPosition(physicsObject.PrimaryBody, physicsObjectState);
+            var physicsObjectOrbitPeriapsis = physicsObjectOrbitPosition.Orbit.CalculateState(0.0);
+
+            var simpleOrbit = physicsObjectOrbitPosition.Orbit.Set(inclination: 0, longitudeOfAscendingNode: 0, argumentOfPeriapsis: 0);
+            var simpleCircularOrbit = Orbit.New(simpleOrbit.PrimaryBody, semiMajorAxis: simpleOrbit.Periapsis);
+
+            var deltaV = (simpleCircularOrbit.CalculateState(0.0).Velocity
+                          - simpleOrbit.CalculateState(0.0).Velocity).Length();
+
+            var periapsisState = SolverHelpers.AfterTime(
+                simulatorEngine.KeplerProblemSolver,
+                physicsObject,
+                physicsObjectState,
+                physicsObjectOrbitPosition.Orbit,
+                physicsObjectOrbitPosition.TimeToPeriapsis(),
+                true);
+
+            return OrbitalManeuvers.Single(new OrbitalManeuver(
+                simulatorEngine.TotalTime + physicsObjectOrbitPosition.TimeToPeriapsis(),
+                deltaV * periapsisState.Retrograde));
         }
     }
 }

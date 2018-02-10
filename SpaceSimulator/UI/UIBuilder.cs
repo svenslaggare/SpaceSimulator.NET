@@ -83,14 +83,27 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// Returns the current position
+        /// </summary>
+        public Vector2 CurrentPosition => new Vector2(this.currentPositionX, this.currentPositionY);
+
+        /// <summary>
         /// Resets the position to the given
         /// </summary>
         /// <param name="x">The x position</param>
         /// <param name="y">The y position</param>
-        public void ResetPosition(float x, float y)
+        public void ResetPosition(float? x, float? y)
         {
-            this.currentPositionX = x;
-            this.currentPositionY = y;
+            if (x != null)
+            {
+                this.currentPositionX = x ?? 0;
+            }
+
+            if (y != null)
+            {
+                this.currentPositionY = y ?? 0;
+            }
+
             this.isFirst = true;
         }
 
@@ -135,7 +148,7 @@ namespace SpaceSimulator.UI
         /// <param name="name">The name of the button</param>
         /// <param name="text">The text of the button</param>
         /// <param name="leftMouseClick">The left mouse click action</param>
-        public void AddButton(string name, string text, Action leftMouseClick)
+        public ButtonUIObject AddButton(string name, string text, Action leftMouseClick)
         {
             var button = new ButtonUIObject(
                 this.renderingManager2D,
@@ -154,6 +167,8 @@ namespace SpaceSimulator.UI
             {
                 leftMouseClick();
             };
+
+            return button;
         }
 
         /// <summary>

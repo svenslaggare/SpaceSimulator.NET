@@ -52,16 +52,16 @@ namespace SpaceSimulator
         /// Creates a new space simulator application
         /// </summary>
         public SpaceSimulatorApp()
-            : base("SpaceSimulator", new OrbitCamera(0.001f, 10000.0f * 1000), "OrbitCamera")
+            : base("SpaceSimulator", new OrbitCamera(0.001f * 0.1f, 10000.0f * 1000), "OrbitCamera")
         {
             Console.WriteLine("");
 
-            //var environment = new Environments.SolarSystem(coplanar: false);
-            var environment = new Environments.EarthSystem();
+            var environment = new Environments.SolarSystem(coplanar: false);
+            //var environment = new Environments.EarthSystem();
             //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
             this.simulatorContainer = environment.Create(this.GraphicsDevice);
-            this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
+            //this.SimulatorEngine.SimulationMode = PhysicsSimulationMode.PerturbationCowell;
 
             this.uiManager = new UIManager(this.RenderingManager2D)
             {
@@ -195,6 +195,12 @@ namespace SpaceSimulator
             //    TextureHelpers.LoadTextureArray(this.GraphicsDevice, this.DeviceContext, new string[] { "Content/Textures/Effects/flare0.png" }),
             //    this.randomTextureView);
             //this.fireParticleSystem.Initialize(this.GraphicsDevice, "Content/Effects/Fire.fx");
+
+            //var marsInjectionBurn = InterplanetaryManeuver.PlanetaryTransfer(
+            //    this.SimulatorEngine,
+            //    this.SimulatorEngine.Objects.Where(obj => obj.Name == "Satellite 1").FirstOrDefault(),
+            //    this.SimulatorEngine.Objects.Where(obj => obj.Name == "Mars").FirstOrDefault(),
+            //    out var possibleDepatures);
         }
 
         protected override void OnMouseButtonDown(Vector2 mousePosition, MouseButtons button)

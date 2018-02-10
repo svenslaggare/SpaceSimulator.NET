@@ -92,9 +92,9 @@ namespace SpaceSimulator.Physics.Maneuvers
         /// <summary>
         /// Calculates the heliocentric transfer orbit
         /// </summary>
-        /// <param name="minCoastRatio">The minimum coast ratio (in Hohmann coast time)</param>
-        /// <param name="maxCoastRatio">The maximum coast ratio (in Hohmann coast time)</param>
-        /// <param name="maxLaunchTime">The maximum number of launch time (in synodic periods)</param>
+        /// <param name="minCoastRatio">The minimum coast time (expressed in number of Hohmann coast periods)</param>
+        /// <param name="maxCoastRatio">The maximum coast time (expressed in number of Hohmann coast periods)</param>
+        /// <param name="maxLaunchTime">The latest launch time (expressed in number of synodic periods)</param>
         /// <param name="deltaTime">The delta time</param>
         public void CalculateHeliocentricTransferOrbit(
             double minCoastRatio = 0.5,
@@ -132,7 +132,7 @@ namespace SpaceSimulator.Physics.Maneuvers
         }
 
         /// <summary>
-        /// Calculates the heliocentric transfer orbit using a hohmann orbit
+        /// Calculates the heliocentric transfer orbit using a Hohmann transfer orbit
         /// </summary>
         public void CalculateHeliocentricTransferUsingHohmannOrbit()
         {
@@ -162,47 +162,16 @@ namespace SpaceSimulator.Physics.Maneuvers
         }
 
         /// <summary>
-        /// Calculates the planetary intercept orbit
-        /// </summary>
-        /// <param name="injectionState">The state of at the injection point</param>
-        /// <param name="injectionPrimaryState">The state of the primary body at the injection point</param>
-        private void CalculatePlanteryInterceptBurnOrbit(ObjectState injectionState, ref ObjectState injectionPrimaryState)
-        {
-            //Calculate the injection orbit (escape orbit from primary body)
-            injectionState.Velocity += this.bestInjectionBurn;
-            var injectionOrbit = OrbitPosition.CalculateOrbitPosition(this.physicsObject.PrimaryBody, ref injectionPrimaryState, ref injectionState);
-            injectionOrbit.TrueAnomaly = 0;
-
-            //Calculate the state when the object leaves the SOI
-            this.timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(injectionOrbit) ?? 0;
-
-            var leaveSOIPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
-                this.physicsObject.PrimaryBody,
-                this.sun.State,
-                injectionPrimaryState,
-                this.CurrentPlanetOrbit,
-                this.timeToLeaveSOI);
-
-            this.leaveSOIState = simulatorEngine.KeplerProblemSolver.Solve(
-                this.physicsObject,
-                injectionPrimaryState,
-                injectionState,
-                injectionOrbit.Orbit,
-                leaveSOIPrimaryState,
-                this.timeToLeaveSOI);
-
-            //Calculate the final heliocentric transfer orbit
-            this.bestHeliocentricOrbitPosition = OrbitPosition.CalculateOrbitPosition(this.sun, ref leaveSOIState);
-        }
-
-        /// <summary>
         /// Calculates the correct burn time for a planetary intercept
         /// </summary>
-        /// <param name="alignmentTime">The hohmann alignment time</param>
+        /// <param name="alignmentTime">The current estimate of when the injection should be performed</param>
         /// <param name="distance">The relative distance of the object</param>
         /// <param name="injectionSpeed">The injection speed</param>
         private double CalculatePlanteryInterceptBurnTime(double alignmentTime, double distance, double injectionSpeed)
         {
+            // To minimize the deltaV for midcourse-correction, 
+            // we should make the burn when our velocity vector aligns with the velocity vector for the primary body.
+            
             var planetMu = this.currentPlanet.StandardGravitationalParameter;
             var E = (injectionSpeed * injectionSpeed * 0.5) - planetMu / distance;
             var h = distance * injectionSpeed;
@@ -245,11 +214,45 @@ namespace SpaceSimulator.Physics.Maneuvers
         }
 
         /// <summary>
+        /// Calculates the planetary intercept orbit
+        /// </summary>
+        /// <param name="injectionState">The state of at the injection point</param>
+        /// <param name="injectionPrimaryState">The state of the primary body at the injection point</param>
+        private void CalculatePlanteryInterceptBurnOrbit(ObjectState injectionState, ref ObjectState injectionPrimaryState)
+        {
+            //Calculate the injection orbit (escape orbit from primary body)
+            injectionState.Velocity += this.bestInjectionBurn;
+            var injectionOrbit = OrbitPosition.CalculateOrbitPosition(this.physicsObject.PrimaryBody, ref injectionPrimaryState, ref injectionState);
+            injectionOrbit.TrueAnomaly = 0;
+
+            //Calculate the state when the object leaves the SOI
+            this.timeToLeaveSOI = OrbitCalculators.TimeToLeaveSphereOfInfluenceUnboundOrbit(injectionOrbit) ?? 0;
+
+            var leaveSOIPrimaryState = simulatorEngine.KeplerProblemSolver.Solve(
+                this.physicsObject.PrimaryBody,
+                this.sun.State,
+                injectionPrimaryState,
+                this.CurrentPlanetOrbit,
+                this.timeToLeaveSOI);
+
+            this.leaveSOIState = simulatorEngine.KeplerProblemSolver.Solve(
+                this.physicsObject,
+                injectionPrimaryState,
+                injectionState,
+                injectionOrbit.Orbit,
+                leaveSOIPrimaryState,
+                this.timeToLeaveSOI);
+
+            //Calculate the final heliocentric transfer orbit
+            this.bestHeliocentricOrbitPosition = OrbitPosition.CalculateOrbitPosition(this.sun, ref leaveSOIState);
+        }
+
+        /// <summary>
         /// Calculates the injection to the departure orbit
         /// </summary>
         public void CalculateInjectionToDepatureOrbit()
         {
-            //Calculate the correct delta V, since the previous calculations does not include speed to escape SOI
+            //Calculate the correct delta V, since the previous calculations does not include speed required to escape SOI
             var state = this.physicsObject.State;
             var orbitalRadius = Vector3d.Distance(state.Position, currentPlanet.State.Position);
             var orbitalSpeed = Vector3d.Distance(state.Velocity, currentPlanet.State.Velocity);
@@ -322,6 +325,7 @@ namespace SpaceSimulator.Physics.Maneuvers
                 listPossibleLaunches: false,
                 allowedDeltaV: 150);
             var midcourseManeuver = midcourseIntercept.Compute();
+            //this.midcourseBurnDeltaV = midcourseManeuver.DeltaVelocity - 0.15 * midcourseManeuver.DeltaVelocity.Normalized();
             this.midcourseBurnDeltaV = midcourseManeuver.DeltaVelocity;
             this.midcourseBurnTime = midcourseManeuver.StartTime;
         }

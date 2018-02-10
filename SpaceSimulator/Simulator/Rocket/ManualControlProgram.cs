@@ -51,27 +51,38 @@ namespace SpaceSimulator.Simulator.Rocket
             {
                 var altitude = this.rocketObject.PrimaryBody.Altitude(this.rocketObject.Position);
 
-                var pitchAltitude = 18750.0;
+                //var pitchAltitude = 18750.0;
+                //var pitchAmount = 2000.0;
+
+                var pitchAltitude = 1000.0;
                 var pitchAmount = 2000.0;
 
                 if (altitude >= pitchAltitude && altitude <= pitchAltitude + pitchAmount)
                 {
-                    this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Up, 1.0 * MathUtild.Deg2Rad));
+                    this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Up, 0.22 * MathUtild.Deg2Rad));
                 }
                 else
                 {
                     this.thrustDirection = Vector3d.ForwardRH;
                 }
 
-                var thrustAngle = MathHelpers.AngleBetween(
-                    RocketHelpers.RelativeToAbsoluteThrustDirection(this.rocketObject, this.thrustDirection),
-                    this.rocketObject.State.Prograde);
+                //var thrustAngle = MathHelpers.AngleBetween(
+                //    RocketHelpers.RelativeToAbsoluteThrustDirection(this.rocketObject, this.thrustDirection),
+                //    this.rocketObject.State.Prograde);
 
-                //Console.WriteLine(thrustAngle * MathHelpers.Rad2Deg);
-                if (thrustAngle * MathHelpers.Rad2Deg >= 2.0 && altitude > 200E3)
-                {
+                ////Console.WriteLine(thrustAngle * MathHelpers.Rad2Deg);
+                //if (thrustAngle * MathHelpers.Rad2Deg >= 2.0 && altitude > 200E3)
+                //{
 
-                }
+                //}
+
+                //if (altitude >= 200E3 && MathUtild.Rad2Deg * this.rocketObject.AngularVelocity.Length() >= 0.01)
+                //if (altitude >= 50E3 
+                //    && Orbit.CalculateOrbit(this.rocketObject).RelativeApoapsis >= 300E3
+                //    && MathUtild.Rad2Deg * this.rocketObject.AngularVelocity.Length() >= 0.01)
+                //{
+                //    this.thrustDirection = Vector3d.Transform(Vector3d.ForwardRH, Quaterniond.RotationAxis(Vector3d.Up, -1.0 * MathUtild.Deg2Rad));
+                //}
             }
 
             var orbit = Orbit.CalculateOrbit(this.rocketObject);

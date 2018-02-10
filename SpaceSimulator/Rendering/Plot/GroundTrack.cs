@@ -64,7 +64,7 @@ namespace SpaceSimulator.Rendering.Plot
             this.CreatePlot();
 
             this.currentPositionBrush = this.renderingManager2D.CreateSolidColorBrush(Color.Red);
-            this.primaryBodyImage = this.renderingManager2D.LoadImage(primaryBodyTexture);
+            this.UpdatePrimaryBodyTexture(primaryBodyTexture);
 
             //this.projectedOrbitSphere = new Sphere(
             //    graphicsDevice,
@@ -168,7 +168,7 @@ namespace SpaceSimulator.Rendering.Plot
                 var primaryOrientation = SolverHelpers.RotateNaturalSatelliteAroundAxis(
                     primaryBody.AxisOfRotation,
                     primaryBody.RotationalPeriod,
-                    Quaterniond.Identity, 
+                    startPrimaryOrientation, 
                     t);
 
                 var nextState = this.keplerProblemSolver.Solve(
@@ -228,6 +228,15 @@ namespace SpaceSimulator.Rendering.Plot
             this.lastTrackCreated = physicsObject.State.Time;
             this.trackOrbitVersion = this.physicsObject.OrbitVersion;
             this.lastTrackCreatedTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Updates the texture for the primary vody
+        /// </summary>
+        /// <param name="textureName">The texture of the primary body</param>
+        public void UpdatePrimaryBodyTexture(string textureName)
+        {
+            this.primaryBodyImage = this.renderingManager2D.LoadImage(textureName);
         }
 
         /// <summary>

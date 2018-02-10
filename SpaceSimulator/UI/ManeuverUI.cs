@@ -37,11 +37,13 @@ namespace SpaceSimulator.UI
         private readonly TextInputUIObject changePeriapsisTextInput;
         private readonly TextInputUIObject changeApoapsisTextInput;
         private readonly TextInputUIObject changeInclinationTextInput;
+        private readonly ButtonUIObject circularizeButton;
 
         private readonly TextInputUIObject hohmannTransferRadiusTextInput;
         private readonly ListBoxUIObject interceptTargetList;
         private readonly ListBoxUIObject rendevouzTargetList;
         private readonly ListBoxUIObject planetaryRendevouzTargetList;
+        private readonly ListBoxUIObject planetaryInsertionTargetList;
 
         private readonly UIGroup ascentGroup;
         private readonly TextInputUIObject ascentTargetAltitudeTextInput;
@@ -71,7 +73,7 @@ namespace SpaceSimulator.UI
             this.uiStyle = uiStyle;
 
             #region Maneuvers
-            var maneuverGroupSize = new Size2(380, 350);
+            var maneuverGroupSize = new Size2(380, 420);
 
             this.maneuverGroup = new UIGroup(
                 this.RenderingManager2D,
@@ -126,6 +128,11 @@ namespace SpaceSimulator.UI
                 "0",
                 this.CreateExecuteManeuver(this.ChangeInclination));
 
+            this.circularizeButton = maneuverBuilder.AddButton(
+                "CircularizeButton",
+                "Circularize",
+                this.Circularize);
+
             maneuverBuilder.ResetPosition(20, 20);
 
             this.hohmannTransferRadiusTextInput = maneuverBuilder.AddButtonAndTextInput(
@@ -156,11 +163,21 @@ namespace SpaceSimulator.UI
                 this.CreateExecuteManeuver(this.PlanetaryRendevouz));
             this.UpdatePlanetaryRendevouzTargetList(this.SelectedObject);
 
+            //maneuverBuilder.ResetPosition(20, maneuverBuilder.CurrentPosition.Y + maneuverBuilder.DeltaY);
+
+            this.planetaryInsertionTargetList = maneuverBuilder.AddButtonAndListBox(
+                "PlanetaryInsertionButton",
+                "Planetary insertion",
+                "RendevouzTargetList",
+                this.CreateExecuteManeuver(this.PlanetaryInsertion));
+            this.UpdatePlanetaryInsertionTargetList(this.SelectedObject);
+
             this.SimulatorContainer.SelectedObjectChanged += (sender, args) =>
             {
                 this.UpdateRendevouzTargetList(args);
                 this.UpdatePlanetaryRendevouzTargetList(args);
                 this.UpdateInterceptTargetList(args);
+                this.UpdatePlanetaryInsertionTargetList(args);
             };
             #endregion
 
@@ -287,11 +304,24 @@ namespace SpaceSimulator.UI
         private void ChangeInclination()
         {
             var newInclination = UIComponentHelpers.ParseDouble(this.changeInclinationTextInput.Text);
-            this.SimulatorEngine.ScheduleManeuver(this.SelectedObject,
+            this.SimulatorEngine.ScheduleManeuver(
+                this.SelectedObject,
                 BasicManeuver.ChangeInclination(
                     this.SimulatorEngine,
                     this.SelectedObject,
                     newInclination * MathUtild.Deg2Rad));
+        }
+
+        /// <summary>
+        /// Circularizes the current orbit
+        /// </summary>
+        private void Circularize()
+        {
+            this.SimulatorEngine.ScheduleManeuver(
+                this.SelectedObject,
+                BasicManeuver.Circularize(
+                    this.SimulatorEngine,
+                    this.SelectedObject));
         }
 
         /// <summary>
@@ -471,6 +501,20 @@ namespace SpaceSimulator.UI
         }
 
         /// <summary>
+        /// The planetary insertion maneuver
+        /// </summary>
+        private void PlanetaryInsertion()
+        {
+            var targetObject = (NaturalSatelliteObject)planetaryRendevouzTargetList.SelectedItem?.Tag;
+
+            if (targetObject != null)
+            {
+                var insertionBurns = InterplanetaryManeuver.PlanetaryInsertion(this.SimulatorEngine, this.SelectedObject, targetObject);
+                this.SimulatorEngine.ScheduleManeuver(this.SelectedObject, insertionBurns);
+            }
+        }
+
+        /// <summary>
         /// Updates the intercept target list
         /// </summary>
         /// <param name="selectedObject">The current selected object</param>
@@ -519,6 +563,29 @@ namespace SpaceSimulator.UI
             else
             {
                 this.planetaryRendevouzTargetList.SetItems(new List<ListBoxUIObject.Item>());
+            }
+        }
+
+        /// <summary>
+        /// Updates the planetary insertion target list
+        /// </summary>
+        /// <param name="selectedObject">The current selected object</param>
+        private void UpdatePlanetaryInsertionTargetList(PhysicsObject selectedObject)
+        {
+            if (selectedObject.Type != PhysicsObjectType.ObjectOfReference)
+            {
+                var validTargets = this.SimulatorEngine.Objects
+                       .Where(x => x.Type == Simulator.PhysicsObjectType.NaturalSatellite
+                                   && x != selectedObject
+                                   && x != selectedObject.PrimaryBody
+                                   && x.PrimaryBody == selectedObject.PrimaryBody.PrimaryBody)
+                       .ToList();
+
+                this.planetaryInsertionTargetList.SetItems(validTargets.Select(x => new ListBoxUIObject.Item(x.Name, x)).ToList());
+            }
+            else
+            {
+                this.planetaryInsertionTargetList.SetItems(new List<ListBoxUIObject.Item>());
             }
         }
 

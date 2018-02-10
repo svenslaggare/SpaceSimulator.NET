@@ -60,22 +60,19 @@ namespace SpaceSimulator.Simulator.OrbitSimulators
                     var relativeApplyPoint = -forwardDirection;
                     torque = Vector3d.Cross(relativeApplyPoint, engineThrust);
 
-                    if (torque.Length() < 1E-8)
-                    {
-                        torque = Vector3d.Zero;
-                    }
+                    //if (torque.Length() < 1E-8)
+                    //{
+                    //    torque = Vector3d.Zero;
+                    //}
 
-                    if (torque.Length() != 0.0)
-                    {
-                        Console.WriteLine(
-                            $"F: {DataFormatter.Format(engineThrust.Length(), DataUnit.Force, useBase10: true)}, " +
-                            $"T: {DataFormatter.Format(torque.Length(), DataUnit.Force, useBase10: true)}, " +
-                            $"S: {Math.Sin(MathHelpers.AngleBetween(engineThrust.Normalized(), relativeApplyPoint.Normalized()))}");
-                    }
+                    //if (torque.Length() != 0.0)
+                    //{
+                    //    Console.WriteLine(
+                    //        $"F: {DataFormatter.Format(engineThrust.Length(), DataUnit.Force, useBase10: true)}, " +
+                    //        $"T: {DataFormatter.Format(torque.Length(), DataUnit.Force, useBase10: true)}, " +
+                    //        $"S: {Math.Sin(MathHelpers.AngleBetween(engineThrust.Normalized(), relativeApplyPoint.Normalized()))}");
+                    //}
                 }
-
-                //Console.WriteLine(MathHelpers.AngleBetween(engineThrust.Normalized(), relativeApplyPoint.Normalized()));
-                //Console.WriteLine(MathHelpers.AngleBetween(engineThrust.Normalized(), forwardDirection));
 
                 torque += rocketObject.RotationTorque();
             }

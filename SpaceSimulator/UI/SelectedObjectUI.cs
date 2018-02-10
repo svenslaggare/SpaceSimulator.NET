@@ -29,8 +29,14 @@ namespace SpaceSimulator.UI
 
         private readonly Arrow arrow;
 
-        private readonly IDictionary<PhysicsObject, GroundTrack> groundTracks = new Dictionary<PhysicsObject, GroundTrack>();
-        private readonly bool showGroundTracks = false;
+        private class GroundTrackData
+        {
+            public GroundTrack GroundTrack;
+            public int PrimaryBodyVersion;
+        }
+
+        private readonly IDictionary<PhysicsObject, GroundTrackData> groundTracks = new Dictionary<PhysicsObject, GroundTrackData>();
+        private readonly bool showGroundTracks = true;
 
         private OrbitCalculators.ApproachData closestApproachData;
         private DateTime lastClosestApproachUpdate;
@@ -151,18 +157,29 @@ namespace SpaceSimulator.UI
                 && this.SelectedObject.ReferenceOrbit.IsBound
                 && this.SelectedObject.PrimaryBody.Name != "Sun")
             {
-                if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrack))
+                if (!this.groundTracks.TryGetValue(this.SelectedObject, out var groundTrackData))
                 {
                     var primaryBodyRenderingObject = this.SimulatorContainer.GetRenderingObject(this.SelectedObject.PrimaryBody);
 
-                    groundTrack = new GroundTrack(
-                        this.RenderingManager2D,
-                        this.SimulatorEngine.KeplerProblemSolver,
-                        this.SelectedObject,
-                        ((Sphere)primaryBodyRenderingObject.Model).TextureName,
-                        Vector2.Zero);
+                    groundTrackData = new GroundTrackData()
+                    {
+                        GroundTrack = new GroundTrack(
+                            this.RenderingManager2D,
+                            this.SimulatorEngine.KeplerProblemSolver,
+                            this.SelectedObject,
+                            ((Sphere)primaryBodyRenderingObject.Model).TextureName,
+                            Vector2.Zero),
+                        PrimaryBodyVersion = this.SelectedObject.PrimaryBodyVersion
+                    };
 
-                    this.groundTracks.Add(this.SelectedObject, groundTrack);
+                    this.groundTracks.Add(this.SelectedObject, groundTrackData);
+                }
+
+                var groundTrack = groundTrackData.GroundTrack;
+                if (this.SelectedObject.HasChangedPrimaryBody(ref groundTrackData.PrimaryBodyVersion))
+                {
+                    var primaryBodyRenderingObject = this.SimulatorContainer.GetRenderingObject(this.SelectedObject.PrimaryBody);
+                    groundTrack.UpdatePrimaryBodyTexture(((Sphere)primaryBodyRenderingObject.Model).TextureName);
                 }
 
                 groundTrack.Position = UIHelpers.CalculateScreenPosition(
@@ -263,7 +280,7 @@ namespace SpaceSimulator.UI
 
             foreach (var groundTrack in this.groundTracks.Values)
             {
-                groundTrack.Dispose();
+                groundTrack.GroundTrack.Dispose();
             }
         }
     }

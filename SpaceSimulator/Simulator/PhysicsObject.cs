@@ -38,6 +38,7 @@ namespace SpaceSimulator.Simulator
         protected ObjectState nextState;
 
         protected int orbitVersion = 0;
+        protected int primaryBodyVersion = 0;
 
         /// <summary>
         /// The name of the object
@@ -318,6 +319,11 @@ namespace SpaceSimulator.Simulator
         public int OrbitVersion => this.orbitVersion;
 
         /// <summary>
+        /// Returns the currnet primary body version
+        /// </summary>
+        public int PrimaryBodyVersion => this.primaryBodyVersion;
+
+        /// <summary>
         /// Sets the next state
         /// </summary>
         /// <param name="nextState">The next state</param>
@@ -351,6 +357,22 @@ namespace SpaceSimulator.Simulator
         }
 
         /// <summary>
+        /// Indicates if the primary body has changed.
+        /// If that is the case, updates the currentVersion
+        /// </summary>
+        /// <param name="currentVersion">The current version</param>
+        public bool HasChangedPrimaryBody(ref int currentVersion)
+        {
+            if (this.primaryBodyVersion != currentVersion)
+            {
+                currentVersion = this.primaryBodyVersion;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Changes the primary body
         /// </summary>
         /// <param name="primaryBody">The primary body</param>
@@ -361,6 +383,7 @@ namespace SpaceSimulator.Simulator
             this.ReferenceOrbit = Orbit.CalculateOrbit(primaryBody, this.state);
             this.ReferencePrimaryBodyState = primaryBody.state;
             this.OrbitChanged();
+            this.primaryBodyVersion++;
         }
 
         /// <summary>
