@@ -331,5 +331,10 @@ namespace SpaceSimulator.Simulator
         {
             this.state.Orientation = orientation;
         }
+
+        public void KillRotation()
+        {
+            this.state.AngularMomentum = Vector3d.Zero;
+        }
     }
 }

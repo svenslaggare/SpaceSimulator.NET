@@ -19,8 +19,8 @@ namespace SpaceSimulator.Camera
 		private float theta;
 		private float phi;
 		private float radius;
-		private float minRadius = 50;
-		private float maxRadius = 1000;
+		private float minRadius;
+		private float maxRadius;
 
         private Vector2 lastMousePosition;
 

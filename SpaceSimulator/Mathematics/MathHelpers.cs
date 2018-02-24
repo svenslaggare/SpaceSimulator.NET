@@ -151,6 +151,16 @@ namespace SpaceSimulator.Mathematics
         }
 
         /// <summary>
+        /// Conjugates the given quaternion
+        /// </summary>
+        /// <param name="quaternion">The quaternion</param>
+        public static Quaterniond Conjugated(this Quaterniond quaternion)
+        {
+            quaternion.Conjugate();
+            return quaternion;
+        }
+
+        /// <summary>
         /// Returns the radial vector
         /// </summary>
         /// <param name="forward">The forward vector</param>

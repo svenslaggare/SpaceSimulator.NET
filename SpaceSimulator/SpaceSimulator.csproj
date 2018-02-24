@@ -96,6 +96,7 @@
     <Compile Include="Camera\FPSCamera.cs" />
     <Compile Include="Camera\OrbitCamera.cs" />
     <Compile Include="Camera\SpaceCamera.cs" />
+    <Compile Include="DebugWriter.cs" />
     <Compile Include="Environments\EnvironmentHelpers.cs" />
     <Compile Include="Environments\Horizons.cs" />
     <Compile Include="Environments\IEnvironment.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Simulator\RocketObject.cs" />
     <Compile Include="Simulator\Rocket\LandingProgram.cs" />
     <Compile Include="Simulator\Rocket\PIDController.cs" />
+    <Compile Include="Simulator\Rocket\PointInDirectionController.cs" />
     <Compile Include="Simulator\Rocket\RocketHelpers.cs" />
     <Compile Include="Simulator\Rocket\Rockets.cs" />
     <Compile Include="Simulator\Rocket\ManualControlProgram.cs" />

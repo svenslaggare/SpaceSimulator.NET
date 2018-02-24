@@ -16,6 +16,7 @@ namespace SpaceSimulator.Simulator.Rocket
         private Vector3d thrustDirection;
 
         private bool runEngine = false;
+        private readonly PointInDirectionController pointInDirectionController;
 
         /// <summary>
         /// Indicates if the program is completed
@@ -36,6 +37,7 @@ namespace SpaceSimulator.Simulator.Rocket
         {
             this.rocketObject = rocketObject;
             this.textOutputWriter = textOutputWriter;
+            this.pointInDirectionController = new PointInDirectionController(rocketObject);
         }
 
         public Vector3d ThrustDirection => this.thrustDirection;
@@ -85,16 +87,32 @@ namespace SpaceSimulator.Simulator.Rocket
                 //}
             }
 
+            var state = this.rocketObject.State;
+            state.MakeRelative(this.rocketObject.PrimaryBody.State);
+
             var orbit = Orbit.CalculateOrbit(this.rocketObject);
             if (orbit.RelativePeriapsis >= 300E3)
             {
+                if (this.runEngine)
+                {
+                    //this.rocketObject.KillRotation();
+                }
+
                 this.thrustDirection = Vector3d.Zero;
                 this.runEngine = false;
                 this.rocketObject.StopEngines();
 
                 //this.IsCompleted = true;
                 //this.Torque = -this.rocketObject.AngularVelocity.Normalized() * 100;
+
+                //this.pointInDirectionController.SetDirection(Vector3d.Transform(state.Prograde, Matrix3x3d.RotationX(30.0 * MathUtild.Deg2Rad)).Normalized());
+                this.pointInDirectionController.SetDirection(state.Prograde);
+                //this.pointInDirectionController.SetDirection(Vector3d.ForwardLH);
+                this.Torque = this.pointInDirectionController.Update(totalTime, timeStep);
             }
+
+            //this.pointInDirectionController.SetDirection(state.Prograde);
+            //this.Torque = this.pointInDirectionController.Update(totalTime);
         }
     }
 }

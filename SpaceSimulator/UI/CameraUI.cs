@@ -138,6 +138,13 @@ namespace SpaceSimulator.UI
                 out var changed,
                 this.CanSetFocus);
 
+            //{
+            //    if (this.cameraManager.ActiveCamera is SpaceCamera spaceCamera)
+            //    {
+            //        spaceCamera.SetScaleFactor2(this.SimulatorEngine.Objects);
+            //    }
+            //}
+
             if (changed)
             {
                 //this.SetScaleFactorFromFocusObject();

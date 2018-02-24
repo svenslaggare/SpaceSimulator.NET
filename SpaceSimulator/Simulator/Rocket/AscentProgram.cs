@@ -216,6 +216,8 @@ namespace SpaceSimulator.Simulator.Rocket
             }
 
             this.SetFaceThrustDirection();
+            //this.FaceDirection(totalTime, this.absoluteThrustDirection);
+            //this.FaceDirection(totalTime, prograde);
 
             //var gimbalAngle = MathHelpers.AngleBetween(this.ThrustDirection, Vector3d.ForwardRH);
             //if (Math.Abs(gimbalAngle) >= 1E-4)

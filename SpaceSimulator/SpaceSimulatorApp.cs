@@ -56,8 +56,8 @@ namespace SpaceSimulator
         {
             Console.WriteLine("");
 
-            var environment = new Environments.SolarSystem(coplanar: false);
-            //var environment = new Environments.EarthSystem();
+            //var environment = new Environments.SolarSystem(coplanar: false);
+            var environment = new Environments.EarthSystem();
             //var environment = new Environments.Horizons(new DateTime(2017, 8, 1, 0, 0, 0));
 
             this.simulatorContainer = environment.Create(this.GraphicsDevice);
@@ -334,7 +334,7 @@ namespace SpaceSimulator
                 }
 
                 this.uiManager.Draw(deviceContext2D);
-                //this.DrawDebug();
+                this.DrawDebug();
             });
         }
 
@@ -344,16 +344,23 @@ namespace SpaceSimulator
         private void DrawDebug()
         {
             var textBuilder = new StringBuilder();
-            textBuilder.AppendLine($"Camera position: {this.CameraManager.ActiveCamera.Position}");
+            //textBuilder.AppendLine($"Camera position: {this.CameraManager.ActiveCamera.Position}");
 
-            foreach (var renderingObject in this.RenderingObjects)
+            //foreach (var renderingObject in this.RenderingObjects)
+            //{
+            //    textBuilder.AppendLine(
+            //        $"{renderingObject.PhysicsObject.Name} - " +
+            //        $"Position: {renderingObject.DrawPosition(this.SpaceCamera)}, " +
+            //        $"ShowSphere: {renderingObject.ShowModel}, " +
+            //        $"ShowOrbit: {renderingObject.ShowOrbit}");
+            //}
+
+            foreach (var line in DebugWriter.Lines)
             {
-                textBuilder.AppendLine(
-                    $"{renderingObject.PhysicsObject.Name} - " +
-                    $"Position: {renderingObject.DrawPosition(this.SpaceCamera)}, " +
-                    $"ShowSphere: {renderingObject.ShowModel}, " +
-                    $"ShowOrbit: {renderingObject.ShowOrbit}");
+                textBuilder.AppendLine(line);
             }
+
+            DebugWriter.Clear();
 
             this.RenderingManager2D.DefaultSolidColorBrush.DrawText(
                 this.DeviceContext2D,

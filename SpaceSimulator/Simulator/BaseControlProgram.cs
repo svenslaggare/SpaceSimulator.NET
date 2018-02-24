@@ -15,6 +15,7 @@ namespace SpaceSimulator.Simulator
     {
         protected readonly RocketObject rocketObject;
         protected Vector3d absoluteThrustDirection;
+        private readonly PointInDirectionController pointInDirectionController;
 
         /// <summary>
         /// Creates a new base control program
@@ -23,6 +24,7 @@ namespace SpaceSimulator.Simulator
         public BaseControlProgram(RocketObject rocketObject)
         {
             this.rocketObject = rocketObject;
+            this.pointInDirectionController = new PointInDirectionController(this.rocketObject);
         }
 
         /// <summary>
@@ -46,6 +48,18 @@ namespace SpaceSimulator.Simulator
         protected void SetFaceThrustDirection()
         {
             this.rocketObject.SetOrientation(MathHelpers.FaceDirectionQuaternion(this.absoluteThrustDirection));
+        }
+
+        /// <summary>
+        /// Rotates to face the given direction
+        /// </summary>
+        /// <param name="totalTime">The total time</param>
+        /// <param name="timeStep">The time step</param>
+        /// <param name="direction">The direction</param>
+        protected void FaceDirection(double totalTime, double timeStep, Vector3d direction)
+        {
+            this.pointInDirectionController.SetDirection(Vector3d.ForwardLH);
+            this.Torque = this.pointInDirectionController.Update(totalTime, timeStep);
         }
 
         /// <summary>

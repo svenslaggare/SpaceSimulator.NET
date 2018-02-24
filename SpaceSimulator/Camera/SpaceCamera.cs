@@ -56,6 +56,27 @@ namespace SpaceSimulator.Camera
             //this.scaleFactor = 0.0001;
         }
 
+        //public void SetScaleFactor2(IList<PhysicsObject> physicsObjects)
+        //{
+        //    var farthestDistance = 0.0;
+        //    var cameraFrustum = new BoundingFrustum(this.ViewProjection);
+
+        //    foreach (var physicsObject in physicsObjects)
+        //    {
+        //        var screenPosition = this.ToDrawPosition(physicsObject.Position);
+        //        if (cameraFrustum.Contains(screenPosition) != ContainmentType.Disjoint)
+        //        {
+        //            var distance = Vector3d.Distance(this.FocusPosition, physicsObject.Position);
+        //            farthestDistance = Math.Max(distance, farthestDistance);
+        //        }
+        //    }
+
+        //    if (farthestDistance != 0.0)
+        //    {
+        //        this.scaleFactor = 1.0 / farthestDistance;
+        //    }
+        //}
+
         /// <summary>
         /// Converts the given scalar in world scale to draw scale
         /// </summary>
